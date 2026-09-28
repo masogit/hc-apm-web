@@ -98,7 +98,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
         }else {
 			listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
 		}
-		deptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).filter(item -> listClinicalDeptName.contains(item.getName())).collect(Collectors.toList());
+		deptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> Objects.equals(item.getOrgType(), 4)).filter(item -> listClinicalDeptName.contains(item.getName())).collect(Collectors.toList());
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 		loadClinicalDeptList();
 	}
@@ -246,7 +246,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	}
 
 	private void loadClinicalDeptList() {
-		clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+		clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
 	}
 
 	public List<String> autoCompleteDeptName(String query) {

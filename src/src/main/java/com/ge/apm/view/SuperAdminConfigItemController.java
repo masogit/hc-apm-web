@@ -115,7 +115,7 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
                 }else{
                     configItem.setShowValue(configItem.getDefaultValue());
                 }
-                if((7 == configItem.getValueType() || 8 == configItem.getValueType())
+                if((Objects.equals(configItem.getValueType(), 7) || Objects.equals(configItem.getValueType(), 8))
                         && StringUtils.isNotEmpty(configItem.getValidation())){
                     String validation = configItem.getValidation();
                     List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
@@ -142,7 +142,7 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
 
     @Override
     public void prepareEdit() {
-        if(8 == this.selected.getValueType()){
+        if(Objects.equals(this.selected.getValueType(), 8)){
             this.multiSelected = new ArrayList<>();
             String showValue = this.selected.getShowValue();
             if(StringUtils.isNotEmpty(showValue)){
@@ -158,7 +158,7 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
 
     public void saveConfig(){
         if(this.selectSite != null){
-            if( selected.getValueType()!=8 &&  !regularCheck()){
+            if(!Objects.equals(selected.getValueType(),8) &&  !regularCheck()){
                 logger.info("配置项保存，正则校验不通过：");
                 WebUtil.addErrorMessage("配置项保存失败，正则校验不通过！");
                 return;
@@ -176,7 +176,7 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
                 configItemValue.setKey(this.selected.getKey());
             }
 
-            if(4 == this.selected.getValueType() || 5 == this.selected.getValueType() || 6 == this.selected.getValueType()){
+            if(Objects.equals(this.selected.getValueType(), 4) || Objects.equals(this.selected.getValueType(), 5) || Objects.equals(this.selected.getValueType(), 6)){
                 try {
                     configItemValue.setValue(formatDate(this.selected.getShowValue()));
                 } catch (ParseException e) {
@@ -184,7 +184,7 @@ public class SuperAdminConfigItemController extends GenericCRUDUUIDController<Co
                     WebUtil.addErrorMessage("配置项保存异常，请联系系统管理员！");
                     return;
                 }
-            }else if(8 == this.selected.getValueType()){
+            }else if(Objects.equals(this.selected.getValueType(), 8)){
                 if(CollectionUtils.isNotEmpty(this.multiSelected)){
                     List<Map<String, String>> maps = new ArrayList<>();
                     List<Map<String, String>> enumList = this.selected.getEnumList();

@@ -14,6 +14,7 @@ import webapp.framework.web.WebUtil;
 
 import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 @Service
 public class AssetFinacingNumGenerateService {
@@ -119,13 +120,13 @@ public class AssetFinacingNumGenerateService {
     public int getLevel(AssetSeriaNumConfig config) {
         OrgInfo org = orgInfoRepository.getByUid(config.getSiteUID());
         //orgInfoMapper.fetchByUid(config.getSiteUid());
-        if(org.getOrgType() == 0) {
+        if(Objects.equals(org.getOrgType(), 0)) {
             return 1;
-        }else if(org.getOrgType() == 1) {
+        }else if(Objects.equals(org.getOrgType(), 1)) {
             return 2;
-        }else if(org.getOrgType() == 2) {
+        }else if(Objects.equals(org.getOrgType(), 2)) {
             return 3;
-        }else if(org.getOrgType() == 3) {
+        }else if(Objects.equals(org.getOrgType(), 3)) {
             return 4;
         }
         return -1;
@@ -280,7 +281,7 @@ public class AssetFinacingNumGenerateService {
 
     private String getFinacingNum(String nationalStardCode, OrgInfoLevel level) {
         DecimalFormat df = new DecimalFormat(FORMAT_STR);
-        if (level.getLevel() == 1) {
+        if (Objects.equals(level.getLevel(), 1)) {
             String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithSiteUID(level.getUid(), nationalStardCode);
             if (StringUtils.isEmpty(maxFinacingNum)) {
                 return nationalStardCode + "00001";
@@ -289,7 +290,7 @@ public class AssetFinacingNumGenerateService {
             Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth - 5, lenth));
             finacingNum++;
             return nationalStardCode + df.format(finacingNum);
-        } else if (level.getLevel() == 2) {
+        } else if (Objects.equals(level.getLevel(), 2)) {
             String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithHospitalUID(level.getUid(), nationalStardCode);
             if (StringUtils.isEmpty(maxFinacingNum)) {
                 return nationalStardCode + "00001";
@@ -298,7 +299,7 @@ public class AssetFinacingNumGenerateService {
             Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth - 5, lenth));
             finacingNum++;
             return nationalStardCode + df.format(finacingNum);
-        } else if (level.getLevel() == 3) {
+        } else if (Objects.equals(level.getLevel(), 3)) {
             String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithInstitutionUID(level.getUid(), nationalStardCode);
             if (StringUtils.isEmpty(maxFinacingNum)) {
                 return nationalStardCode + "00001";
@@ -307,7 +308,7 @@ public class AssetFinacingNumGenerateService {
             Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth - 5, lenth));
             finacingNum++;
             return nationalStardCode + df.format(finacingNum);
-        } else if (level.getLevel() == 4) {
+        } else if (Objects.equals(level.getLevel(), 4)) {
             String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithTenantUID(level.getUid(), nationalStardCode);
             if (StringUtils.isEmpty(maxFinacingNum)) {
                 return nationalStardCode + "00001";

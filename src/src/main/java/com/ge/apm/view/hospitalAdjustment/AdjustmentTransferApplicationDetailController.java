@@ -135,7 +135,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         }
         processNode();
         // 待审批状态下，处理日期默认带出当前时间
-        if(selected.getStatus() == 1 && selected.getPendingDeliveryDate() == null){
+        if(Objects.equals(selected.getStatus(), 1) && selected.getPendingDeliveryDate() == null){
             selected.setPendingDeliveryDate(new Date());
         }
         signatureId=selected.getHandlerSignature();
@@ -391,7 +391,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         }
 
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-        if(byUid.getStatus()!=1){
+        if(!Objects.equals(byUid.getStatus(), 1)){
             WebUtil.addWarnMessage("申请已经审批过");
             return;
         }
@@ -421,7 +421,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
         }
 
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-        if(byUid.getStatus()!=1){
+        if(!Objects.equals(byUid.getStatus(), 1)){
             WebUtil.addWarnMessage("申请已经审批过");
             return;
         }
@@ -434,7 +434,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     }
     public void cancel(){
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-        if(byUid.getStatus()!=1 && !selected.getApplicationUid().equals(currentUserAccount.getUid())){
+        if(!Objects.equals(byUid.getStatus(),1) && !selected.getApplicationUid().equals(currentUserAccount.getUid())){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
@@ -455,7 +455,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
 
     public void   confirmReceipt() {
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-        if(byUid.getStatus()!=4  && !selected.getApplicationUid().equals(currentUserAccount.getUid())){
+        if(!Objects.equals(byUid.getStatus(),4)  && !selected.getApplicationUid().equals(currentUserAccount.getUid())){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
@@ -541,7 +541,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
 
     public void   equipmentReturn() {
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-        if(byUid.getStatus()!=6  || !selected.getApplicationUid().equals(currentUserAccount.getUid())){
+        if(!Objects.equals(byUid.getStatus(), 6)  || !selected.getApplicationUid().equals(currentUserAccount.getUid())){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
@@ -639,7 +639,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     public void   returnPass() {
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
 
-        if(byUid.getStatus()!=7  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_WORKBENCH.name())  ){
+        if(!Objects.equals(byUid.getStatus(), 7)  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_WORKBENCH.name())  ){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
@@ -657,7 +657,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
     public void   returnRefuse() {
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
 
-        if(byUid.getStatus()!=7  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_WORKBENCH.name())  ){
+        if(!Objects.equals(byUid.getStatus(), 7)  ||  !userContextService.accessContainsFunctionMenu(ApmFunction.HOSPITAL_ADJUSTMENT_WORKBENCH.name())  ){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
@@ -676,7 +676,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
      */
     public void returnConfirm() {
         AdjustmentTransferApplication byUid = dao.findByUid(selected.getUid());
-        if(byUid.getStatus()!=10 || !selected.getApplicationUid().equals(currentUserAccount.getUid())){
+        if(!Objects.equals(byUid.getStatus(), 10) || !selected.getApplicationUid().equals(currentUserAccount.getUid())){
             WebUtil.addWarnMessage("无权操作,请检查订单状态");
             return;
         }
@@ -742,7 +742,7 @@ public class AdjustmentTransferApplicationDetailController extends GenericCRUDUU
 
     public boolean returnValid() {
         // 已完成状态的工单均可发起退回
-        return selected.getStatus() == 6;
+        return Objects.equals(selected.getStatus(), 6);
     }
 
 

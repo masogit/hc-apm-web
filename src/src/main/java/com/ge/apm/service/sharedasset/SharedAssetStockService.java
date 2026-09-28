@@ -406,7 +406,7 @@ public class SharedAssetStockService {
         if(excludeItemList.contains(orgInfo.getUid())) {
             //exclude allocation centers from dropdown list
         } else {
-            SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", orgInfo.getOrgType() != 4);
+            SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", !Objects.equals(orgInfo.getOrgType(), 4));
             itemList.add(selectItem);
         }
 

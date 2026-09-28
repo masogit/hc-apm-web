@@ -155,16 +155,16 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.removeFilterOnField("deptUID");
 
         this.updateSearchFilter(new SearchFilter("ownerConfigType", SearchFilter.Operator.EQ, OwnerConfig.OwnerConfigType.Department.name()));
-        if(this.selectedOrg.getOrgLevel() == 0){
+        if(Objects.equals(this.selectedOrg.getOrgLevel(), 0)){
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
         }
-        if(this.selectedOrg.getOrgLevel() == 1){
+        if(Objects.equals(this.selectedOrg.getOrgLevel(), 1)){
             this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
         }
-        if(this.selectedOrg.getOrgLevel() == 2){
+        if(Objects.equals(this.selectedOrg.getOrgLevel(), 2)){
             this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
         }
-        if(this.selectedOrg.getOrgLevel() == 3){
+        if(Objects.equals(this.selectedOrg.getOrgLevel(), 3)){
             this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
         }
 
@@ -362,7 +362,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     //获取所属科室过滤控件的数据
     private void loadClinicalDeptFilter() {
         filterClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != selectedOrg) {
             filterClinicalDeptList = filterClinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectedOrg.getSiteUID()) || item.getHospitalUID().equals(selectedOrg.getSiteUID())
                     || item.getInstitutionUID().equals(selectedOrg.getSiteUID()) || item.getTenantUID().equals(selectedOrg.getSiteUID())).collect(Collectors.toList());

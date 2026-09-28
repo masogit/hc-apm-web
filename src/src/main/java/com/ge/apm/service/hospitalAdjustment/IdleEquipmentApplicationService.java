@@ -89,10 +89,10 @@ public class IdleEquipmentApplicationService {
 //        IdleEquipmentStock idleEquipmentStock = adjustmentTransferApplication.getIdleEquipmentStock();
         AssetInfo assetInfo = assetInfoRepository.findByUid(idleEquipmentApplication.getAssetUid());
 //
-        params.put("ck_lead", 1==idleEquipmentApplication.getMedicalConsortiumType() ? checked : unchecked);
-        params.put("ck_town", 2==idleEquipmentApplication.getMedicalConsortiumType()  ? checked : unchecked);
-        params.put("ck_center", 3==idleEquipmentApplication.getMedicalConsortiumType()  ? checked : unchecked);
-        params.put("ck_station", 4==idleEquipmentApplication.getMedicalConsortiumType()  ? checked : unchecked);
+        params.put("ck_lead", Objects.equals(idleEquipmentApplication.getMedicalConsortiumType(), 1) ? checked : unchecked);
+        params.put("ck_town", Objects.equals(idleEquipmentApplication.getMedicalConsortiumType(), 2)  ? checked : unchecked);
+        params.put("ck_center", Objects.equals(idleEquipmentApplication.getMedicalConsortiumType(), 3)  ? checked : unchecked);
+        params.put("ck_station", Objects.equals(idleEquipmentApplication.getMedicalConsortiumType(), 4)  ? checked : unchecked);
 //        OrgInfo borrowDeptName = orgInfoRepository.getByUid(adjustmentTransferApplication.getBorrowDeptUid());
         params.put("company_name",idleEquipmentApplication.getCompanyName());
 //        params.put("dept_name",borrowDeptName.getName());

@@ -387,7 +387,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         isEnableAssetTypeGroup = selectedTenant.getFeatureList().contains("CONFIG_ASSET_TYPE_GROUP");
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
-        if (selectedTenant != null && selectedTenant.getId() != 46) { // skip building tenant org tree for apm ib user
+        if (selectedTenant != null && !Objects.equals(selectedTenant.getId(), 46)) { // skip building tenant org tree for apm ib user
             rebuildOrgTree();
             TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
             if (null != selectedOrgNode) {
@@ -421,7 +421,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void filterTreeNode() {
-        if (selectedTenant != null && selectedTenant.getId() == 46) {
+        if (selectedTenant != null && Objects.equals(selectedTenant.getId(), 46)) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithClinicalDept(loginUser.getUid(), treeNodeNameFilter, selectedTenant.getId());
             OrgInfo tenant = orgInfoDao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
@@ -532,7 +532,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilterList.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilterList.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
                 searchFilterList.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                if (selectedOrg.getOrgType() == 4) {
+                if (Objects.equals(selectedOrg.getOrgType(), 4)) {
                     //clinical dept may include child clinical dept
                     OrgInfoClinicalDeptService clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
                     List<OrgInfo> allClinicals = clinicalDeptService.collectChildClinicalDept(selectedOrg);
@@ -637,7 +637,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         assignedRoles = new ArrayList<>();
 //        permissionGroups = uaaService.getPermissionGroups(selected.getTenantUID());
         assignedPermissionGroupUidList = uaaService.getPermissionGroupsByUserUid(selected.getUid());
-        if (loginUser.getType() != null && loginUser.getType() == UserAccount.LI_XIANG) {
+        if (loginUser.getType() != null && Objects.equals(loginUser.getType(), UserAccount.LI_XIANG)) {
             SysRoleVO sysRoleVO = getVOBySysRoleName(SYSTEM_ACTIVE);
             if (sysRoleVO == null) {
                 logger.error("cann't find system role by ActivationPerson");
@@ -1354,7 +1354,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private void prepareUserScope() {
         List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
-        if (46 == selected.getSiteId()) {
+        if (Objects.equals(46, selected.getSiteId())) {
             //查询权限结合 给表格填充数据。
             orgInfoTableData46 = orgList;//给表格数据赋值。
             accessOrgTree = new DefaultTreeNode("root", null, null);
@@ -1436,7 +1436,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
 //        Set<OrgInfo> selectedOrgList = new HashSet<>(uaaService.getOrgListByPermissionGroup(ObjectUtil.isNotEmpty(assignedPermissionGroupUidList) ? assignedPermissionGroupUidList : ListUtil.toList("-1")));
         Set<OrgInfo> selectedOrgList = new HashSet<>();
-        if (46 == selected.getSiteId()) {
+        if (Objects.equals(46, selected.getSiteId())) {
             //only add parent if all children is selected
             readSelectedOrgTree46(accessOrgTree, selectedOrgList);
             //if site is not selected, which means not all clinical are selected. then we add all the selected clinical.
@@ -1473,7 +1473,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                     addMissingChildClinical(item, selectedTreeNodeList);
                 }
             }
-        } else if (data.getOrgType() == 5 || data.getOrgType() == 4) {
+        } else if (Objects.equals(data.getOrgType(), 5) || Objects.equals(data.getOrgType(), 4)) {
             //if site is selected, will not traverse here
             if (node.isSelected()) {
                 selectedTreeNodeList.add(data);
@@ -1978,15 +1978,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (null == selected || null == selected.getSiteId()) {
             return false;
         }
-        return 46 == selected.getSiteId();
+        return Objects.equals(46, selected.getSiteId());
     }
 
     public boolean getIsSelect46Account() {
-        return selectedTenant != null && selectedTenant.getId() == 46;
+        return selectedTenant != null && Objects.equals(selectedTenant.getId(), 46);
     }
 
     public void filterTreeNodeByUid() {
-        if (selectedTenant != null && selectedTenant.getId() == 46 && selectedUserOrg != null && !StringUtils.isEmpty(selectedUserOrg.getInstitutionUID())) {
+        if (selectedTenant != null && Objects.equals(selectedTenant.getId(), 46) && selectedUserOrg != null && !StringUtils.isEmpty(selectedUserOrg.getInstitutionUID())) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListByUid(selectedUserOrg.getInstitutionUID());
             OrgInfo tenant = orgInfoDao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);

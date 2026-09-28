@@ -211,7 +211,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addErrorMessage("该设备不属于调剂设备类型！");
                     return;
-                }else if(infoVo.getStatus()!= 1 && infoVo.getStatus()!= 3){
+                }else if(!Objects.equals(infoVo.getStatus(), 1) && !Objects.equals(infoVo.getStatus(), 3)){
                     WebUtil.addErrorMessage("该设备故障，不可借用！");
                     return; 
                 }

@@ -172,7 +172,7 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
         // Capture department selection from SearchController org tree
         if (eventObject instanceof OrgInfo) {
             OrgInfo orgInfo = (OrgInfo) eventObject;
-            if (orgInfo != null && orgInfo.getOrgType() != null && orgInfo.getOrgType() == 4) {
+            if (orgInfo != null && Objects.equals(orgInfo.getOrgType(), 4)) {
                 selectedDept = orgInfo;
             } else {
                 selectedDept = null;

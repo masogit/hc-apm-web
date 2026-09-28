@@ -449,7 +449,7 @@ public class V2PmOrderManuallyConfirmController extends GenericCRUDUUIDControlle
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         }).collect(Collectors.toList());
             }
 

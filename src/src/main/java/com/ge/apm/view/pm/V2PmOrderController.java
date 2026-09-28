@@ -1100,25 +1100,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                  return result;
              }
 
-             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> Objects.equals(item.getRuleLevel(), 3));
              if(result){
                  WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel3WorkOrdersInBatches"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }
-             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 4);
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> Objects.equals(item.getRuleLevel(), 4));
              if(result){
                  WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel4WorkOrdersInBatches"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }
-             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 1);
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> Objects.equals(item.getRuleLevel(), 1));
              if (result && requireInspectionPhotos) {
                  WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel1WorkOrdersInBatches"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return true;
              }
-             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 2);
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> Objects.equals(item.getRuleLevel(), 2));
              if (result && (requireRuleLevelSecondMaintenancePhotos || requireRuleLevelSecondOtherPhotos)) {
                  WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel2WorkOrdersInBatches"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
@@ -1662,12 +1662,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void savePM(PmOrderActionForm formData) {
-        if (selectedAsset.getStatus() == 5) {
+        if (Objects.equals(selectedAsset.getStatus(), 5)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("DeactivatedCantRepair"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        if (selectedAsset.getStatus() == 4) {
+        if (Objects.equals(selectedAsset.getStatus(), 4)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("CantRepairToBeTerminated"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
@@ -1715,9 +1715,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void onStatusChange() {
         if (null != selectedAsset) {//new sr
-            needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
+            needConfirmTime = Objects.equals(currentStatus, 2) && !Objects.equals(selectedAsset.getStatus(), 2);
         } else {//update sr
-            needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
+            needConfirmTime = Objects.equals(currentStatus, 2) && !Objects.equals(selected.getAssetInfo().getStatus(), 2);
         }
     }
 
@@ -1832,7 +1832,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest.setRequestTime(new Date());
 
         String repairSource = RepairSourceEnum.Maintenance.name();
-        if(selectedPmOrder.getRuleLevel()!=null && selectedPmOrder.getRuleLevel()==4){
+        if(selectedPmOrder.getRuleLevel()!=null && Objects.equals(selectedPmOrder.getRuleLevel(),4)){
             repairSource=RepairSourceEnum.QualityControl.name();
         }
         newServiceRequest.setSrRepairSource(repairSource);
@@ -1855,7 +1855,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void saveServiceRequest() {
 
-        if(currentStatus!=2 && currentStatus!=3){
+        if(!Objects.equals(currentStatus, 2) && !Objects.equals(currentStatus, 3)){
             WebUtil.addErrorMessage(WebUtil.getMessage("MustSelectCurrentStatus"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("status", true);
@@ -1863,7 +1863,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(newServiceRequest.getRequestReason()==null){
             newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
         }
-        if (selectedAsset.getStatus() == 4) {
+        if (Objects.equals(selectedAsset.getStatus(), 4)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("CantRepairToBeTerminated"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -3111,7 +3111,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }
@@ -3181,9 +3181,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     private void loadClinicalDeptListForFilter() {
         clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
@@ -3303,7 +3303,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         dptName = asset.getClinicalDeptName();//orgDao.getByUid(orgInfoUID).getName();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
-        if (currentStatus == 1) {
+        if (Objects.equals(currentStatus, 1)) {
             currentStatus = 3;
         }
         needConfirmTime = false;
@@ -3698,7 +3698,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (CollectionUtils.isEmpty(orgList)) {
             List<OrgInfo> orgInfos = uaaService.getUserAccessibleSiteList(loginUser.getUid());
             if (!CollectionUtils.isEmpty(orgInfos)) {
-                orgList = orgInfos.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+                orgList = orgInfos.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
             }
         }
         return orgList;

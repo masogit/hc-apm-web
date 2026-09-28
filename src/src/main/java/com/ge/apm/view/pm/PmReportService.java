@@ -255,9 +255,9 @@ public class PmReportService {
         // Maintenance information
         content.put(MaintenanceTemplate.Maintenance.NUMBER.toString(), pmOrder.getPmNum());
         content.put(MaintenanceTemplate.Maintenance.CREATOR.toString(), pmOrder.getCreatorName());
-        if(pmOrder.getRuleLevel()==1){
+        if(Objects.equals(pmOrder.getRuleLevel(),1)){
             content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), "巡检");
-        }else if(pmOrder.getRuleLevel()==4){
+        }else if(Objects.equals(pmOrder.getRuleLevel(),4)){
             content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), "质量控制");
         }else {
             content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), pmOrder.getRuleLevel());

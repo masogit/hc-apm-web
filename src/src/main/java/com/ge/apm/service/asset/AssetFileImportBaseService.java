@@ -234,7 +234,7 @@ public class AssetFileImportBaseService {
         int row = 0;
         List<AssetInfo> saveList = ListUtil.newArrayList();
         try {
-            if (UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID) {
+            if (Objects.equals(UserContextService.getCurrentUserAccount().getSiteId(), ApmConstant.IB_TENANT_ID)) {
 
                 //locate parent assets first for later use
                 parentAssetsMap = supportingService.getParentAssets(importAssetMap);
@@ -301,7 +301,7 @@ public class AssetFileImportBaseService {
         List<AssetInfo> saveList = ListUtil.newArrayList();
         DbResourcesUtil resourcesUtil=WebUtil.getBean(DbResourcesUtil.class);
         try {
-            if (UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID) {
+            if (Objects.equals(UserContextService.getCurrentUserAccount().getSiteId(), ApmConstant.IB_TENANT_ID)) {
 
                 //locate parent assets first for later use
                 parentAssetsMap = supportingService.getParentAssetsNew(importDataList);
@@ -363,7 +363,7 @@ public class AssetFileImportBaseService {
         int row = 0;
         List<AssetInfo> saveList = ListUtil.newArrayList();
         try {
-            if (currentAccount.getSiteId() == ApmConstant.IB_TENANT_ID) {
+            if (Objects.equals(currentAccount.getSiteId(), ApmConstant.IB_TENANT_ID)) {
 
                 //locate parent assets first for later use
                 parentAssetsMap = supportingService.getParentAssetsNew(importDataList);

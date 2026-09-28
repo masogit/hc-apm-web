@@ -423,7 +423,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		if(listAssetInfo!=null && listAssetInfo.size()>0){
 			for(int i=0;i<listAssetInfo.size();++i){
 				AssetInfo tempAsset=listAssetInfo.get(i);
-				if(tempAsset.getStatus()==4 || tempAsset.getIsValid()==false || tempAsset.getIsDeleted()==true){
+				if(Objects.equals(tempAsset.getStatus(), 4) || tempAsset.getIsValid()==false || tempAsset.getIsDeleted()==true){
 					mapAsset.put(tempAsset.getUid(), tempAsset);
 				}
 			}
@@ -1133,7 +1133,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 		List<WorkflowConfig> bySearchFilter = workflowConfigRepository.findBySearchFilter(searchFilters);
 		List<I18nMessage> i18nByType = i18nRepository.findI18nByType(msgType);
 		if(CollectionUtils.isEmpty(bySearchFilter) || CollectionUtils.isEmpty(i18nByType)) return ;
-		List<I18nMessage> collect = bySearchFilter.stream().filter(item-> item.getSiteId() != 70).filter(distinctByKey(item->item.getSiteId())).map(item -> {
+		List<I18nMessage> collect = bySearchFilter.stream().filter(item-> !Objects.equals(item.getSiteId(), 70)).filter(distinctByKey(item->item.getSiteId())).map(item -> {
 			return i18nByType.stream().map(i18n -> {
 				I18nMessage i18nMessage = new I18nMessage();
 				BeanUtils.copyProperties(i18n, i18nMessage);
@@ -1475,7 +1475,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 
 	private void buildActiveFeatureByHospitalUid(String uid, List<AdminFeatureActive> waitSave, String featureKey) {
 		OrgInfo info = orgInfoRepository.getByUid(uid);
-		if (info.getOrgLevel() == 2) {
+		if (Objects.equals(info.getOrgLevel(), 2)) {
 			Set<String> features = adminFeatureActiveRepository.findByHospitalUID(uid).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
 			if (!features.contains(featureKey)) {
 				AdminFeatureActive adminFeatureActive = new AdminFeatureActive();

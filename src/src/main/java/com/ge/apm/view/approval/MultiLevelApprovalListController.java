@@ -148,7 +148,7 @@ public class MultiLevelApprovalListController extends GenericCRUDUUIDController<
             content.stream().forEach(item->{
                 UserAccount userAccount = userAccountMap.get(item.getInitiateApproverUid());
                 OrgInfo orgInfo = orgInfoMap.get(userAccount.getOrgInfoUID());
-                if(orgInfo.getOrgType()==4){
+                if(Objects.equals(orgInfo.getOrgType(),4)){
                     item.setApplicationDepartment(orgInfo.getName());
                 }
             });

@@ -124,19 +124,19 @@ public class WorkOrderExportService {
         if (v2WorkOrderReportDto.getTenantUid() != null) {
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getTenantUid()));
         }
-        if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 0) {
+        if (v2WorkOrderReportDto.getSelectedOrg() != null && Objects.equals(v2WorkOrderReportDto.getSelectedOrg().getOrgLevel(), 0)) {
             SearchFilter tenantFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(tenantFilter);
         }
-        if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 1) {
+        if (v2WorkOrderReportDto.getSelectedOrg() != null && Objects.equals(v2WorkOrderReportDto.getSelectedOrg().getOrgLevel(), 1)) {
             SearchFilter institutionFilter = new SearchFilter("institutionUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(institutionFilter);
         }
-        if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 2) {
+        if (v2WorkOrderReportDto.getSelectedOrg() != null && Objects.equals(v2WorkOrderReportDto.getSelectedOrg().getOrgLevel(), 2)) {
             SearchFilter hospitalFilter = new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(hospitalFilter);
         }
-        if (v2WorkOrderReportDto.getSelectedOrg() != null && v2WorkOrderReportDto.getSelectedOrg().getOrgLevel() == 3) {
+        if (v2WorkOrderReportDto.getSelectedOrg() != null && Objects.equals(v2WorkOrderReportDto.getSelectedOrg().getOrgLevel(), 3)) {
             SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, v2WorkOrderReportDto.getSelectedOrg().getUid());
             searchFilters.add(siteFilter);
         }
@@ -299,17 +299,17 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("warrantyDate"), formatDate2(workOrderExportPojo.getWarrantyDate()));
             workOrderMap.put(WebUtil.getMessage("factoryWarrantyDate"), formatDate2(workOrderExportPojo.getFactoryWarrantyDate()));
             workOrderMap.put(WebUtil.getMessage("CloseTime_xlsx"), formatDate(workOrderExportPojo.getCloseTime()));
-            workOrderMap.put(WebUtil.getMessage("feedbackRating"), workOrderExportPojo.getFeedbackRating()!=null&& workOrderExportPojo.getFeedbackRating()!=0?workOrderExportPojo.getFeedbackRating():null);
+            workOrderMap.put(WebUtil.getMessage("feedbackRating"), workOrderExportPojo.getFeedbackRating()!=null&&!Objects.equals(workOrderExportPojo.getFeedbackRating(), 0)?workOrderExportPojo.getFeedbackRating():null);
             workOrderMap.put("feedbackComment", workOrderExportPojo.getFeedbackComment());
             workOrderMap.put(WebUtil.getMessage("travelTime"), workOrderExportPojo.getTravelTime());
             Integer currentStepId = workOrderExportPojo.getCurrentStepId();
             if (UserContextService.hasCurrentTenantName("")) {
                 if (currentStepId == null) {
                     workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), "");
-                } else if (currentStepId == 7 || currentStepId == 9) {//云阜用户 已关单
+                } else if (Objects.equals(currentStepId, 7) || Objects.equals(currentStepId, 9)) {//云阜用户 已关单
                     currentStepId = 9;
                     workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
-                } else if (currentStepId == 2 || currentStepId == 3) {//云阜用户 待接单
+                } else if (Objects.equals(currentStepId, 2) || Objects.equals(currentStepId, 3)) {//云阜用户 待接单
                     currentStepId = 3;
                     workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
                 } else {
@@ -509,7 +509,7 @@ public class WorkOrderExportService {
 
         for (Map.Entry<String, List<MultiLevelApproval>> listEntry : approvalsMap.entrySet()) {
             List<MultiLevelApproval> value = listEntry.getValue();
-            List<MultiLevelApproval> collect = value.stream().filter(item -> item.getApprovalStatus() == 2 || item.getApprovalStatus() == 1).collect(Collectors.toList());
+            List<MultiLevelApproval> collect = value.stream().filter(item -> Objects.equals(item.getApprovalStatus(), 2) || Objects.equals(item.getApprovalStatus(), 1)).collect(Collectors.toList());
             Optional<MultiLevelApproval> maxMultiLevelApproval = collect.stream().max(Comparator.comparing(MultiLevelApproval::getCreatedDate));
             if(maxMultiLevelApproval.isPresent()){
                 MultiLevelApproval multiLevelApproval = maxMultiLevelApproval.get();
@@ -552,7 +552,7 @@ public class WorkOrderExportService {
                 m.put("approverSignatureList", Optional.ofNullable(approverSignatureObjMap.get(woid))
                         .map(o -> o.stream().map(AuditGroupConfigurationDetail::getApproverSignature).collect(Collectors.toList()))
                         .orElse(Collections.emptyList()));
-            } else if (tenantInfo.getType() != null && tenantInfo.getType() == 6) {//县域新增
+            } else if (tenantInfo.getType() != null && Objects.equals(tenantInfo.getType(), 6)) {//县域新增
                 m.put(WebUtil.getMessage("siebleNumber"), m.get("siebleNumber"));
                 m.put(WebUtil.getMessage("callCenterNumber"), m.get("callCenterNumber"));
             }
@@ -597,7 +597,7 @@ public class WorkOrderExportService {
 //                        node.setNodeId(i + 1);
 //                    }
 //                    List<ApprovalNode> collect = approvalNodes.stream().filter(item -> Objects.equals(item.getNodeId(), multiLevelApproval.getApprovalLevel())).collect(Collectors.toList());
-                    if(multiLevelApproval.getApprovalNodeStatus()==2){
+                    if(Objects.equals(multiLevelApproval.getApprovalNodeStatus(), 2)){
                         int approvalLevel = multiLevelApproval.getApprovalLevel() - 1;
                         approvalMap.put("audit_signature_title"+approvalLevel,"审核人签名:");
                         approvalMap.put("audit_opinion_title"+approvalLevel,"备件审核意见:");

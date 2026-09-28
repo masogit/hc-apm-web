@@ -719,7 +719,7 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
         if(isAssetHead){
             return false;
         }else{
-            return selected.getStatus() == 1 ? true : false;
+            return Objects.equals(selected.getStatus(), 1) ? true : false;
         }
     }
 

@@ -511,7 +511,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
      * @return
      */
     public void purchaseInfoSubmit() throws Exception {
-        if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2){
+        if(this.selected.getApprovalLevel()!=null && Objects.equals(this.selected.getApprovalLevel(), 2)){
             if(!handValidateData(this.purchaseOrderInfo)){
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
@@ -536,14 +536,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                     if(StringUtils.isBlank(baa.getConfirmNotice()) || StringUtils.isBlank(baa.getConfirmEquipmentCategory())){
                         throw new RuntimeException();
                     }
-                    if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2) {
+                    if(this.selected.getApprovalLevel()!=null && Objects.equals(this.selected.getApprovalLevel(), 2)) {
                         if(baa.getConfirmPrice() == null || baa.getConfirmQuantity() == null ){
                             throw new RuntimeException();
                         }
                     }
                 });
             } catch(Exception e) {
-                if(this.selected.getApprovalLevel()!=null && this.selected.getApprovalLevel() == 2) {
+                if(this.selected.getApprovalLevel()!=null && Objects.equals(this.selected.getApprovalLevel(), 2)) {
                     WebUtil.addWarnMessage("申购单数量/价格确认未完成，请检查后重试！");
                 }else {
                     WebUtil.addWarnMessage("申购单信息确认未完成，请检查后重试！");
@@ -962,7 +962,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
         } else {
             // 用户在科室级别时, 可选择所在科室
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setSelectable(org.getOrgType() == 4);
+            node.setSelectable(Objects.equals(org.getOrgType(), 4));
             node.setRowKey("org_" + org.getId());
             rootNode.getChildren().add(node);
         }
@@ -1074,7 +1074,7 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     }
 
     public boolean approvedCompleted(){
-       return multiLevelApprovals.stream().anyMatch(item -> item.getApprovalStatus() == 0 || item.getApprovalStatus() == 1);
+       return multiLevelApprovals.stream().anyMatch(item -> Objects.equals(item.getApprovalStatus(), 0) || Objects.equals(item.getApprovalStatus(), 1));
     }
 
 }

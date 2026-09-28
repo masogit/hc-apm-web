@@ -150,7 +150,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
 	}
 
     private void loadClinicalDeptList() {
-        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
     }
 
     public List<String> autoCompleteDeptName(String query) {

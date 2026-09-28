@@ -193,10 +193,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 }else{
                     configItem.setShowValue(configItem.getDefaultValue());
                 }
-                if (3 == configItem.getValueType()) {
+                if (Objects.equals(configItem.getValueType(), 3)) {
                     configItem.setShowValue(Optional.ofNullable(configItem.getShowValue()).map(String::toLowerCase).orElse(""));
                 }
-                if((7 == configItem.getValueType() || 8 == configItem.getValueType())
+                if((Objects.equals(configItem.getValueType(), 7) || Objects.equals(configItem.getValueType(), 8))
                         && StringUtils.isNotEmpty(configItem.getValidation())){
                     String validation = configItem.getValidation();
                     List<Map<String, String>> mapList = JSON.parseObject(validation, new TypeReference<List<Map<String,String>>>(){});
@@ -212,10 +212,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
                     configItem.setEnumList(mapList);
                 }
-                if (9 == configItem.getValueType()) {
+                if (Objects.equals(configItem.getValueType(), 9)) {
                     configItem.setFieldColumnDto(JSON.parseObject(configItem.getShowValue(), FieldColumnDto.class));
                 }
-                if(10 == configItem.getValueType()){
+                if(Objects.equals(configItem.getValueType(), 10)){
                     configItem.setFieldColumnDtoList(JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class));
                     List<FieldColumnDto> showValueList = JSON.parseArray(configItem.getShowValue(), FieldColumnDto.class);
                     List<FieldColumnDto> defaultValueList = JSON.parseArray(configItem.getDefaultValue(), FieldColumnDto.class);
@@ -273,7 +273,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
             Page<ConfigItem> configItemPage = loadData(new PageRequest(0, 5000));
             configItemList = configItemPage.getContent();
             for (ConfigItem configItem : configItemList) {
-                if (8 == configItem.getValueType()) {
+                if (Objects.equals(configItem.getValueType(), 8)) {
                     multiSelected = getMultiEum(configItem);
                     multiSelectedMap.put(configItem.getKey(), getMultiEum(configItem));
                 }
@@ -337,7 +337,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     @Override
     public void prepareEdit() {
-        if(8 == this.selected.getValueType()){
+        if(Objects.equals(this.selected.getValueType(), 8)){
             this.multiSelected = new ArrayList<>();
             String showValue = this.selected.getShowValue();
             if(StringUtils.isNotEmpty(showValue)){
@@ -397,17 +397,17 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     selectedObjectMap.remove("AssetHead");
                 }
                 configItem.setShowValue(configItem.getDefaultValue());
-                if (3 == configItem.getValueType()) {
+                if (Objects.equals(configItem.getValueType(), 3)) {
                     configItem.setShowValue(Optional.ofNullable(configItem.getShowValue()).map(String::toLowerCase).orElse(""));
                 }
-                if (8 == configItem.getValueType()) {
+                if (Objects.equals(configItem.getValueType(), 8)) {
                     multiSelected = getMultiEum(configItem);
                     multiSelectedMap.put(configItem.getKey(), getMultiEum(configItem));
                 }
-                if (9 == configItem.getValueType()) {
+                if (Objects.equals(configItem.getValueType(), 9)) {
                     configItem.setFieldColumnDto(JSON.parseObject(configItem.getDefaultValue(), FieldColumnDto.class));
                 }
-                if (10 == configItem.getValueType()){
+                if (Objects.equals(configItem.getValueType(), 10)){
                     String value = configItemValueRepository.findByKeyAndSiteForUseParent(selectSite.getSiteUID(),
                             selectSite.getHospitalUID(),
                             selectSite.getInstitutionUID(),
@@ -468,7 +468,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     public void saveConfig(ConfigItem configItem){
         this.selected = configItem;
         if(this.selectSite != null){
-            if((this.selected.getValueType()!=8 && this.selected.getValueType()!=7) &&  !regularCheck()){
+            if((!Objects.equals(this.selected.getValueType(), 8) && !Objects.equals(this.selected.getValueType(), 7)) &&  !regularCheck()){
                 logger.info("配置项保存，正则校验不通过：");
                 WebUtil.addErrorMessage("配置项保存失败，正则校验不通过！");
                 return;
@@ -511,7 +511,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 this.selected.setShowValue(jsonObject.toJSONString());
             }
 
-            if(4 == this.selected.getValueType() || 5 == this.selected.getValueType() || 6 == this.selected.getValueType()){
+            if(Objects.equals(this.selected.getValueType(), 4) || Objects.equals(this.selected.getValueType(), 5) || Objects.equals(this.selected.getValueType(), 6)){
                 try {
                     configItemValue.setValue(formatDate(this.selected.getShowValue()));
                 } catch (ParseException e) {
@@ -519,7 +519,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     WebUtil.addErrorMessage("配置项保存异常，请联系系统管理员！");
                     return;
                 }
-            }else if(8 == this.selected.getValueType()){
+            }else if(Objects.equals(this.selected.getValueType(), 8)){
                 List<String> multiSelected;
                 if ("Edit".equals(crudActionName)) {
                     multiSelected = this.multiSelected;
@@ -548,9 +548,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     }
                     configItemValue.setValue(JSON.toJSONString(maps));
                 }
-            } else if (9 == this.selected.getValueType()) {
+            } else if (Objects.equals(this.selected.getValueType(), 9)) {
                 configItemValue.setValue(JSON.toJSONString(this.selected.getFieldColumnDto()));
-            } else if(10 == this.selected.getValueType()) {
+            } else if(Objects.equals(this.selected.getValueType(), 10)) {
                 configItemValue.setValue(JSON.toJSONString(this.selected.getFieldColumnDtoList()));
             }else{
                 configItemValue.setValue(this.selected.getShowValue());
@@ -566,13 +566,13 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                     NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
                     Integer orgType = selectSite.getOrgType();
                     String configKey = this.selected.getKey();
-                    if (orgType != null && orgType == 3) {
+                    if (orgType != null && Objects.equals(orgType, 3)) {
                         // 院区级别：只影响该院区（如果它自己没有独立配置则不会被清，但刚保存的就是它自己的配置，所以 NOT EXISTS 不会排除它）
                         nurseSiteMaintainDataRepository.clearSkipForUnfinishedItemsBySite(selectSite.getSiteUID(), configKey);
-                    } else if (orgType != null && orgType == 2) {
+                    } else if (orgType != null && Objects.equals(orgType, 2)) {
                         // 医院级别：影响该医院下所有没有独立 dailyCheckIgnorable 配置的院区
                         nurseSiteMaintainDataRepository.clearSkipForUnfinishedItemsByHospital(selectSite.getHospitalUID(), configKey);
-                    } else if (orgType != null && orgType == 1) {
+                    } else if (orgType != null && Objects.equals(orgType, 1)) {
                         // 机构级别：影响该机构下所有没有独立配置的院区
                         nurseSiteMaintainDataRepository.clearSkipForUnfinishedItemsByInstitution(selectSite.getInstitutionUID(), configKey);
                     } else {

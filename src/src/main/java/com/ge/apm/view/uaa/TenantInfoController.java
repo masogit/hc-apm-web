@@ -223,7 +223,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	public boolean isIBTenant() {
 		TenantInfo thisTenant = this.selected;
-		return thisTenant.getId() == 46;
+		return Objects.equals(thisTenant.getId(), 46);
 	}
 	public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
@@ -308,7 +308,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				return;
 			}
 			List<ApmFeature> featureList = new ArrayList<>();
-			if (selected.getType() == 0 || selected.getType() == 2) {
+			if (Objects.equals(selected.getType(), 0) || Objects.equals(selected.getType(), 2)) {
 				//普通租户 or 临时租户 基础版本默认
 				featureList.addAll(ApmFeatureGroup.basicVersion.getFeatureList());
 			} else {
@@ -700,7 +700,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	public String getNameWithOrgName(UserAccount user) {
 		OrgInfo org = orgInfoDao.getByUid(user.getOrgInfoUID());
-		if(4 == org.getOrgType()){
+		if(Objects.equals(org.getOrgType(), 4)){
 			return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
 		}
 		return user.getName() + "-" + org.getName();
@@ -710,7 +710,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		if (ObjectUtils.isEmpty(selected)) {
 			return true;
 		} else {
-			return (selected.getType() != 0 && selected.getType() != 2);
+			return (!Objects.equals(selected.getType(), 0) && !Objects.equals(selected.getType(), 2));
 		}
 	}
 }

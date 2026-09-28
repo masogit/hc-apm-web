@@ -233,10 +233,10 @@ public class SysConfigTemplateController extends GenericCRUDUUIDController<Syste
         }
         List<SystemTemplateValue> systemTemplateValues = systemTemplateService.getOrgInfoSubSystemTemplate(selectedOrg.getTenantUID(), selected.getTemplateType());
         List<SystemTemplateValue> collect = systemTemplateValues.stream().filter(item -> !item.getSiteUid().equals(selectedOrg.getTenantUID())).collect(Collectors.toList());
-        if(selectedOrg.getOrgLevel()==2){
+        if(Objects.equals(selectedOrg.getOrgLevel(), 2)){
             collect = systemTemplateValues.stream().filter(item -> item.getHospitalUid().equals(selectedOrg.getHospitalUID()) &&  !item.getSiteUid().equals(item.getHospitalUid() ) ).collect(Collectors.toList());
         }
-        if(selectedOrg.getOrgLevel()==1){
+        if(Objects.equals(selectedOrg.getOrgLevel(), 1)){
             collect = systemTemplateValues.stream().filter(item -> item.getInstitutionUid().equals(selectedOrg.getInstitutionUID()) &&  !item.getSiteUid().equals(item.getInstitutionUid() ) ).collect(Collectors.toList());
         }
         if (CollectionUtils.isNotEmpty(collect)) {

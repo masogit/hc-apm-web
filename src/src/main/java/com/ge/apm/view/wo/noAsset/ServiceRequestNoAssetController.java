@@ -333,7 +333,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }
@@ -404,7 +404,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
                         .map(val -> cacheService.findOrgByUid(val)).collect(Collectors.toList());
             }
             if (!CollectionUtils.isEmpty(orgList)) {
-                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+                orgList = orgList.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
             }
         }
         return orgList;
@@ -435,7 +435,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         newServiceRequest.setRequestorPhone(loginUser.getTelephone());
         newServiceRequest.setRequestTime(new Date());
         OrgInfo orgInfo = orgDao.findByUid(loginUser.getOrgInfoUID());
-        if (orgInfo.getOrgType() == 4) {
+        if (Objects.equals(orgInfo.getOrgType(), 4)) {
             newServiceRequest.setDeptName(orgInfo.getName());
             newServiceRequest.setDeptUid(orgInfo.getUid());
         }
@@ -462,7 +462,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         } else {
             // 用户在科室级别时, 可选择所在科室
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setSelectable(org.getOrgType() == 4);
+            node.setSelectable(Objects.equals(org.getOrgType(), 4));
             node.setRowKey("org_" + org.getId());
             rootNode.getChildren().add(node);
         }
@@ -472,7 +472,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
 
 
     public OrgInfo getCourtyardAreaOrg(OrgInfo orgInfo) {
-        if (orgInfo != null && orgInfo.getOrgLevel() == orgInfo.getOrgType()) {
+        if (orgInfo != null && Objects.equals(orgInfo.getOrgLevel(), orgInfo.getOrgType())) {
             return orgInfo;
         }
         return getCourtyardAreaOrg(orgInfo.getParentOrg());
@@ -536,10 +536,10 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         if (newServiceRequest == null && selectedSr==null) {
             return;
         }
-        if(currentStatus==2){ //选择停机状态
+        if(Objects.equals(currentStatus, 2)){ //选择停机状态
             needConfirmTime=true;
         }
-        if(currentStatus==3){//选择 限制功能使用
+        if(Objects.equals(currentStatus, 3)){//选择 限制功能使用
             needConfirmTime=false;
         }
     }
@@ -609,18 +609,18 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
         currentStatus = asset.getStatus();
 
         if(customConfig ==null){
-            if (currentStatus == AssetConstant.ASSET_STATUS_NORMAL
-                    || currentStatus == AssetConstant.ASSET_STATUS_TO_TERMINATED
-                    || currentStatus == AssetConstant.ASSET_STATUS_STOP) {
+            if (Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_NORMAL)
+                    || Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_TO_TERMINATED)
+                    || Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_STOP)) {
                 currentStatus = AssetConstant.ASSET_STATUS_ILL;
             }
             needConfirmTime = false;
         }else{ //如果有自定义配置
             String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
             currentStatus= Integer.valueOf(strAssetStatus);
-            if(currentStatus == AssetConstant.ASSET_STATUS_ILL) //限制功能使用
+            if(Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_ILL)) //限制功能使用
                 needConfirmTime=false;
-            if(currentStatus == AssetConstant.ASSET_STATUS_DOWN)//停机
+            if(Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_DOWN))//停机
                 needConfirmTime=true;
         }
 
@@ -661,7 +661,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
             newAssetServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
         }
 
-        if (selectedAsset.getStatus() == 4) {
+        if (Objects.equals(selectedAsset.getStatus(), 4)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -703,7 +703,7 @@ public class ServiceRequestNoAssetController extends GenericCRUDUUIDController<V
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
-        if (selectedAsset.getStatus() == 4) {
+        if (Objects.equals(selectedAsset.getStatus(), 4)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);

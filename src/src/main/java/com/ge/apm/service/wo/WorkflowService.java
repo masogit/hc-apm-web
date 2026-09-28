@@ -222,13 +222,13 @@ public class WorkflowService {
     }
     public int getLevel(WorkflowConfig config) {
         OrgInfo org = orgInfoRepository.getOrgInfoUIDByUid(config.getSiteUID());
-        if(org.getOrgType() == 0) {
+        if(Objects.equals(org.getOrgType(), 0)) {
             return 1;
-        }else if(org.getOrgType() == 1) {
+        }else if(Objects.equals(org.getOrgType(), 1)) {
             return 2;
-        }else if(org.getOrgType() == 2) {
+        }else if(Objects.equals(org.getOrgType(), 2)) {
             return 3;
-        }else if(org.getOrgType() == 3) {
+        }else if(Objects.equals(org.getOrgType(), 3)) {
             return 4;
         }
         return -1;

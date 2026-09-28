@@ -28,6 +28,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by 503035627
@@ -74,7 +75,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 	public void prepareGEIBData() {
 		if (this.selected != null) {
 			this.prepareEdit();
-			if (this.selected.getType() == 1) {
+			if (Objects.equals(this.selected.getType(), 1)) {
 				this.selected.setGeDeviceType(0);
 				this.selected.setIbStatus(0);
 				this.selected.setType(0);
@@ -115,7 +116,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 		// TODO Auto-generated method stub
 		super.prepareEdit();
 		resetValue();
-		if (this.selected.getType() != null && this.selected.getType() == 1)
+		if (this.selected.getType() != null && Objects.equals(this.selected.getType(), 1))
 			return;
 		assetInfo = service.getAssetInfoBySystemId(this.selected.getSystemId());
 		if (assetInfo != null) {
@@ -138,9 +139,9 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 			searchFilters = new ArrayList<>();
 		}
 		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
-		if (currentUser.getOrgLevel() == 1) {
+		if (Objects.equals(currentUser.getOrgLevel(), 1)) {
 			searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-		} else if (currentUser.getOrgLevel() == 2) {
+		} else if (Objects.equals(currentUser.getOrgLevel(), 2)) {
 			searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
 		} else {
 			searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
@@ -181,7 +182,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 
 	public void checkSystemId() {
 
-		if (this.selected.getType() != null && this.selected.getType() == 1)
+		if (this.selected.getType() != null && Objects.equals(this.selected.getType(), 1))
 			return;
 		getAssetInfo();
 		if (assetInfo == null) {
@@ -210,7 +211,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 			String replacedContent  = StringEscapeUtils.escapeHtml4(this.selected.getContent());
 			this.selected.setContent(replacedContent);
 		}
-		if (this.selected.getType() == 0) {
+		if (Objects.equals(this.selected.getType(), 0)) {
 			if (checkedSystemId == null || checkedSystemId.equals(this.selected.getSystemId()) == false) {
 				getAssetInfo();
 			}
@@ -224,7 +225,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 				FacesMessage message = new FacesMessage("注意！保存失败,SystemID对应设备未找到");
 				FacesContext.getCurrentInstance().addMessage("other", message);
 			}
-		} else if (this.selected.getType() == 1) {
+		} else if (Objects.equals(this.selected.getType(), 1)) {
 			if (this.selected.getGeDeviceType() == null) {
 				FacesMessage message = new FacesMessage("注意！保存失败，设备类型不能为空");
 				FacesContext.getCurrentInstance().addMessage("other", message);
@@ -252,14 +253,14 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 	}
 
 	public boolean validateRequiredField() {
-		if (this.selected.getType() == 0) {
+		if (Objects.equals(this.selected.getType(), 0)) {
 			if (this.selected.getSystemId() == null) {
 				return false;
 			}
 			if (this.selected.getIbStatus() == null) {
 				return false;
 			}
-		} else if (this.selected.getType() == 1) {
+		} else if (Objects.equals(this.selected.getType(), 1)) {
 			if (this.selected.getGeDeviceType() == null) {
 				return false;
 			}
@@ -272,9 +273,9 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 
 	private void setIndexValue() {
 		CaptureDataMessages captureDataMessages = null;
-		if (this.selected.getType() == 0) {
+		if (Objects.equals(this.selected.getType(), 0)) {
 			captureDataMessages = dao.findBySystemId(this.selected.getSystemId());
-		} else if (this.selected.getType() == 1) {
+		} else if (Objects.equals(this.selected.getType(), 1)) {
 			captureDataMessages = dao.findByGeDeviceType(this.selected.getGeDeviceType());
 		}
 		if (captureDataMessages != null) {

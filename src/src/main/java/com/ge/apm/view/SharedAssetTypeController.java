@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -297,7 +298,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
 
         List<SharedAssetType> objectList;
-        if (userOrg.getOrgType() == 4) {
+        if (Objects.equals(userOrg.getOrgType(), 4)) {
             objectList = dao.findbyClinicalDeptUid(UserContextService.getCurrentUserAccount().getSiteUID(), userOrg.getUid());
         } else {
             objectList = dao.findbySiteUid(UserContextService.getCurrentUserAccount().getSiteUID());

@@ -291,7 +291,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
         if (tenantUID != null) {
             TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUID);
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
-            if(46==tenantInfo.getId()){
+            if(Objects.equals(tenantInfo.getId(), 46)){
                 logger.info("===========================================QrCodeLibController.onSiteChange 46号租户不加载医院下拉列表");
                 tenantOrgTreePage = createTenantOrgTree46();
                 hospitalOn = true;
@@ -333,7 +333,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
         } else {
             TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUIDFilter);
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
-            if(46==tenantInfo.getId()){
+            if(Objects.equals(tenantInfo.getId(), 46)){
                 logger.info("===========================================QrCodeLibController.onTenantFilterChange 46号租户不加载医院下拉列表");
                 tenantOrgTreePage = createTenantOrgTree46();
                 hospitalOn = true;

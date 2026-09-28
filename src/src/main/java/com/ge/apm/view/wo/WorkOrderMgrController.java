@@ -646,13 +646,13 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void selectSubstatus(){
         if(selectedWorkOrder.getSubStatus() == null){
             displayTime=false;
-        }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
+        }else if(Objects.equals(selectedWorkOrder.getSubStatus(), ApmConstant.SUBSTATUS1)){
             subStatus =1;
             displayTime=true;
-        }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
+        }else if(Objects.equals(selectedWorkOrder.getSubStatus(), ApmConstant.SUBSTATUS2)){
             subStatus =2;
             displayTime=false;
-        } else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS3){
+        } else if(Objects.equals(selectedWorkOrder.getSubStatus(), ApmConstant.SUBSTATUS3)){
             subStatus =3;
             displayTime=false;
         }
@@ -801,7 +801,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }
@@ -1624,7 +1624,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     public void prepareActCancel(String woId) {
         selectedWorkOrder = dao.findById(woId);
         // 维修中
-        if (selectedWorkOrder.getStatus() == 1 && selectedWorkOrder.getCurrentStepId() == 4) {
+        if (Objects.equals(selectedWorkOrder.getStatus(), 1) && Objects.equals(selectedWorkOrder.getCurrentStepId(), 4)) {
             if (multiLevelApprovalRepository.getIncompleteApprovalBusiness(woId) > 0) {
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("approvalProcessIsComplete", false);
@@ -1653,7 +1653,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             return false;
         }
         //2-待派工/3-已派工
-        if(workOrder.getCurrentStepId()==2 ||workOrder.getCurrentStepId()==3 ||workOrder.getCurrentStepId()==4 ){
+        if(Objects.equals(workOrder.getCurrentStepId(), 2) || Objects.equals(workOrder.getCurrentStepId(), 3) || Objects.equals(workOrder.getCurrentStepId(), 4) ){
             return false;
         }else{
             return true;
@@ -1769,7 +1769,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         acker=woService.getAckerList(selectedWorkOrder.getId());
         //如果子状态为1 说明是等待备件 需要显示日期
 
-        if(selectedWorkOrder.getSubStatus()!=null && selectedWorkOrder.getSubStatus()==1){
+        if(Objects.equals(selectedWorkOrder.getSubStatus(), 1)){
             displayTime=true;
         }
         Integer userId = selectedWorkOrder.getAckId();
@@ -2323,7 +2323,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             selectedAsset = assetDao.findByUid(requestAssetUid);
             onSelectedAsset(selectedAsset);
             currentStatus = selectedAsset.getStatus();
-            if (currentStatus == 1) {
+            if (Objects.equals(currentStatus, 1)) {
                 currentStatus = 3;
             }
         }
@@ -2382,7 +2382,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             selectedAsset = assetDao.findByUid(requestAssetUid);
             onSelectedAsset(selectedAsset);
             currentStatus = selectedAsset.getStatus();
-            if (currentStatus == 1) {
+            if (Objects.equals(currentStatus, 1)) {
                 currentStatus = 3;
             }
         }
@@ -2432,7 +2432,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                     newServiceRequest.setRequestReason(faultReason);
                 }
 
-                if (assetInfo.getStatus() == 4) {
+                if (Objects.equals(assetInfo.getStatus(), 4)) {
                     WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
                     RequestContext requestContext = RequestContext.getCurrentInstance();
                     requestContext.addCallbackParam("validationFailed", true);
@@ -2524,7 +2524,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             newServiceRequest.setRequestReason(faultReason);
         }
 
-        if (selectedAsset.getStatus() == 4) {
+        if (Objects.equals(selectedAsset.getStatus(), 4)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -2572,7 +2572,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
-        if (selectedAsset.getStatus() == 4) {
+        if (Objects.equals(selectedAsset.getStatus(), 4)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -2622,18 +2622,18 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         currentStatus = asset.getStatus();
 
         if(customConfig ==null){
-            if (currentStatus == AssetConstant.ASSET_STATUS_NORMAL
-                    || currentStatus == AssetConstant.ASSET_STATUS_TO_TERMINATED
-                    || currentStatus == AssetConstant.ASSET_STATUS_STOP) {
+            if (Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_NORMAL)
+                    || Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_TO_TERMINATED)
+                    || Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_STOP)) {
                 currentStatus = AssetConstant.ASSET_STATUS_ILL;
             }
             needConfirmTime = false;
         }else{ //如果有自定义配置
             String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
             currentStatus= Integer.valueOf(strAssetStatus);
-            if(currentStatus == AssetConstant.ASSET_STATUS_ILL) //限制功能使用
+            if(Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_ILL)) //限制功能使用
                 needConfirmTime=false;
-            if(currentStatus == AssetConstant.ASSET_STATUS_DOWN)//停机
+            if(Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_DOWN))//停机
                 needConfirmTime=true;
         }
 
@@ -2652,10 +2652,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (selectedAsset == null && selected == null) {
             return;
         }
-        if(currentStatus==2){ //选择停机状态
+        if(Objects.equals(currentStatus, 2)){ //选择停机状态
             needConfirmTime=true;
         }
-        if(currentStatus==3 || currentStatus==1){//选择 限制功能使用 或可正常使用
+        if(Objects.equals(currentStatus, 3) || Objects.equals(currentStatus, 1)){//选择 限制功能使用 或可正常使用
             needConfirmTime=false;
         }
 
@@ -2669,10 +2669,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if (assetInfos == null) {
             return;
         }
-        if(currentStatus==2){ //选择停机状态
+        if(Objects.equals(currentStatus, 2)){ //选择停机状态
             needConfirmTime=true;
         }
-        if(currentStatus==3 || currentStatus==1){//选择 限制功能使用 或可正常使用
+        if(Objects.equals(currentStatus, 3) || Objects.equals(currentStatus, 1)){//选择 限制功能使用 或可正常使用
             needConfirmTime=false;
         }
 
@@ -2794,14 +2794,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         if(selectedWorkOrder==null){
             return true;
         }
-        if( selectedWorkOrder.getStatus()==2) {//关单后
+        if( Objects.equals(selectedWorkOrder.getStatus(), 2)) {//关单后
             return userContextService.hasAnyRole("AssetHead") || userContextService.hasAnyRole("AssetStaff");
         }
         return true;
     }
 
     public boolean allowChangedForDisable() {
-        if (selected.getStatus() == 2) {//关单后
+        if (Objects.equals(selected.getStatus(), 2)) {//关单后
             if (userContextService.hasAnyRole("AssetHead") || userContextService.hasAnyRole("AssetStaff")) {
                 return false;
             }
@@ -4317,7 +4317,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
                         .map(val -> cacheService.findOrgByUid(val)).collect(Collectors.toList());
             }
             if (!CollectionUtils.isEmpty(orgList)) {
-                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+                orgList = orgList.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
             }
         }
         return orgList;
@@ -4325,7 +4325,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void initLoadInternalSiteNameList() {
         orgList = uaaService.getUserAccessibleSiteList(loginUser.getUid());
-        hospitalShow = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList()).size() > 1;
+        hospitalShow = orgList.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList()).size() > 1;
     }
 
     public List<OrgInfo> getLoadInternalSiteNameList() {
@@ -4453,7 +4453,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public boolean needTwoSubStatus(String woId){
         V2_WorkOrder workOrder = dao.findById(woId);
-        return isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID())&& (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10;
+        return isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID())&& (Objects.equals(workOrder.getRepairType(), 2) || Objects.equals(workOrder.getRepairType(), 3)) && Objects.equals(workOrder.getCurrentStepId(), 10);
     }
 
     public void needTwoSubStatusBatch(List<V2_WorkOrder> workOrders){
@@ -4461,7 +4461,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             V2_WorkOrder_Step workOrder_step = new V2_WorkOrder_Step();
             String tenantUID = loginUser.getTenantUID();
             if(StringUtils.isNotBlank(tenantUID) && tenantUID.equals(workOrder.getTenantUID())){
-                workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+                workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (Objects.equals(workOrder.getRepairType(), 2) || Objects.equals(workOrder.getRepairType(), 3)) && Objects.equals(workOrder.getCurrentStepId(), 10) ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
             }else if(StringUtils.isNotBlank(tenantUID) && !tenantUID.equals(workOrder.getTenantUID())){
                /* if(workOrder.getMvsIbMapping() != null  && workOrder.getMvsIbMapping().getAssetInfo() != null){
                     workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getMvsIbMapping().getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
@@ -4600,7 +4600,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     }
 
     public boolean approvedCompleted(){
-        return approveList.stream().anyMatch(item -> item.getApprovalStatus() == 0 || item.getApprovalStatus() == 1);
+        return approveList.stream().anyMatch(item -> Objects.equals(item.getApprovalStatus(), 0) || Objects.equals(item.getApprovalStatus(), 1));
     }
     public Date getMaxDate(){
         if(selectedWorkOrderManHoursDetail.getStartTime() != null){

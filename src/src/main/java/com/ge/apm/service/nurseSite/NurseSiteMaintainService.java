@@ -1265,7 +1265,7 @@ public class NurseSiteMaintainService {
 		completeMaintainData(listMaintain);
 		for (int i = 0; i < listMaintain.size(); ++i) {
 			NurseSiteMaintain tempMaintain = listMaintain.get(i);
-			if (tempMaintain.getStatus() == 0) {
+			if (Objects.equals(tempMaintain.getStatus(), 0)) {
 				if (StringUtils.isNotEmpty(signatureId)) {
 					tempMaintain.setSignatureId(signatureId);
 				}
@@ -1279,7 +1279,7 @@ public class NurseSiteMaintainService {
 		Date currentTime=ca.getTime();
 		for(int i=0;i<listMaintain.size();++i){
 			NurseSiteMaintain tempMaintain=listMaintain.get(i);
-			if(tempMaintain.getStatus()!=0){
+			if(!Objects.equals(tempMaintain.getStatus(), 0)){
 				continue;
 			}
 			Calendar tempCa=Calendar.getInstance();
@@ -1330,7 +1330,7 @@ public class NurseSiteMaintainService {
 		if (batchUpdate) {
 			// insert new record
 			// 0：未检查,1:已检查，2:通过，3有问题
-			if (obj.getStatus() == null || obj.getStatus() == 0) {
+			if (obj.getStatus() == null || Objects.equals(obj.getStatus(), 0)) {
 				obj.setCheckDate(currentDate);
 				obj.setModifyBy(currentUser);
 				obj.setModifyByUid(currentUser.getUid());
@@ -1347,7 +1347,7 @@ public class NurseSiteMaintainService {
 	}
 
 	public NurseSiteMaintain createMaintainWithoutItem(Date date, UserAccount currentUser, NurseSiteMaintainConfig nurseSiteMaintainConfig, Integer sequence) {
-		if (nurseSiteMaintainConfig.getType() != null && nurseSiteMaintainConfig.getType() != 1) {
+		if (nurseSiteMaintainConfig.getType() != null && !Objects.equals(nurseSiteMaintainConfig.getType(), 1)) {
 			sequence = 0;
 		}
 		NurseSiteMaintain tempNurseSiteMaintain = new NurseSiteMaintain();
@@ -1379,7 +1379,7 @@ public class NurseSiteMaintainService {
 
 	public NurseSiteMaintain createMaintain(Date date, UserAccount currentUser, NurseSiteMaintainConfig nurseSiteMaintainConfig, List<AssetInfo> listCheckAssets,
 			Integer sequence) {
-		if (nurseSiteMaintainConfig.getType() != null && nurseSiteMaintainConfig.getType() != 1) {
+		if (nurseSiteMaintainConfig.getType() != null && !Objects.equals(nurseSiteMaintainConfig.getType(), 1)) {
 			sequence = 0;
 		}
 		List<NurseSiteMaintainItem> listItem = loadConfigCheckItems(nurseSiteMaintainConfig, listCheckAssets);

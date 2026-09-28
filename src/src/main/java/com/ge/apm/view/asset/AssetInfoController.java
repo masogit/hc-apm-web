@@ -1549,7 +1549,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         WorkflowConfig config = configService.findConfigBySite(this.selected.getSiteUID());
 
-        if (config == null || config.getGenerateMethod() == null || config.getGenerateMethod().intValue() != 2) {
+        if (config == null || config.getGenerateMethod() == null || !Objects.equals(config.getGenerateMethod(), 2)) {
             //not configured to generate by parent asset
             return;
         }
@@ -1654,7 +1654,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.selectedMap.clear();
         if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
-            if (deptOrg.getOrgType() == 4) {
+            if (Objects.equals(deptOrg.getOrgType(), 4)) {
                 fileterOrg = deptOrg;
                 return;
             }
@@ -1663,7 +1663,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void discard(AssetInfo asset) {
-        if (asset != null && asset.getUsageStatus() == 3) {
+        if (asset != null && Objects.equals(asset.getUsageStatus(), 3)) {
             asset.setIsValid(false);
             asset.setTerminateDate(new Date());
             this.selected = dao.save(asset);
@@ -1674,7 +1674,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void readyForDiscard(AssetInfo asset) {
-        if (asset != null && asset.getUsageStatus() == 2) {
+        if (asset != null && Objects.equals(asset.getUsageStatus(), 2)) {
             asset.setStatus(4);
             this.selected = dao.save(asset);
             WebUtil.addSuccessMessage("已将状态修改为待报废！");
@@ -2163,7 +2163,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         BigDecimal unit = unitAndTotalTime._1;
         String totalTime = unitAndTotalTime._2;
 
-        if(item.getStatus().intValue() == 1 || item.getStatus().intValue() == 3) {
+        if(Objects.equals(item.getStatus(), 1) || Objects.equals(item.getStatus(), 3)) {
             if(this.getOrgUids().contains(item.getAssetDeptUID())) {
             } else {
                 SharedAssetRequest request = sharedAssetReqDetail.getLeaseRequest();

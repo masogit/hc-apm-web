@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -615,7 +616,7 @@ public class AssetFileImportController {
     }
 
     public boolean getIsSelect46Account() {
-        if (UserContextService.getCurrentUserAccount().getSiteId() == 46 && UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
+        if (Objects.equals(UserContextService.getCurrentUserAccount().getSiteId(), 46) && UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
             return true;
         }
         return false;

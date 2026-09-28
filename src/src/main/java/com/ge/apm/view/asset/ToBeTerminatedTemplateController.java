@@ -176,7 +176,7 @@ public class ToBeTerminatedTemplateController extends GenericCRUDUUIDController<
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 1) {
+        if (Objects.equals(oi.getOrgLevel(), 1)) {
             return oi.getName();
         }
         return null;
@@ -187,7 +187,7 @@ public class ToBeTerminatedTemplateController extends GenericCRUDUUIDController<
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 2) {
+        if (Objects.equals(oi.getOrgLevel(), 2)) {
             return oi.getName();
         }
         return null;
@@ -198,7 +198,7 @@ public class ToBeTerminatedTemplateController extends GenericCRUDUUIDController<
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 3) {
+        if (Objects.equals(oi.getOrgLevel(), 3)) {
             return oi.getName();
         }
         return null;

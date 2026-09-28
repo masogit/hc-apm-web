@@ -114,11 +114,11 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         queryBiomedGroup.setTenantUID(currentUser.getTenantUID());
         queryAsset.setTenantUID(currentUser.getTenantUID());
 
-        if(currentUser.getOrgLevel() != 0) {
-            if (currentUser.getOrgLevel() == 1) {
+        if(!Objects.equals(currentUser.getOrgLevel(), 0)) {
+            if (Objects.equals(currentUser.getOrgLevel(), 1)) {
                 queryBiomedGroup.setInstitutionUID(currentUser.getInstitutionUID());
                 queryAsset.setInstitutionUID(currentUser.getInstitutionUID());
-            } else if (currentUser.getOrgLevel() == 2) {
+            } else if (Objects.equals(currentUser.getOrgLevel(), 2)) {
                 queryBiomedGroup.setHospitalUID(currentUser.getHospitalUID());
                 queryAsset.setHospitalUID(currentUser.getHospitalUID());
             } else {
@@ -152,10 +152,10 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
 
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
 
-        if(currentUser.getOrgLevel() != 0){
-            if(currentUser.getOrgLevel() == 1){
+        if(!Objects.equals(currentUser.getOrgLevel(), 0)){
+            if(Objects.equals(currentUser.getOrgLevel(), 1)){
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-            }else if(currentUser.getOrgLevel() == 2){
+            }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
             }else{
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
@@ -322,11 +322,11 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         }
 
         if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
-            if(selectedOrg.getOrgLevel() == 1){
+            if(Objects.equals(selectedOrg.getOrgLevel(), 1)){
                 queryAsset.setInstitutionUID(selectedOrg.getInstitutionUID());
-            }else if(selectedOrg.getOrgLevel() == 2){
+            }else if(Objects.equals(selectedOrg.getOrgLevel(), 2)){
                 queryAsset.setHospitalUID(selectedOrg.getHospitalUID());
-            }else if(selectedOrg.getOrgLevel() == 3){
+            }else if(Objects.equals(selectedOrg.getOrgLevel(), 3)){
                 queryAsset.setSiteUID(selectedOrg.getSiteUID());
             }
         }

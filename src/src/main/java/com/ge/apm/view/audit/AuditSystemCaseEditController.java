@@ -119,9 +119,9 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
                 Integer targetNum=0;//指标总数
                 List<AuditSystemEntry> auditSystemEntries = auditSystemEntryRepository.findByCaseUid(auditSystemCase.getUid());
                 for (AuditSystemEntry auditSystemEntry : auditSystemEntries){
-                    if (auditSystemEntry.getType()==1){
+                    if (Objects.equals(auditSystemEntry.getType(),1)){
                         stripNum++;
-                    }else if(auditSystemEntry.getType()==2){
+                    }else if(Objects.equals(auditSystemEntry.getType(),2)){
                         paymentNum++;
                     }else {
                         targetNum++;
@@ -189,7 +189,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     private void editData(AuditSystemEntry auditSystemEntry, TreeNode node ,Map<String, TreeNode> treeMap, Map<String, TreeNode> parentTreeMap ){
         treeMap.put(auditSystemEntry.getUid(), node);
         node.setExpanded(true);
-        if(auditSystemEntry.getLevel()==1){
+        if(Objects.equals(auditSystemEntry.getLevel(),1)){
             parentTreeMap.put(auditSystemEntry.getUid(),node);
         }else {
             AuditSystemEntry entry = auditSystemEntryRepository.findByUid(auditSystemEntry.getParentUid());
@@ -305,7 +305,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         if(auditSystemEntry!=null&&auditSystemEntry.getUid()!=null){
             auditSystemEntrySelected=auditSystemEntry;
             entryFlag = false;
-            if (auditSystemEntry.getLevel()==1){
+            if (Objects.equals(auditSystemEntry.getLevel(),1)){
                 entryFlag=true;
             }
         }
@@ -380,7 +380,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         auditSystemEntrySelected.setParentUid(Optional.ofNullable(auditSystemEntry).map(AuditSystemEntry::getUid).orElse("1"));
         auditSystemEntrySelected.setOrderBy(Optional.ofNullable(selectedNode).map(TreeNode::getChildren).map(n-> n.size()+1).orElse(1));
         entryFlag = false;
-        if (auditSystemEntrySelected.getLevel()==2){
+        if (Objects.equals(auditSystemEntrySelected.getLevel(),2)){
             entryFlag=true;
         }
     }
@@ -484,7 +484,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         switch (type){
             case "entryItem":
                 auditConfigItemSelected=new AuditConfigItem();
-                if(2== selected.getType()){ //质控
+                if(Objects.equals(selected.getType(), 2)){ //质控
                     auditConfigItemSelected.setContentType(3);
                     this.onContentTypeChange();
                 }
@@ -557,15 +557,15 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
     }
     public void saveNewAuditConfigItem(){
 
-        if(1 ==auditConfigItem.getType() && StringUtils.isEmpty(auditConfigItem.getContent())){
+        if(Objects.equals(auditConfigItem.getType(), 1) && StringUtils.isEmpty(auditConfigItem.getContent())){
             WebUtil.addErrorMessage("请填写内容！");
             return ;
         }
-        if(2 ==auditConfigItem.getType() && CollectionUtils.isEmpty(this.attachements)){
+        if(Objects.equals(auditConfigItem.getType(), 2) && CollectionUtils.isEmpty(this.attachements)){
             WebUtil.addErrorMessage("请上传图片！");
             return ;
         }
-        if(selected.getType()!=null && selected.getType()==2){
+        if(selected.getType()!=null && Objects.equals(selected.getType(), 2)){
             auditConfigItem.setContentType(3);
         }
         // 同类型下，mark唯一
@@ -601,7 +601,7 @@ public class AuditSystemCaseEditController extends GenericCRUDUUIDController<Aud
         }
     }
     public boolean typeChecking(){
-        if (selected.getType()==2){
+        if (Objects.equals(selected.getType(),2)){
             List<AuditSystemCase> data = dao.findByType(selected.getType());
             if(data!=null && !data.isEmpty()){
                 WebUtil.addErrorMessage("已存在质控配置不能重复添加!");

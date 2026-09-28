@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class AssetWorkOrderService {
             }
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
         } else {
-            List<String> allAccessibleClinicalDeptUids = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).map(orgInfo -> orgInfo.getUid()).collect(Collectors.toList());
+            List<String> allAccessibleClinicalDeptUids = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> Objects.equals(item.getOrgType(), 4)).map(orgInfo -> orgInfo.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, allAccessibleClinicalDeptUids));
         }
 

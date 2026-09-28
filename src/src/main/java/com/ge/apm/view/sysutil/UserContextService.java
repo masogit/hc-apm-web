@@ -183,7 +183,7 @@ public class UserContextService implements Serializable {
      */
     public static boolean isDeparmentUser() {
         OrgInfo org = WebUtil.getBean(OrgInfoRepository.class).getByUid(getCurrentUserAccount().getOrgInfoUID());
-        return  null == org.getOrgType() ? Boolean.FALSE : 4 == org.getOrgType();
+        return  null == org.getOrgType() ? Boolean.FALSE : Objects.equals(org.getOrgType(), 4);
     }
     /**
      * 判断当前登录是
@@ -481,7 +481,7 @@ public class UserContextService implements Serializable {
     public boolean isAgentTenant() {
         if(flagIsAgentTenant!=null) return flagIsAgentTenant;
         tenant = getTenantInfo();
-        flagIsAgentTenant = tenant.getType() != null && tenant.getType() == 1;
+        flagIsAgentTenant = tenant.getType() != null && Objects.equals(tenant.getType(), 1);
 
         return flagIsAgentTenant;
     }
@@ -951,11 +951,11 @@ public class UserContextService implements Serializable {
         if(org.springframework.util.CollectionUtils.isEmpty(byUser)){
             return new ArrayList<>();
         }
-        List<String> collect = byUser.stream().filter(item -> item != null && item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        List<String> collect = byUser.stream().filter(item -> item != null && !Objects.equals(item.getOrgType(), 4)).map(OrgInfo::getUid).collect(Collectors.toList());
         if(!org.springframework.util.CollectionUtils.isEmpty(collect)){
             return wcDao.findWorkflowConfig(collect);
         }
-        List<String> collectType4 = byUser.stream().filter(item -> item != null && item.getOrgType() == 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        List<String> collectType4 = byUser.stream().filter(item -> item != null && Objects.equals(item.getOrgType(), 4)).map(OrgInfo::getUid).collect(Collectors.toList());
         if(!org.springframework.util.CollectionUtils.isEmpty(collectType4)){
             return  wcDao.findWorkflowConfig(collectType4);
         }
@@ -963,7 +963,7 @@ public class UserContextService implements Serializable {
     }
     public String isActive(){
         UserAccount currentUser = getLoginUser();
-        if((!currentUser.getIsActive() && currentUser.getId() != 0)){
+        if((!currentUser.getIsActive() && !Objects.equals(currentUser.getId(), 0))){
             return "1";//need active user
         } else {
             return "0";
@@ -1092,7 +1092,7 @@ public class UserContextService implements Serializable {
 
     public boolean isZkbAccount() {
         TenantInfo tenantInfo = getTenantInfo();
-        return tenantInfo.getType() != null && tenantInfo.getType() == 3;
+        return tenantInfo.getType() != null && Objects.equals(tenantInfo.getType(), 3);
     }
 
     public boolean isGeAdmin() {
@@ -1119,7 +1119,7 @@ public class UserContextService implements Serializable {
 
     public boolean isZtbTenant() {
         TenantInfo tenantInfo = getTenantInfo();
-        return tenantInfo.getType() != null && tenantInfo.getType() == 4;
+        return tenantInfo.getType() != null && Objects.equals(tenantInfo.getType(), 4);
     }
 
     public boolean isMvsTenant() {
@@ -1303,7 +1303,7 @@ public class UserContextService implements Serializable {
         TenantInfo currentTenantInfo = this.getCurrentUserTenantInfo();
         UserAccount user = getLoginUser();
         List<String> userRoles = user.getRoleNames();
-        if(currentTenantInfo.getName().contains("九") || currentTenantInfo.getId() == 112){
+        if(currentTenantInfo.getName().contains("九") || Objects.equals(currentTenantInfo.getId(), 112)){
             if (ninthHospitalNineJudgment(userRoles)) return Boolean.TRUE;
             return Boolean.FALSE;
         }
@@ -1483,7 +1483,7 @@ public class UserContextService implements Serializable {
 
     public boolean isCountyArea(){
         TenantInfo tenantInfo = getTenantInfo();
-        return tenantInfo.getType() != null && tenantInfo.getType() == 6;
+        return tenantInfo.getType() != null && Objects.equals(tenantInfo.getType(), 6);
     }
 
     public void updateSiteUid(){
@@ -1539,7 +1539,7 @@ public class UserContextService implements Serializable {
             if (item == null) return false;
             Integer orgLevel = item.getOrgLevel();
             Integer orgType = item.getOrgType();
-            return orgLevel != null && orgType != null && orgLevel == 3 && orgType == 3;
+            return orgLevel != null && orgType != null && Objects.equals(orgLevel, 3) && Objects.equals(orgType, 3);
         }).filter(item -> {
             List<WorkflowConfig> siteWorkflowConfigList = workflowConfigDao.findBySiteUID(item.getUid());
             if (CollectionUtils.isEmpty(siteWorkflowConfigList)) {
@@ -1618,7 +1618,7 @@ public class UserContextService implements Serializable {
         if(selectSite != null){
             List<OrgInfo> orgInfos = WebUtil.getBean(OrgInfoRepository.class).getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(selectSite.getUid());
             if(!org.springframework.util.CollectionUtils.isEmpty(orgInfos)){
-                selectItems = orgInfos.stream().map(item -> new SelectItem(item.getUid(), item.getName(), "", item.getOrgType() != 4)).collect(Collectors.toList());
+                selectItems = orgInfos.stream().map(item -> new SelectItem(item.getUid(), item.getName(), "", !Objects.equals(item.getOrgType(), 4))).collect(Collectors.toList());
             }
         }
         return selectItems;

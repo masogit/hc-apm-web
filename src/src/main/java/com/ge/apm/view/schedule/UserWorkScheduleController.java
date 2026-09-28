@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by 212605082 on 2018/1/12.
@@ -82,9 +83,9 @@ public class UserWorkScheduleController extends GenericCRUDUUIDController<UserSc
         queryUserAccount = new UserAccount();
         queryUserAccount.setTenantUID(currentUser.getTenantUID());
 
-        if(currentUser.getOrgLevel() == 1){
+        if(Objects.equals(currentUser.getOrgLevel(), 1)){
             queryUserAccount.setInstitutionUID(currentUser.getInstitutionUID());
-        }else if(currentUser.getOrgLevel() == 2){
+        }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
             queryUserAccount.setHospitalUID(currentUser.getHospitalUID());
         }else{
             queryUserAccount.setSiteUID(currentUser.getSiteUID());
@@ -228,11 +229,11 @@ public class UserWorkScheduleController extends GenericCRUDUUIDController<UserSc
         }
 
         if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
-            if(selectedOrg.getOrgLevel() == 1){
+            if(Objects.equals(selectedOrg.getOrgLevel(), 1)){
                 queryUserAccount.setInstitutionUID(selectedOrg.getInstitutionUID());
-            }else if(selectedOrg.getOrgLevel() == 2){
+            }else if(Objects.equals(selectedOrg.getOrgLevel(), 2)){
                 queryUserAccount.setHospitalUID(selectedOrg.getHospitalUID());
-            }else if(selectedOrg.getOrgLevel() == 3){
+            }else if(Objects.equals(selectedOrg.getOrgLevel(), 3)){
                 queryUserAccount.setSiteUID(selectedOrg.getSiteUID());
             }
         }

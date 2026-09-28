@@ -270,7 +270,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             setSelected(dao.findById((String)UrlEncryptController.getValueFromMap(encodeStr, "selectedid")));
             if(selected != null){
                 selected.setAttachments(initAttachments(selected.getId()));
-                if(selected.getBehavior() == 2){
+                if(Objects.equals(selected.getBehavior(), 2)){
                     List<SharedAssetReqDetail> sharedAssetReqDetails = asdDao.findByReturnId(selected.getId());
                     for (SharedAssetReqDetail sharedAssetReqDetail : sharedAssetReqDetails) {
                         addSharedAssetRequests(sharedAssetReqDetail);
@@ -291,7 +291,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(currentWorkflowConfig == null) {
             currentWorkflowConfig = getWorkflowConfig();
             if(selected != null && selected.getBehavior() != null) {
-                if(selected.getBehavior().intValue() == 1) {
+                if(Objects.equals(selected.getBehavior(), 1)) {
                     //借用
                     if(currentWorkflowConfig.getEnableLeaseManHour() != null && currentWorkflowConfig.getEnableLeaseManHour()) {
                         if(selected.getEffort() == null) {
@@ -299,7 +299,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                         }
                     }
                 }
-                if(selected.getBehavior().intValue() == 2) {
+                if(Objects.equals(selected.getBehavior(), 2)) {
                     //归还
                     if(currentWorkflowConfig.getEnableReturnManHour() != null && currentWorkflowConfig.getEnableReturnManHour()) {
                         if(selected.getEffort() == null) {
@@ -480,7 +480,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
         
-        if(userOrg.getOrgType()==4){
+        if(Objects.equals(userOrg.getOrgType(),4)){
             object.setClinicalDeptName(userOrg.getName());
             object.setClinicalDeptUid(userOrg.getUid());
         }
@@ -786,7 +786,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                              }
                              preSelectReqDetail = null;
                              //更改使用科室
-                             if(userOrg.getOrgType()==3 || userOrg.getOrgType()==4){
+                             if(Objects.equals(userOrg.getOrgType(),3) || Objects.equals(userOrg.getOrgType(),4)){
                                  depts.stream().findFirst().ifPresent(infoVo::setAssetDeptUID);
                                  infoVo.setAssetDeptId(infoVo.getClinicalDeptId());
                                  String clinicalDeptUid = infoVo.getClinicalDeptUID();
@@ -946,7 +946,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
                 }
-                if (infoVo.getStatus() != 1 && infoVo.getStatus() != 3) {
+                if (!Objects.equals(infoVo.getStatus(), 1) && !Objects.equals(infoVo.getStatus(), 3)) {
                     WebUtil.addWarnMessage("该设备故障，不可借用！");
                     return;
                 }

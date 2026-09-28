@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author : 503189362
@@ -991,7 +992,7 @@ public class ZkbFePartOrder {
             return templeList;
         }
         for (ZkbFePartOrderAssetInfo item : this.zkbFePartOrderAssetInfoList) {
-            if (0 == item.getAssetQty())
+            if (Objects.equals(item.getAssetQty(), 0))
                 continue;
             templeList.add(item);
         }

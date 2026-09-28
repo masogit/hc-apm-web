@@ -275,7 +275,7 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
                             if (item == null) {
                                 log.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }
@@ -439,10 +439,10 @@ public class IdleEquipmentApplicationController extends GenericCRUDUUIDControlle
     public void deleteIdleApplication(IdleEquipmentApplication application) {
         if (application != null && application.getUid() != null) {
             IdleEquipmentApplication byUid = idleEquipmentApplicationRepository.findByUid(application.getUid());
-            if (byUid != null && byUid.getStatus() == 3) {
+            if (byUid != null && Objects.equals(byUid.getStatus(), 3)) {
                 WebUtil.addErrorMessage("闲置设备入库已经申请通过无法删除");
             }
-            if (byUid != null && byUid.getStatus() != 3) {
+            if (byUid != null && !Objects.equals(byUid.getStatus(), 3)) {
                 idleEquipmentApplicationRepository.delete(application.getUid());
                 WebUtil.addSuccessMessage("闲置设备申请已删除");
             }

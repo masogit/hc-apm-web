@@ -738,7 +738,7 @@ public class MaintainController implements ServerEventInterface{
 			listCheckClinicalOrgInfo = new ArrayList<>();
 		}
 		if (tempOrg != null) {
-			if (tempOrg.getOrgType() != 4) {
+			if (!Objects.equals(tempOrg.getOrgType(), 4)) {
 				listCheckClinicalOrgInfo.addAll(nurseSiteMaintainService.findAccessOrgDeptList(tempOrg.getSiteUID()));
 				selectedSite = tempOrg;
 			} else {

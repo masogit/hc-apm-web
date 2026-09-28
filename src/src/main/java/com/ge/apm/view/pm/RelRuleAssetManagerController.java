@@ -252,12 +252,12 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
     }
 
     private void loadSiteList() {
         siteList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 3).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
     }
 
     public List<String> autoCompleteSiteName(String query) {
@@ -561,13 +561,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     public List<SearchFilter> getOrgFilter(String siteUID) {
         List<SearchFilter> filter = new ArrayList<>();
         OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
-        if (orgInfo.getOrgType() == 3) {
+        if (Objects.equals(orgInfo.getOrgType(), 3)) {
             // 院区
             filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-        } else if (orgInfo.getOrgType() == 2) {
+        } else if (Objects.equals(orgInfo.getOrgType(), 2)) {
             // 医院
             filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-        } else if (orgInfo.getOrgType() == 1) {
+        } else if (Objects.equals(orgInfo.getOrgType(), 1)) {
             // 集团
             filter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
         } else {// 租户

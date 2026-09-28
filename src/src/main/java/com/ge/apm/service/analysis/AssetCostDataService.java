@@ -3,6 +3,7 @@ package com.ge.apm.service.analysis;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -116,7 +117,7 @@ public class AssetCostDataService {
 		//2、计算宕机时间
 		Date confirmDownTime = assetCostStatistics.getConfirmedDownTime();
 		Date requestTime =assetCostStatistics.getRequestTime();
-		if(assetCostStatistics.getStatus().intValue() == ASSET_STATUS_DOWN){
+		if(Objects.equals(assetCostStatistics.getStatus(), ASSET_STATUS_DOWN)){
 			DateTime nowTime =new DateTime();
 			DateTime endOfDay = nowTime.secondOfDay().withMaximumValue();
 			if(confirmDownTime != null){

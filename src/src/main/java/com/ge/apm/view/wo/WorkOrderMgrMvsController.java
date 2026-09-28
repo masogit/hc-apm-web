@@ -788,18 +788,18 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         currentStatus = asset.getStatus();
 
         if(customConfig ==null){
-            if (currentStatus == AssetConstant.ASSET_STATUS_NORMAL
-                    || currentStatus == AssetConstant.ASSET_STATUS_TO_TERMINATED
-                    || currentStatus == AssetConstant.ASSET_STATUS_STOP) {
+            if (Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_NORMAL)
+                    || Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_TO_TERMINATED)
+                    || Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_STOP)) {
                 currentStatus = AssetConstant.ASSET_STATUS_ILL;
             }
             needConfirmTime = false;
         }else{ //如果有自定义配置
             String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
             currentStatus= Integer.valueOf(strAssetStatus);
-            if(currentStatus == AssetConstant.ASSET_STATUS_ILL) //限制功能使用
+            if(Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_ILL)) //限制功能使用
                 needConfirmTime=false;
-            if(currentStatus == AssetConstant.ASSET_STATUS_DOWN)//停机
+            if(Objects.equals(currentStatus, AssetConstant.ASSET_STATUS_DOWN))//停机
                 needConfirmTime=true;
         }
         if (this.newServiceRequest == null) {
@@ -816,10 +816,10 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         if (selectedAsset == null && selected == null) {
             return;
         }
-        if(currentStatus==2){ //选择停机状态
+        if(Objects.equals(currentStatus, 2)){ //选择停机状态
             needConfirmTime=true;
         }
-        if(currentStatus==3 || currentStatus==1){//选择 限制功能使用 或可正常使用
+        if(Objects.equals(currentStatus, 3) || Objects.equals(currentStatus, 1)){//选择 限制功能使用 或可正常使用
             needConfirmTime=false;
         }
 
@@ -1017,7 +1017,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                         .collect(Collectors.toList());
             }
             if (!CollectionUtils.isEmpty(orgListMVS)) {
-                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+                orgListMVS = orgListMVS.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
             }
         }
         return orgListMVS;
@@ -1063,7 +1063,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }
@@ -1086,7 +1086,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
         workOrders.forEach(workOrder -> {
             V2_WorkOrder_Step workOrder_step = new V2_WorkOrder_Step();
             try {
-                workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (workOrder.getRepairType() == 2 || workOrder.getRepairType() == 3) && workOrder.getCurrentStepId() == 10 ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
+                workOrder_step = isConfigNeedTwoSubBySiteUid(workOrder.getAssetInfo().getSiteUID()) && (Objects.equals(workOrder.getRepairType(), 2) || Objects.equals(workOrder.getRepairType(), 3)) && Objects.equals(workOrder.getCurrentStepId(), 10) ? getRepairPerson(workOrder.getId(), 10):getRepairPerson(workOrder.getId(), 4);
             } catch (Exception e) {
                 logger.info("workOrder.info:"+JSONObject.toJSONString(workOrder)+";");
                 logger.error("needTwoSubStatusBatch", e);
@@ -1137,7 +1137,7 @@ public class WorkOrderMgrMvsController extends  GenericCRUDUUIDController<V2_Wor
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }

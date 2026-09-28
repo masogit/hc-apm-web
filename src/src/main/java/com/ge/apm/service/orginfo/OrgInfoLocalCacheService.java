@@ -27,7 +27,7 @@ public class OrgInfoLocalCacheService {
         List<Object[]> orgInfosArr = orgInfoDao.getOrgHierarchyForTenant(tenantUid);
         List<OrgInfo> orgInfos = convertOrgInfo(orgInfosArr);
         orgInfos.forEach(item -> {
-            if (item.getOrgType() == 0) {
+            if (Objects.equals(item.getOrgType(), 0)) {
                 result.put(TENANT_ORG_KEY, item);
             } else {
                 result.put(item.getOrgUri(), item);

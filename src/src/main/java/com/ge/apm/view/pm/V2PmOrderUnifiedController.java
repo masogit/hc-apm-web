@@ -247,7 +247,7 @@ public class V2PmOrderUnifiedController extends GenericCRUDUUIDController<V2_PmO
     public List<OrgInfo> LoadSiteNameList() {
         orgList = uaaService.getUserAccessibleSiteList(loginUser.getUid());
         if (!org.springframework.util.CollectionUtils.isEmpty(orgList)) {
-            orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+            orgList = orgList.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
         } else {
             orgList = Collections.emptyList();
         }
@@ -265,7 +265,7 @@ public class V2PmOrderUnifiedController extends GenericCRUDUUIDController<V2_PmO
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }

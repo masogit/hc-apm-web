@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,7 +65,7 @@ public class LoginController extends LoginService {
             UserAccount user = userAccountService.getUserByTelephone(telephone);
             if(user != null) {
                 TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
-                if(tenantInfo != null && tenantInfo.getType() != null && tenantInfo.getType() != 3){
+                if(tenantInfo != null && tenantInfo.getType() != null && !Objects.equals(tenantInfo.getType(), 3)){
                     WebUtil.addErrorMessage("此手机号非智康保用户!");
                     return;
                 }

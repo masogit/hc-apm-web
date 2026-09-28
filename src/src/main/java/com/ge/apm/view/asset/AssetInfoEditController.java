@@ -1227,7 +1227,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //        if(status != assetLifecyleStatus){
 //            assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,loginUser);
 //        }
-        if (this.selected.getStatus() == 4) {
+        if (Objects.equals(this.selected.getStatus(), 4)) {
             aimService.updateNurseSiteMaintain(this.selected.getUid());
         }
         assetDepreciationService.saveAssetDerpeciation(selected);
@@ -1964,7 +1964,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setParentAssetUid(assetInfo.getUid());
         }
 
-        if(selected.getSiteId()==46){
+        if(Objects.equals(selected.getSiteId(),46)){
             selected.setVisibleStatus(1);
         }
         return true;
@@ -2206,7 +2206,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public boolean getIsSelect46Account() {
-        return loginUser.getSiteId() == 46 && loginUser.getTenantUID().equals(loginUser.getSiteUID());
+        return Objects.equals(loginUser.getSiteId(), 46) && loginUser.getTenantUID().equals(loginUser.getSiteUID());
     }
     private TreeNode buildTree(List<OrgInfo> orgList,int siteId) {
         OrgInfo rootOrg = new OrgInfo();

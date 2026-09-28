@@ -17,6 +17,7 @@ import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by 212605082 on 2018/1/8.
@@ -54,10 +55,10 @@ public class MeasuringResultListController extends GenericCRUDUUIDController<Mea
 
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
 
-        if(currentUser.getOrgLevel() != 0){
-            if(currentUser.getOrgLevel() == 1){
+        if(!Objects.equals(currentUser.getOrgLevel(), 0)){
+            if(Objects.equals(currentUser.getOrgLevel(), 1)){
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-            }else if(currentUser.getOrgLevel() == 2){
+            }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
             }else{
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));

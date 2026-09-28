@@ -304,7 +304,7 @@ public class NurseSiteMaintainJob {
                     , Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant()), nurseSiteMaintainConfig.getId());
             List<String> removeMaintainIdList = new ArrayList<>();
             existMaintain.stream().forEach(m -> {
-                if (m.getStatus() == 0) {
+                if (Objects.equals(m.getStatus(), 0)) {
                     removeMaintainIdList.add(m.getId());
                 } else {
                     scheduleDateSet.remove(new Tuple2<>(m.getScheduleDate(), m.getSequence()));
@@ -416,7 +416,7 @@ public class NurseSiteMaintainJob {
     }
 
     private NurseSiteMaintain createMaintain(Date date, Integer sequence, String userUid, NurseSiteMaintainConfig nurseSiteMaintainConfig,List<NurseSiteMaintainItem> listNewMaintainItem) {
-        if (nurseSiteMaintainConfig.getType() != null && nurseSiteMaintainConfig.getType() != 1) {
+        if (nurseSiteMaintainConfig.getType() != null && !Objects.equals(nurseSiteMaintainConfig.getType(), 1)) {
             sequence = 0;
         }
         NurseSiteMaintain tempNurseSiteMaintain = new NurseSiteMaintain();

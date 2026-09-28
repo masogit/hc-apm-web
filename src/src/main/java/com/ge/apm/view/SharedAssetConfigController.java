@@ -102,8 +102,8 @@ public class SharedAssetConfigController {
         List<UserAccount> userAccountList = userAccountDao.findByTenantUIDAndRoleNames(currentUser.getTenantUID(), Arrays.asList("SharedAssetMgmt","AssetStaff"));
         OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
         if(!userAccountList.isEmpty()){
-            if(currentUser.getOrgLevel() != 0){
-                if(currentUser.getOrgLevel() == 1){
+            if(!Objects.equals(currentUser.getOrgLevel(), 0)){
+                if(Objects.equals(currentUser.getOrgLevel(), 1)){
                     userAccountList = userAccountList.stream()
                             .filter(item-> currentUser.getInstitutionUID().equals(item.getInstitutionUID()))
                             .filter(item-> {
@@ -117,7 +117,7 @@ public class SharedAssetConfigController {
                                 return false;
                             })
                             .collect(Collectors.toList());
-                }else if(currentUser.getOrgLevel() == 2){
+                }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
                     userAccountList = userAccountList.stream()
                             .filter(item-> currentUser.getHospitalUID().equals(item.getHospitalUID()))
                             .filter(item-> {

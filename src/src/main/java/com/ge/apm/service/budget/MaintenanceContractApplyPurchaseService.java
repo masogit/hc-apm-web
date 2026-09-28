@@ -162,7 +162,7 @@ public class MaintenanceContractApplyPurchaseService {
 
     public void initCreateObject(MaintenanceContractApplyPurchase applyPurchase, UserAccount account) {
         OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
-        if (orgInfo.getOrgType() == 4) {
+        if (Objects.equals(orgInfo.getOrgType(), 4)) {
             applyPurchase.setApplicationDeptName(orgInfo.getName());
             applyPurchase.setApplicationDeptId(orgInfo.getId());
             applyPurchase.setApplicationDept(orgInfo);
@@ -178,7 +178,7 @@ public class MaintenanceContractApplyPurchaseService {
     }
 
     public OrgInfo getCourtyardAreaOrg(OrgInfo orgInfo) {
-        if (orgInfo != null && orgInfo.getOrgLevel() == orgInfo.getOrgType()) {
+        if (orgInfo != null && Objects.equals(orgInfo.getOrgLevel(), orgInfo.getOrgType())) {
             return orgInfo;
         }
         return getCourtyardAreaOrg(orgInfo.getParentOrg());
@@ -356,8 +356,8 @@ public class MaintenanceContractApplyPurchaseService {
     private void setApplicationDepartment( UserAccount userAccount, MultiLevelApproval multiLevelApproval) {
         OrgInfo  org= configCacheService.findOrgByUid(userAccount.getOrgInfoUID());
 
-        multiLevelApproval.setApplicationDepartment(org==null?null:org.getOrgType()==4?org.getName():null);
-        multiLevelApproval.setApplicationDepartmentUid(org==null?null:org.getOrgType()==4?org.getUid():null);
+        multiLevelApproval.setApplicationDepartment(org==null?null:Objects.equals(org.getOrgType(), 4)?org.getName():null);
+        multiLevelApproval.setApplicationDepartmentUid(org==null?null:Objects.equals(org.getOrgType(), 4)?org.getUid():null);
 
     }
     private void sendMsg(MaintenanceContractApplyPurchase application, MultiLevelApprovalConfig config, MultiLevelApproval approval) {

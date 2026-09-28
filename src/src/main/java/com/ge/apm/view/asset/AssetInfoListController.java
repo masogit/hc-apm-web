@@ -783,7 +783,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (selectedAccessOrgNodes!=null && selectedAccessOrgNodes.length>0){
             Set<OrgInfo> orgInfos = new HashSet<>();
             selectSiteDeptList=new ArrayList<>();
@@ -807,7 +807,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
     private void loadSiteList() {
         siteList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 3).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
         if (selectedAccessOrgNodes!=null && selectedAccessOrgNodes.length>0){
             Set<OrgInfo> orgInfos = new HashSet<>();
             selectSiteDeptList=new ArrayList<>();

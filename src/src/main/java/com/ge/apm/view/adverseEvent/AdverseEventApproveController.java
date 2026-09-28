@@ -143,7 +143,7 @@ public class AdverseEventApproveController extends AdverseEventBaseController{
     public void loadAdverseEventById(String id) {
         if (StringUtils.hasText(id)) {
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
-            if (selected.getStatus() != null && (selected.getStatus() == 2 || selected.getStatus() == 3)) {
+            if (selected.getStatus() != null && (Objects.equals(selected.getStatus(), 2) || Objects.equals(selected.getStatus(), 3))) {
                 readOnlyEditForm = false;
                 readOnlyCreateForm = false;
             } else {
@@ -162,7 +162,7 @@ public class AdverseEventApproveController extends AdverseEventBaseController{
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());

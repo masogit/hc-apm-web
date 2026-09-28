@@ -143,7 +143,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
         }
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uuaService.getUserAccessibleSiteListWithClinicalDept(user.getUid()).stream()
-                .filter(item -> item.getOrgType() == 4)
+                .filter(item -> Objects.equals(item.getOrgType(), 4))
                 .map(item -> item.getUid())
                 .collect(Collectors.toList());
         this.updateSearchFilter(new SearchFilter("outDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -287,7 +287,7 @@ public class DepartmentConvertController extends GenericCRUDUUIDController<Asset
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uuaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 3).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
     }
 
     public List<OrgInfo> autoCompleteDeptName(String query) {

@@ -139,7 +139,7 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
         loadClinicalDeptList();
         filterObject=new HashMap<>();
         assetGroup= i18nMessageService.getByMsgType("assetGroup");
-        borrowHospitalList = orgList.stream().filter(ite->ite.getOrgType() == 2).collect(Collectors.toList());
+        borrowHospitalList = orgList.stream().filter(ite->Objects.equals(ite.getOrgType(), 2)).collect(Collectors.toList());
     }
 
     @Override
@@ -298,7 +298,7 @@ public class IdleEquipmentStockController extends GenericCRUDUUIDController<Idle
                             if (item == null) {
                                 log.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }

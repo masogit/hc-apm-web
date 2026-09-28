@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -40,16 +41,16 @@ public class WorkOrderStatisticsService {
         String endDate = null;
         String assetTypeGroupEncodedStr = null;
 
-        if(selectedOrg != null && selectedOrg.getOrgLevel() == 0){
+        if(selectedOrg != null && Objects.equals(selectedOrg.getOrgLevel(), 0)){
             tenantUID = selectedOrg.getUid();
         }
-        if(selectedOrg != null && selectedOrg.getOrgLevel() == 1){
+        if(selectedOrg != null && Objects.equals(selectedOrg.getOrgLevel(), 1)){
             institutionUID = selectedOrg.getUid();
         }
-        if(selectedOrg != null && selectedOrg.getOrgLevel() == 2){
+        if(selectedOrg != null && Objects.equals(selectedOrg.getOrgLevel(), 2)){
             hospitalUID = selectedOrg.getUid();
         }
-        if(selectedOrg != null && selectedOrg.getOrgLevel() == 3){
+        if(selectedOrg != null && Objects.equals(selectedOrg.getOrgLevel(), 3)){
             siteUID = selectedOrg.getUid();
         }
         if(startTime != null){

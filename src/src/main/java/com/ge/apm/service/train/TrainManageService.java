@@ -121,7 +121,7 @@ public class TrainManageService extends MicroServiceInvoker {
                     }
                     //判断是否是智康宝用户，如果不是就移除掉智康宝的角色
                     if(t.getName().equals("zkbDealerSales") || t.getName().equals("zkbDealerFE")){
-                        if(null != ti.getType() && ti.getType()!=3){
+                        if(null != ti.getType() && !Objects.equals(ti.getType(), 3)){
                             return false;
                         }
                     }

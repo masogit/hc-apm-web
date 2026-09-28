@@ -183,7 +183,7 @@ public final class AssetMaintenanceController implements ServerEventInterface {
 
     private final void setTopErrorReason() {
         Integer id = convertToScalar(this.query(SQL_SCALAR_TOP_ERROR_REASON), Integer.valueOf(0));
-        if (id == null || id.intValue() == 0) {
+        if (id == null || Objects.equals(id, 0)) {
             this.topErrorReason = WebUtil.getMessage("maintenanceAnalysis_empty");
             return;
         }
@@ -202,7 +202,7 @@ public final class AssetMaintenanceController implements ServerEventInterface {
 
     private final void setTopErrorStep() {
         Integer id = convertToScalar(this.query(SQL_SCALAR_TOP_ERROR_STEP), Integer.valueOf(0));
-        if (id == null || id.intValue() == 0) {
+        if (id == null || Objects.equals(id, 0)) {
             this.topErrorStep = WebUtil.getMessage("maintenanceAnalysis_empty");
             return;
         }
@@ -232,7 +232,7 @@ public final class AssetMaintenanceController implements ServerEventInterface {
 
     private final void setTopErrorDeviceType() {
         Integer id = convertToScalar(this.query(SQL_SCALAR_TOP_ERROR_DEVICE_TYPE_ALL), Integer.valueOf(0));
-        if (id == null || id.intValue() == 0) {
+        if (id == null || Objects.equals(id, 0)) {
             this.topErrorDeviceType = WebUtil.getMessage("maintenanceAnalysis_empty");
             return;
         }
@@ -266,7 +266,7 @@ public final class AssetMaintenanceController implements ServerEventInterface {
         for (Map<String, Object> map : list) {
             Integer id = (Integer)map.get("key");
             String key;
-            if (id == null || id.intValue() == 0) {
+            if (id == null || Objects.equals(id, 0)) {
                 key = WebUtil.getMessage("maintenanceAnalysis_empty");
             }
             else if (id > 99) {
@@ -395,7 +395,7 @@ public final class AssetMaintenanceController implements ServerEventInterface {
         for (Map<String, Object> map : list) {
             Integer id = (Integer)map.get("key");
             String key;
-            if (id == null || id.intValue() == 0) {
+            if (id == null || Objects.equals(id, 0)) {
                 key = WebUtil.getMessage("maintenanceAnalysis_empty");
             }
             else if (id > 99) {

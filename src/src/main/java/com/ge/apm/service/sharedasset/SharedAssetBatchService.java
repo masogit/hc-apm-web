@@ -112,7 +112,7 @@ public class SharedAssetBatchService {
         if(selectSite != null){
             List<String> orgInfoUidsByparentUid = orgInfoRepository.getOrgInfoUidsByparentUid(selectSite.getUid());
             List<String>  allocationDepts= wfCfigDao.findDeptForSharedAsset(selectSite.getUid());
-            orgInfos = orgInfoUidsByparentUid.stream().map(orgInfoRepository::findByUid).filter(item->item.getOrgType() == 4)
+            orgInfos = orgInfoUidsByparentUid.stream().map(orgInfoRepository::findByUid).filter(item-> Objects.equals(item.getOrgType(), 4))
                     .filter(item->{
                         if(CollectionUtils.isEmpty(allocationDepts))return true;
                         return !allocationDepts.contains(item.getUid());

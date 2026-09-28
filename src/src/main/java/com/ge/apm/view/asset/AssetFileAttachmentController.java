@@ -136,7 +136,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         getAllAttachmentCategories();
         this.filterBySite = false;
         orgUidList = uuaService.getOrgListByUser(currentUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() == 0){
+        if(currentUser.getOrgLevel() != null && Objects.equals(currentUser.getOrgLevel(), 0)){
             orgUidList.add(currentUser.getTenantUID());
         }
 
@@ -419,7 +419,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
 
         OrgInfo rootOrg = new OrgInfo();
-        if(currentUser.getOrgLevel() != null && currentUser.getOrgLevel() == 0){
+        if(currentUser.getOrgLevel() != null && Objects.equals(currentUser.getOrgLevel(), 0)){
             OrgInfo tempOrgInfo = orgInfoDao.getByUid(loginUser.getTenantUID());
             rootOrg = tempOrgInfo;
         }else {
@@ -450,16 +450,16 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
 
         if (selectedOrg != null && selectedOrg.getOrgLevel() != null) {
-            if(selectedOrg.getOrgLevel() == 0){
+            if(Objects.equals(selectedOrg.getOrgLevel(), 0)){
                 queryAsset.setTenantUID(selectedOrg.getTenantUID());
                 clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getTenantUID(), 4);
-            } else if (selectedOrg.getOrgLevel() == 1) {
+            } else if (Objects.equals(selectedOrg.getOrgLevel(), 1)) {
                 queryAsset.setInstitutionUID(selectedOrg.getInstitutionUID());
                 clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getInstitutionUID(), 4);
-            } else if (selectedOrg.getOrgLevel() == 2) {
+            } else if (Objects.equals(selectedOrg.getOrgLevel(), 2)) {
                 queryAsset.setHospitalUID(selectedOrg.getHospitalUID());
                 clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getHospitalUID(), 4);
-            } else if (selectedOrg.getOrgLevel() == 3) {
+            } else if (Objects.equals(selectedOrg.getOrgLevel(), 3)) {
                 queryAsset.setSiteUID(selectedOrg.getSiteUID());
                 clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getSiteUID(), 4);
             }

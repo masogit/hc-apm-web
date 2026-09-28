@@ -798,7 +798,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         return false;
     }
     public boolean getIsSelect46Account() {
-        if (loginUser.getSiteId()==46&&loginUser.getTenantUID().equals(loginUser.getSiteUID())) {
+        if (Objects.equals(loginUser.getSiteId(),46)&&loginUser.getTenantUID().equals(loginUser.getSiteUID())) {
             return true;
         }
         return false;
@@ -1370,7 +1370,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         orgInfoList = orgDao.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID());
         filter.setSiteOrg(orgInfoList.get(0));
         clinicalDeptListAsFilter = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
 
         Set<OrgInfo> collect = clinicalDeptListAsFilter.stream().filter(item -> item.getSiteUID().equals(UserContextService.getCurrentUserAccount().getSiteUID()) || item.getHospitalUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())
                 || item.getInstitutionUID().equals(UserContextService.getCurrentUserAccount().getSiteUID()) || item.getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())).collect(Collectors.toSet());
@@ -1426,7 +1426,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             clinicalDeptListAsFilter = Collections.emptyList();
         } else {
             clinicalDeptListAsFilter = uaaService.getAllAccessibleClinicalDeptList()
-                    .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                    .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
 
             OrgInfo finalFilterSiteOrg = filterSiteOrg;
             Set<OrgInfo> collect = clinicalDeptListAsFilter.stream().filter(item -> item.getSiteUID().equals(finalFilterSiteOrg.getSiteUID()) || item.getHospitalUID().equals(finalFilterSiteOrg.getSiteUID())

@@ -350,8 +350,8 @@ public class PurchaseOrderService {
     private void setApplicationDepartment( UserAccount userAccount, MultiLevelApproval multiLevelApproval) {
         OrgInfo  org= configCacheService.findOrgByUid(userAccount.getOrgInfoUID());
 
-        multiLevelApproval.setApplicationDepartment(org==null?null:org.getOrgType()==4?org.getName():null);
-        multiLevelApproval.setApplicationDepartmentUid(org==null?null:org.getOrgType()==4?org.getUid():null);
+        multiLevelApproval.setApplicationDepartment(org==null?null:Objects.equals(org.getOrgType(), 4)?org.getName():null);
+        multiLevelApproval.setApplicationDepartmentUid(org==null?null:Objects.equals(org.getOrgType(), 4)?org.getUid():null);
 
     }
     private void sendMsg(PurchaseOrderInfo purchaseOrderInfo, MultiLevelApprovalConfig config,  MultiLevelApproval approval) {

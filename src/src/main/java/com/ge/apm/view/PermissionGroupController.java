@@ -183,7 +183,7 @@ public class PermissionGroupController extends GenericCRUDUUIDController<Permiss
                     addMissingChildClinical(item, selectedTreeNodeList);
                 }
             }
-        } else if (data.getOrgType() == 5 || data.getOrgType() == 4) {
+        } else if (Objects.equals(data.getOrgType(), 5) || Objects.equals(data.getOrgType(), 4)) {
             //if site is selected, will not traverse here
             if (node.isSelected()) {
                 selectedTreeNodeList.add(data);

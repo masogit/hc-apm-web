@@ -322,14 +322,14 @@ public class AssetSelectJNController extends GenericCRUDUUIDController<AssetInfo
     private void buildBaseSearchFilters() {
         // for access control
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID(), "1*"));
-        if(selectedOrg.getOrgLevel() == 1) {
+        if(Objects.equals(selectedOrg.getOrgLevel(), 1)) {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
         }
-        if(selectedOrg.getOrgLevel() == 2) {
+        if(Objects.equals(selectedOrg.getOrgLevel(), 2)) {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
         }
-        if(selectedOrg.getOrgLevel() == 3) {
+        if(Objects.equals(selectedOrg.getOrgLevel(), 3)) {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getInstitutionUID(), "1*"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getHospitalUID(), "1*"));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getSiteUID(), "1*"));
