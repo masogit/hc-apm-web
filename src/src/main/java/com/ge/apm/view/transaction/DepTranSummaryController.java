@@ -9,7 +9,6 @@ import com.ge.apm.web.DepTranForTrans;
 import com.ge.apm.web.TimeForm;
 import lombok.Getter;
 import lombok.Setter;
-import org.primefaces.component.tabview.TabView;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -39,10 +38,6 @@ public class DepTranSummaryController  implements Serializable{
 
     @Getter @Setter
     private Date endTime;
-
-    @Getter
-    @Setter
-    private TabView tabView;
     @Getter
     @Setter
     private int queryTab;

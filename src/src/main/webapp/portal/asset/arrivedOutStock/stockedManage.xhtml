@@ -32,6 +32,10 @@
                     <p:inputText value="#{assetStockedController.searchItem.assetName}"/>
                 </h:panelGroup>
                 <h:panelGroup>
+                    <label class="label">安装位置</label>
+                    <p:inputText value="#{assetStockedController.searchItem.locationName}"/>
+                </h:panelGroup>
+                <h:panelGroup>
                     <label class="label">#{msg.vendor}</label>
                     <p:autoComplete dropdown="true" value="#{assetStockedController.supplier}" scrollHeight="300"  forceSelection="true"
                                     completeMethod="#{assetStockedController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
@@ -102,6 +106,9 @@
             </p:column>
             <p:column headerText="#{msg.assetName}">
                 <h:outputText value="#{item.assetInfo.name}"/>
+            </p:column>
+            <p:column headerText="安装位置">
+                <h:outputText value="#{item.arrivalListItem.locationName}"/>
             </p:column>
             <p:column headerText="#{msg.arrivalListContractNum}">
                 <h:outputText value="#{item.arrivalList.contractNum}"/>
