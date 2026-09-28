@@ -1240,7 +1240,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 						ruleUid = relRuleAssetMap.get(order.getAssetUid() + "#" + order.getRuleLevel());
 						pmOrderRule = ruleMap.get(ruleUid);
 					}
-					if (ObjectUtil.isEmpty(pmOrderRule) && 4 == order.getRuleLevel()) {
+					if (ObjectUtil.isEmpty(pmOrderRule) && Objects.equals(4,order.getRuleLevel())) {
 						pmOrderRule = ruleMap.get(order.getPmRuleUid());
 					}
 					if (ObjectUtil.isNotEmpty(dataMap) && !dataMap.keySet().isEmpty()) {
@@ -1286,7 +1286,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 						// 更新检查项
 						List<PmOrderRuleCheckList> items = Optional.ofNullable(checkItemMap.get(pmOrderRule.getUid())).orElse(ListUtil.empty());
 						for (PmOrderRuleCheckList item : items) {
-							if (item.getStatus() == 0) {
+							if (Objects.equals(item.getStatus(),0)) {
 								continue;
 							}
 							UnstructuredData data = new UnstructuredData();
@@ -1454,7 +1454,7 @@ public class AdminConsoleService extends MicroServiceInvoker {
 			if (BooleanUtils.isTrue(tenantInfo.getIsEnabled())) {
 				List<OrgInfo> hospitals = orgInfoRepository.findByTenantUIDAndOrgType(tenantInfo.getUid(), 2);
 				hospitals.forEach(info -> {
-					if (info.getOrgLevel() == 2) {
+					if (Objects.equals(info.getOrgLevel() , 2)) {
 						Set<String> features = adminFeatureActiveRepository.findByHospitalUID(info.getUid()).stream().map(AdminFeatureActive::getFeatureKey).collect(Collectors.toSet());
 						if (!features.contains(featureKey)) {
 							AdminFeatureActive adminFeatureActive = new AdminFeatureActive();

@@ -311,11 +311,11 @@ public class AssetCreateService {
         if(CollectionUtils.isEmpty(byUser)){
             return new ArrayList<>();
         }
-        List<String> collect = byUser.stream().filter(item -> item != null && item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        List<String> collect = byUser.stream().filter(item -> item != null && !Objects.equals(4,item.getOrgType())).map(OrgInfo::getUid).collect(Collectors.toList());
         if(!CollectionUtils.isEmpty(collect)){
             return wcDao.findWorkflowConfig(collect);
         }
-        List<String> collectType4 = byUser.stream().filter(item -> item != null && item.getOrgType() == 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        List<String> collectType4 = byUser.stream().filter(item -> item != null && Objects.equals(4,item.getOrgType())).map(OrgInfo::getUid).collect(Collectors.toList());
         if(!CollectionUtils.isEmpty(collectType4)){
             return  wcDao.findWorkflowConfig(collectType4);
         }
