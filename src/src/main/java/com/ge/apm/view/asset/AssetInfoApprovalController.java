@@ -25,6 +25,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 
