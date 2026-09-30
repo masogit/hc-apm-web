@@ -115,6 +115,23 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportAccount'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportAccount').configItemValue == null}"/>
             </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass').key).concat(')')}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass').showValue}"
+                                 rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" validatorMessage="请输入正确的配置值" requiredMessage="#{msg.ConfigItemValue}#{msg.ValidationRequire}">
+                    <f:validateRegex disabled="#{empty systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass').validation}" pattern="#{systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass').validation}"/>
+                </p:inputTextarea>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('adverseEventsReportAccountPass').configItemValue == null}"/>
+            </h:panelGroup>
 
             <h:panelGroup>
                 <label class="label">#{systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey').name.concat('(').concat(systemConfigItemController.configItemMap.get('adverseEventsReportSecretKey').key).concat(')')}</label>
