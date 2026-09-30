@@ -380,7 +380,7 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
     public void cancel() {
 
         IdleEquipmentApplication equipmentApplication = dao.findByUid(selected.getUid());
-        if (equipmentApplication.getStatus() != 2) {
+        if (!Objects.equals(equipmentApplication.getStatus(), 2)) {
             WebUtil.addErrorMessage("审批状态异常,不支持取消");
             return;
         }
@@ -409,7 +409,7 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
             WebUtil.addErrorMessage("审核结果必填！");
             return;
         }
-        if(selected.getStatus()!=2){
+        if(!Objects.equals(selected.getStatus(), 2)){
             WebUtil.addErrorMessage("审批状态不合法");
             return;
         }
@@ -444,7 +444,7 @@ public class AdjustmentApplicationDetailController extends GenericCRUDUUIDContro
             WebUtil.addErrorMessage("审核结果必填！");
             return;
         }
-        if(selected.getStatus()!=2){
+        if(!Objects.equals(selected.getStatus(), 2)){
             WebUtil.addErrorMessage("审批状态不合法");
             return;
         }

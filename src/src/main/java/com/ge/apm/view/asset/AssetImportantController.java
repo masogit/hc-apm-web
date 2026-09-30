@@ -238,7 +238,7 @@ public class AssetImportantController extends JpaCRUDController<AssetInfo> imple
     }
 
     private void loadSList() {
-        siteList = uaaService.getUserAccessibleSiteList(user.getUid()).stream().filter(item -> item.getOrgType() == 3).collect(Collectors.toList());
+        siteList = uaaService.getUserAccessibleSiteList(user.getUid()).stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
     }
 
     private void loadFieldFillRate() {

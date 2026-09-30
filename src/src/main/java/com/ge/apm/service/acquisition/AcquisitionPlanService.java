@@ -159,7 +159,7 @@ public class AcquisitionPlanService {
         acquisitionPlan.setLastModifiedDate(new Date());
 
         OrgInfo orgInfo = orgDao.findByUid(userAccount.getOrgInfoUID());
-        if(orgInfo.getOrgType()==4){
+        if( Objects.equals(4,orgInfo.getOrgType())){
             acquisitionPlan.setApplicationDeptUid(userAccount.getClinicalDeptUID());
             acquisitionPlan.setApplicationDeptName(userAccount.getDepartName());
         }
@@ -311,7 +311,7 @@ public class AcquisitionPlanService {
             acquisitionPlan.setDrugCenterUid(account.getUid());
             acquisitionPlan.setApplicationStep(9);
         }
-        if(acquisitionPlan.getApplicationStep() != 9){
+        if(!Objects.equals(acquisitionPlan.getApplicationStep(),9)){
             List<UserAccount> users = uaaService.getUsersByApmFunction(function, account.getTenantUID());
             if(CollectionUtils.isNotEmpty(users)){
                 names = users.stream()
@@ -339,7 +339,7 @@ public class AcquisitionPlanService {
             acquisitionPlanStepRepository.save(oldPlanStep);
         }
 
-        if(acquisitionPlan.getApplicationStep() != 9){
+        if(!Objects.equals(acquisitionPlan.getApplicationStep(), 9)){
             //创建下一个节点
             AcquisitionPlanStep acquisitionPlanStep = new AcquisitionPlanStep();
             acquisitionPlanStep.setPid(acquisitionPlan.getId());

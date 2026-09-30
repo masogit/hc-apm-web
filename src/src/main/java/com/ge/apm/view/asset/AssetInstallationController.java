@@ -1152,6 +1152,15 @@ public class AssetInstallationController extends GenericCRUDUUIDController<Arriv
                 || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).sorted(new PinYinComparator()).collect(Collectors.toList());
     }
 
+    public List<String> autoCompleteLocation(String query) {
+        return deptInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).sorted(new PinYinComparator()).collect(Collectors.toList());
+    }
+
+    public void onLocationSelect(SelectEvent event) {
+        // dropdown选择时触发AJAX，确保值在immediate保存前已更新到model
+    }
+
     public void onClinicalDeptChange(SelectEvent event) {
         OrgInfo dept = deptInfoList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
         if (dept != null) {

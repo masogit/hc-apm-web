@@ -68,7 +68,7 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
     }
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != fileterSiteOrg) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(fileterSiteOrg.getSiteUID()) || item.getHospitalUID().equals(fileterSiteOrg.getSiteUID())
                     || item.getInstitutionUID().equals(fileterSiteOrg.getSiteUID()) || item.getTenantUID().equals(fileterSiteOrg.getSiteUID())).collect(Collectors.toList());
@@ -161,7 +161,7 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
         if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
-            if (deptOrg.getOrgType() == 4) {
+            if (Objects.equals(deptOrg.getOrgType(), 4)) {
                 fileterDeptOrg =deptOrg;
                 return;
             }

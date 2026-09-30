@@ -215,7 +215,7 @@ public class BudgetPersistService {
         application.setDataSource("SYSTEM");
         application.setOrderType(orderType);
         OrgInfo orgInfo = orgDao.findByUid(account.getOrgInfoUID());
-        if(orgInfo.getOrgType()==4){
+        if(Objects.equals(orgInfo.getOrgType(),4)){
             application.setApplicationDeptName(orgInfo.getName());
             application.setApplicationDept(orgInfo);
         }
@@ -225,7 +225,7 @@ public class BudgetPersistService {
     }
 
     public OrgInfo getCourtyardAreaOrg(OrgInfo orgInfo){
-        if(orgInfo!=null&& orgInfo.getOrgLevel()==orgInfo.getOrgType()){
+        if(orgInfo!=null&& Objects.equals(orgInfo.getOrgLevel(),orgInfo.getOrgType())){
             return orgInfo;
         }
         return getCourtyardAreaOrg(orgInfo.getParentOrg());
@@ -354,8 +354,8 @@ public class BudgetPersistService {
     private void setApplicationDepartment( UserAccount userAccount, MultiLevelApproval multiLevelApproval) {
         OrgInfo  org= configCacheService.findOrgByUid(userAccount.getOrgInfoUID());
 
-        multiLevelApproval.setApplicationDepartment(org==null?null:org.getOrgType()==4?org.getName():null);
-        multiLevelApproval.setApplicationDepartmentUid(org==null?null:org.getOrgType()==4?org.getUid():null);
+        multiLevelApproval.setApplicationDepartment(org==null?null:Objects.equals(org.getOrgType(),4)?org.getName():null);
+        multiLevelApproval.setApplicationDepartmentUid(org==null?null:Objects.equals(org.getOrgType(),4)?org.getUid():null);
 
     }
     private void sendMsg(BudgetApplication application, MultiLevelApprovalConfig config,  MultiLevelApproval approval) {

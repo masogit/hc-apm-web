@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -108,16 +109,16 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         this.removeFilterOnField("siteUID");
 
         this.updateSearchFilter(new SearchFilter("ownerConfigType", SearchFilter.Operator.EQ, OwnerConfig.OwnerConfigType.AssetGroup.name()));
-        if(this.selectedOrg.getOrgLevel() == 0){
+        if(Objects.equals(this.selectedOrg.getOrgLevel(), 0)){
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
         }
-        if(this.selectedOrg.getOrgLevel() == 1){
+        if(Objects.equals(this.selectedOrg.getOrgLevel(), 1)){
             this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
         }
-        if(this.selectedOrg.getOrgLevel() == 2){
+        if(Objects.equals(this.selectedOrg.getOrgLevel(), 2)){
             this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
         }
-        if(this.selectedOrg.getOrgLevel() == 3){
+        if(Objects.equals(this.selectedOrg.getOrgLevel(), 3)){
             this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid()));
         }
 

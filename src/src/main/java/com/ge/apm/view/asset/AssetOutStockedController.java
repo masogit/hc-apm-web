@@ -214,13 +214,20 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         return page;
     }
 
-    private void pckFilters(List<SearchFilter> searchFilters) {
-        if (!this.hasFilterOnField("siteUid")) {
+    private void pckFilters(List<SearchFilter> filters) {
+        boolean hasFieldFilter = false;
+        for (SearchFilter filter : filters) {
+            if ("siteUid".equals(filter.fieldName)) {
+                hasFieldFilter = true;
+                break;
+            }
+        }
+        if (!hasFieldFilter) {
             List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("siteUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("hospitalUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("institutionUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("tenantUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
 
@@ -360,7 +367,7 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
         } else {
             // 用户在科室级别时, 可选择所在科室
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setSelectable(org.getOrgType() == 4);
+            node.setSelectable(Objects.equals(org.getOrgType(), 4));
             node.setRowKey("org_" + org.getId());
             rootNode.getChildren().add(node);
         }

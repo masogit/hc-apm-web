@@ -2,6 +2,8 @@ package com.ge.apm.domain;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+
 /**
  * 设备信息统计
  * @author 503202755 2020/10/42
@@ -125,7 +127,7 @@ public class ZkbAssetStatistic {
         if(StringUtils.isNotBlank(this.qrCodeCount))
         {
             Integer integerQrCodeCount = new Integer(this.qrCodeCount);
-            if(integerQrCodeCount.intValue()==3)
+            if(Objects.equals(integerQrCodeCount, 3))
             {
                 return "Y";
             }

@@ -163,7 +163,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
 
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
-        if (selectSite.getOrgType() == 4) {
+        if (Objects.equals(selectSite.getOrgType(), 4)) {
             selectSite = configCacheService.findOrgByUid(selectSite.getSiteUID());
         }
         selectAdverseSite = userContextService.getLoginUserOrgInfo();
@@ -196,7 +196,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
             loadUsePlace();
         } else {
             selected = adverseEventServiceClient.getAdverseEventsById(UserContextService.getAccessToken(), id);
-            if (selected.getStatus() != null && (selected.getStatus() == 1 || selected.getStatus() == 4)) {
+            if (selected.getStatus() != null && (Objects.equals(selected.getStatus(), 1) || Objects.equals(selected.getStatus(), 4))) {
                 renderedSearchForm = true;
                 readOnlyCreateForm = false;
             } else {
@@ -345,7 +345,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
@@ -626,7 +626,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
     public  void  adverseEventWithdrawn(){
         AdverseEvents result = adverseEventServiceClient.adverseEventWithdrawn(UserContextService.getAccessToken(), selected);
 
-        if(result!=null && result.getStatus()==1){
+        if(result!=null && Objects.equals(result.getStatus(),1)){
             MessageUtil.outPutReturnFacesMessage("撤回成功", FacesMessage.SEVERITY_INFO);
 
         }

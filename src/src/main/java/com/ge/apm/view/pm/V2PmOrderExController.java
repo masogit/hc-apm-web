@@ -175,7 +175,7 @@ public class V2PmOrderExController extends GenericCRUDUUIDController<PmScheduleD
 
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
-        if (currentStatus == 1) {
+        if (Objects.equals(currentStatus, 1)) {
             currentStatus = 3;
         }
         needConfirmTime = false;

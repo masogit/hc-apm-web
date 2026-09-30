@@ -78,9 +78,9 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
                 List<AuditSystemEntry> auditSystemEntries = auditSystemEntryRepository.findByCaseUid(auditSystemCase.getUid());
                 if (auditSystemEntries!=null && !auditSystemEntries.isEmpty()){
                     for (AuditSystemEntry auditSystemEntry : auditSystemEntries){
-                        if (auditSystemEntry.getType()==1){
+                        if (Objects.equals(auditSystemEntry.getType(),1)){
                             stripNum++;
-                        }else if(auditSystemEntry.getType()==2){
+                        }else if(Objects.equals(auditSystemEntry.getType(),2)){
                             BigDecimal score = new BigDecimal(scoreNum);
                             BigDecimal scoreStandard = new BigDecimal(auditSystemEntry.getScoreStandard()==null ? 0D :auditSystemEntry.getScoreStandard());
                             scoreNum=score.add(scoreStandard).doubleValue();
@@ -88,7 +88,7 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
                         }else {
                             String parentUid = auditSystemEntry.getParentUid();
                             AuditSystemEntry data = auditSystemEntryRepository.findByUid(parentUid);
-                            if(data!=null && data.getType()==1){
+                            if(data!=null && Objects.equals(data.getType(),1)){
                                 BigDecimal score = new BigDecimal(scoreNum);
                                 BigDecimal scoreStandard = new BigDecimal(auditSystemEntry.getScoreStandard()==null ? 0D :auditSystemEntry.getScoreStandard());
                                 scoreNum=score.add(scoreStandard).doubleValue();
@@ -210,7 +210,7 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
     }
 
     public void deleteAction() {
-        if(selected.getStatus()==1){
+        if(Objects.equals(selected.getStatus(),1)){
             try {
                 String caseUid = selected.getUid();
                 List<AuditSystemEntry> systemEntries = auditSystemEntryRepository.findByCaseUid(caseUid);
@@ -229,7 +229,7 @@ public class AuditSystemCaseListController extends GenericCRUDUUIDController<Aud
                 WebUtil.addErrorMessage(WebUtil.getMessage("delete") + WebUtil.getMessage("FAILED"));
             }
         }else {
-            if(selected.getStatus()==2){
+            if(Objects.equals(selected.getStatus(),2)){
                 WebUtil.addErrorMessage("发布状态数据不能删除!");
             }else {
                 WebUtil.addErrorMessage("过期状态数据不能删除!");

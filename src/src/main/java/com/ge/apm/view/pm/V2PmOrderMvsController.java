@@ -742,7 +742,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }
@@ -822,7 +822,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
         assetUid = asset.getUid();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
-        if (currentStatus == 1) {
+        if (Objects.equals(currentStatus, 1)) {
             currentStatus = 3;
         }
         autoSetPmRuleUid(assetUid,ruleLevel);
@@ -888,7 +888,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
     public List<OrgInfo> LoadSiteNameListMVS() {
         orgListMVS = uaaService.getUserAccessibleSiteList(loginUser.getUid());
         if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
-                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+                orgListMVS = orgListMVS.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
         } else {
             orgListMVS = Collections.emptyList();
         }
@@ -914,7 +914,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
 //                }
 //            }
 //            if (!org.springframework.util.CollectionUtils.isEmpty(orgListMVS)) {
-//                orgListMVS = orgListMVS.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+//                orgListMVS = orgListMVS.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
 //            }
 //        }
 //        return orgListMVS;
@@ -951,7 +951,7 @@ public class V2PmOrderMvsController extends GenericCRUDUUIDController<V2_PmOrder
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }

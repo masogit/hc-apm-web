@@ -125,11 +125,11 @@ public class WorkScheduleController{
         List<SearchFilter> searchFilters = new ArrayList<>();
         SearchFilter orgLevel = new SearchFilter("orgType", SearchFilter.Operator.NE, 4);
         searchFilters.add(orgLevel);
-        if(currentUser.getOrgLevel() == 0){
+        if(Objects.equals(currentUser.getOrgLevel(), 0)){
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
-        }else if(currentUser.getOrgLevel() == 1){
+        }else if(Objects.equals(currentUser.getOrgLevel(), 1)){
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-        }else if(currentUser.getOrgLevel() == 2){
+        }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
         }else{
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
@@ -269,9 +269,9 @@ public class WorkScheduleController{
     public List<UserAccount> loadUserList(){
         OrgInfo selectSiteSchedule = userContextService.getSelectSiteSchedule();
         List<UserAccount> userAccountList = new ArrayList<>();
-        if(currentUser.getOrgLevel() == 0){
+        if(Objects.equals(currentUser.getOrgLevel(), 0)){
             userAccountList = userAccountDao.findByTenantUIDAndStaffRole(currentUser.getTenantUID());
-        }else if(currentUser.getOrgLevel() == 1){
+        }else if(Objects.equals(currentUser.getOrgLevel(), 1)){
             userAccountList = userAccountDao.findByInstitutionUIDAndStaffRole(currentUser.getInstitutionUID());
             userAccountList = userAccountList.stream()
                     .filter(item-> currentUser.getInstitutionUID().equals(item.getInstitutionUID()))
@@ -286,7 +286,7 @@ public class WorkScheduleController{
                         return false;
                     })
                     .collect(Collectors.toList());
-        }else if(currentUser.getOrgLevel() == 2){
+        }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
             userAccountList = userAccountDao.findByHospitalUIDAndStaffRole(currentUser.getHospitalUID());
             userAccountList = userAccountList.stream()
                     .filter(item-> currentUser.getHospitalUID().equals(item.getHospitalUID()))
@@ -300,7 +300,7 @@ public class WorkScheduleController{
                         return false;
                     })
                     .collect(Collectors.toList());
-        }else if(currentUser.getOrgLevel() == 3){
+        }else if(Objects.equals(currentUser.getOrgLevel(), 3)){
             userAccountList = userAccountDao.findBySiteUIDAndStaffRole(currentUser.getSiteUID());
         }
         userAccountList=userAccountList.stream().filter(item-> item.getIsDeleted() == null?Boolean.TRUE:!item.getIsDeleted()).collect(Collectors.toList());
@@ -751,7 +751,7 @@ public class WorkScheduleController{
         TreeNode rootNode = new DefaultTreeNode("org", null, null);
         Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> {
             TreeNode org = new DefaultTreeNode("org", item, null);
-            if(item.getOrgType() != orgInfo.getOrgType()){
+            if(!Objects.equals(item.getOrgType(), orgInfo.getOrgType())){
                 org.setSelectable(false);
             }
             return org;

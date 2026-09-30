@@ -157,7 +157,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             this.selected.setCreatedBy(loginUser.getName());
             this.selected.setCreatedDate(now);
         }
-        if (this.selected.getStatus() == 0 || this.selected.getStatus() == 1 || action == -11) {
+        if (Objects.equals(this.selected.getStatus(), 0) || Objects.equals(this.selected.getStatus(), 1) || action == -11) {
             if (ObjectUtil.isNotEmpty(deptContact)) {
                 this.selected.setDeptContactUid(deptContact.getUid());
                 this.selected.setDeptContactName(deptContact.getName());
@@ -173,7 +173,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                 this.selected.setAssetDeptName(assetDept.getName());
             }
         }
-        if(this.selected.getStatus() == 1 && flag && ObjectUtil.isNotEmpty(probationConfirmor)) {
+        if(Objects.equals(this.selected.getStatus(), 1) && flag && ObjectUtil.isNotEmpty(probationConfirmor)) {
             this.selected.setProbationStartUserUid(probationConfirmor.getUid());
             this.selected.setProbationStartUserName(probationConfirmor.getName());
         }
@@ -371,7 +371,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
             valid = false;
         }
         if (ObjectUtil.isNotEmpty(this.selected.getStatus())) {
-            if (this.selected.getStatus() == 3 && ObjectUtil.isEmpty(this.selected.getDetectionSituation())) {
+            if (Objects.equals(this.selected.getStatus(), 3) && ObjectUtil.isEmpty(this.selected.getDetectionSituation())) {
                 WebUtil.addErrorMessage("检测情况不能为空！");
                 RequestContext.getCurrentInstance().addCallbackParam("detectionSituationRead", true);
                 valid = false;
@@ -565,7 +565,7 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
         if ("View".equals(actionName)) {
             return false;
         }
-        return loginUser.getUid().equals(this.selected.getApplicantUserUid()) && (this.action == -11 || this.selected.getStatus() == 0);
+        return loginUser.getUid().equals(this.selected.getApplicantUserUid()) && (this.action == -11 || Objects.equals(this.selected.getStatus(), 0));
     }
 
     public boolean canEditDetection() {
@@ -576,14 +576,14 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
     }
 
     public boolean viewDetection() {
-        if ("View".equals(actionName) && this.selected.getStatus() == 1) {
+        if ("View".equals(actionName) && Objects.equals(this.selected.getStatus(), 1)) {
             return false;
         }
         return this.selected.getStatus() >= 1 && this.action != -11;
     }
 
     public boolean viewEvacuation() {
-        if ("View".equals(actionName) && this.selected.getStatus() == 3) {
+        if ("View".equals(actionName) && Objects.equals(this.selected.getStatus(), 3)) {
             return false;
         }
         return this.selected.getStatus() >= 3;

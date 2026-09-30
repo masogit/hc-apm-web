@@ -177,7 +177,7 @@ public class SparePartStockRecordController extends GenericCRUDUUIDController<St
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
     }
 
     public void exportToDocx() {

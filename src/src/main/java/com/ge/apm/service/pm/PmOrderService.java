@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by 212605082 on 2017/5/18.
@@ -128,7 +129,7 @@ public class PmOrderService {
         List<SearchFilter> assetFilters = new ArrayList<>();
         assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
         //assetFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
-        if (null != queryAsset.getHospitalId() && queryAsset.getHospitalId() != 0) {
+        if (null != queryAsset.getHospitalId() && !Objects.equals(queryAsset.getHospitalId(), 0)) {
             assetFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
         }else{
             queryAsset.setClinicalDeptId(null);

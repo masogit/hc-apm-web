@@ -68,10 +68,10 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
             searchFilters = new ArrayList<>();
         }
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
-        if(currentUser.getOrgLevel() != 0){
-            if(currentUser.getOrgLevel() == 1){
+        if(!Objects.equals(currentUser.getOrgLevel(), 0)){
+            if(Objects.equals(currentUser.getOrgLevel(), 1)){
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-            }else if(currentUser.getOrgLevel() == 2){
+            }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
             }else{
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
@@ -102,7 +102,7 @@ public class AssetArrivedItemsImportController extends GenericCRUDUUIDController
             OrgInfo site = orgMap.get(arrivalItemImport.getSite());
             OrgInfo clinicalDept = orgMap.get(arrivalItemImport.getClinicalDept());
             if (ObjectUtil.isNotEmpty(site)) {
-                if (ObjectUtil.isEmpty(site) || site.getOrgLevel() != 3) {
+                if (ObjectUtil.isEmpty(site) || !Objects.equals(site.getOrgLevel(), 3)) {
                     errMsg.append("院区不存在;");
                 } else {
                     siteUidList.add(site.getUid());

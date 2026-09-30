@@ -171,7 +171,7 @@ public class AssetInfoMgrService {
             assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, usingSiteUid));
             //配置项根据主设备生成编号
             WorkflowConfig config = configService.findConfigBySite(usingSiteUid);
-            if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 2) {
+            if (config != null && config.getGenerateMethod() != null && Objects.equals(config.getGenerateMethod(), 2)) {
                 assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
             }
         } else {
@@ -293,7 +293,7 @@ public class AssetInfoMgrService {
     public String getMaintanceType(AssetInfo selected) {
         
         TenantInfo tenant = configCacheService.getTenantByUid(selected.getTenantUID());
-        if(tenant.getId() == 46){
+        if(Objects.equals(tenant.getId(), 46)){
             return "external";
         }
         JSONObject tenantConfig = JSONObject.parseObject(tenant.getTenantConfig());

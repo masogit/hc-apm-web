@@ -288,7 +288,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             ArrayList<SearchFilter> orgFilters = new ArrayList<SearchFilter>();
             orgFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
             orgFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-            if (orgInfo.getOrgType() == 4) {
+            if (Objects.equals(orgInfo.getOrgType(), 4)) {
                 orgFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
             } else {
                 orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));

@@ -3,12 +3,7 @@ package com.ge.apm.view.asset;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
@@ -88,10 +83,10 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
             searchFilters = new ArrayList<>();
         }
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
-        if(currentUser.getOrgLevel() != 0){
-            if(currentUser.getOrgLevel() == 1){
+        if(!Objects.equals(currentUser.getOrgLevel(), 0)){
+            if(Objects.equals(currentUser.getOrgLevel(), 1)){
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-            }else if(currentUser.getOrgLevel() == 2){
+            }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
             }else{
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));

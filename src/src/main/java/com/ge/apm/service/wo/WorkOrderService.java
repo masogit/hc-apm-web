@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -358,7 +359,7 @@ public class WorkOrderService {
         WorkOrderStepRepository woStepDao = WebUtil.getBean(WorkOrderStepRepository.class);
 
         try{
-            if (currentWoStep.getStepId() == 6){
+            if (Objects.equals(currentWoStep.getStepId(), 6)){
                 saveWorkOrderStep(wo, currentWoStep, null);
             } else {
                 WorkOrderStep nextWoStep = initWorkOrderCurrentStep(wo);

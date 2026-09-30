@@ -43,7 +43,7 @@ public class AssetFileImportUseCacheService extends AssetFileImportBaseService {
         int row = 0;
 
         try {
-            if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
+            if(Objects.equals(UserContextService.getCurrentUserAccount().getSiteId(), ApmConstant.IB_TENANT_ID)){
                 //locate parent assets first for later use
                 parentAssetsMap = supportingService.getParentAssets(importAssetMap);
                 //first iteration: import parent asset

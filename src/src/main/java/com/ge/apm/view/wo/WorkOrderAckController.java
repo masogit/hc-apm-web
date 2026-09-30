@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -124,7 +125,7 @@ public class WorkOrderAckController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void onStatusChange() {
-        if (currentAsset != null && currentStatus == 2 && currentAsset.getStatus() != 2) {
+        if (currentAsset != null && Objects.equals(currentStatus, 2) && !Objects.equals(currentAsset.getStatus(), 2)) {
             needConfirmTime = true;
         } else {
             needConfirmTime = false;

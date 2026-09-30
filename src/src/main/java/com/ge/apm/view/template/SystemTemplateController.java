@@ -114,7 +114,7 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
 //        orgTree=uaaService.getOrgTreeNodes(orgInfoUID,affiliationDepartmentGroup);
 
         tenantUid=user.getTenantUID();
-        if (selectedTenant != null && selectedTenant.getId() != 46) {
+        if (selectedTenant != null && !Objects.equals(selectedTenant.getId(), 46)) {
             rebuildOrgTree();
             TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
             if (null != selectedOrgNode) {
@@ -306,10 +306,10 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         }
         List<SystemTemplateValue> systemTemplateValues = systemTemplateService.getOrgInfoSubSystemTemplate(selectedOrg.getTenantUID(), selected.getTemplateType());
         List<SystemTemplateValue> collect = systemTemplateValues.stream().filter(item -> !item.getSiteUid().equals(selectedOrg.getTenantUID())).collect(Collectors.toList());
-        if(selectedOrg.getOrgLevel()==2){
+        if(Objects.equals(selectedOrg.getOrgLevel(), 2)){
             collect = systemTemplateValues.stream().filter(item -> item.getHospitalUid().equals(selectedOrg.getHospitalUID()) &&  !item.getSiteUid().equals(item.getHospitalUid() ) ).collect(Collectors.toList());
         }
-        if(selectedOrg.getOrgLevel()==1){
+        if(Objects.equals(selectedOrg.getOrgLevel(), 1)){
             collect = systemTemplateValues.stream().filter(item -> item.getInstitutionUid().equals(selectedOrg.getInstitutionUID()) &&  !item.getSiteUid().equals(item.getInstitutionUid() ) ).collect(Collectors.toList());
         }
         if (CollectionUtils.isNotEmpty(collect)) {
@@ -428,7 +428,7 @@ public class SystemTemplateController extends GenericCRUDUUIDController<SystemTe
         selected = null;
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
-        if (selectedTenant != null && selectedTenant.getId() != 46) {
+        if (selectedTenant != null && !Objects.equals(selectedTenant.getId(), 46)) {
             rebuildOrgTree();
             TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
             if (null != selectedOrgNode) {

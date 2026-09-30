@@ -26,6 +26,7 @@ import com.ge.apm.domain.pure.AdvancedSearchConfig;
 import com.ge.apm.domain.pure.AdvancedSearchFieldConfig;
 import com.ge.apm.domain.pure.RangeOption;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.assetTypeGroup.AssetTypeService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.pm.RelRuleAssetController;
@@ -59,6 +60,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -92,6 +94,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private CustomRoleRepository customRoleRepository;
     private AssetTypeGroupRepository assetTypeGroupRepository;
     private SysAuthGroupRepository sysAuthGroupRepository;
+    private AssetTypeService assetTypeService;
+    private List<AssetTypeGroup> allAssetTypeGroupList;
 
     private AssetInfoService assetInfoService;
     private I18nMessageService i18nMessageService;
@@ -286,6 +290,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupRepository = WebUtil.getBean(AssetTypeGroupRepository.class);
         sysAuthGroupRepository = WebUtil.getBean(SysAuthGroupRepository.class);
         assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
+        assetTypeService = WebUtil.getBean(AssetTypeService.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         contractInfoMapper = WebUtil.getBean(ContractInfoMapper.class);
@@ -778,7 +783,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (selectedAccessOrgNodes!=null && selectedAccessOrgNodes.length>0){
             Set<OrgInfo> orgInfos = new HashSet<>();
             selectSiteDeptList=new ArrayList<>();
@@ -802,7 +807,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
     private void loadSiteList() {
         siteList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 3).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
         if (selectedAccessOrgNodes!=null && selectedAccessOrgNodes.length>0){
             Set<OrgInfo> orgInfos = new HashSet<>();
             selectSiteDeptList=new ArrayList<>();
@@ -2272,39 +2277,249 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return false;
     }
 
-    private String filterAssetTypeGroup;
     private List<AssetTypeGroup> assetTypeGroupList;
     private AssetTypeGroupService assetTypeGroupService;
     private Set<String> assetTypeGroupEncodedSet;
     private Map<String, AssetTypeGroup> currentPageAssetTypeGroupMap;
 
-    public void onAssetTypeGroupNameFilterChange(AjaxBehaviorEvent event) {
+    // 资产分类树形筛选
+    private TreeNode assetTypeGroupFilterTree;
+    private TreeNode selectedAssetTypeGroupFilterNode;
+    private String assetTypeGroupFilterText;
+    private String selectedAssetTypeGroupDisplayName;
+    private String selectedAssetTypeGroupUid;
+    private String expandedAssetTypeGroupUid;
+    private boolean keepAssetTypeFilterPanelOpen;
+    private List<AssetTypeGroup> assetTypeGroupSelectItems;
 
-        if (event instanceof SelectEvent) {
-            filterAssetTypeGroup = (String) ((SelectEvent) event).getObject();
+    public TreeNode getAssetTypeGroupFilterTree() {
+        if (assetTypeGroupFilterTree == null) {
+            buildAssetTypeGroupFilterTree();
         }
+        return assetTypeGroupFilterTree;
+    }
 
-        if (!Strings.isNullOrEmpty(filterAssetTypeGroup) && !assetTypeGroupList.stream().anyMatch(item -> filterAssetTypeGroup.equals(item.getName()))) {
-            filterAssetTypeGroup = null;
+    public TreeNode getSelectedAssetTypeGroupFilterNode() {
+        return selectedAssetTypeGroupFilterNode;
+    }
+
+    public void setSelectedAssetTypeGroupFilterNode(TreeNode selectedAssetTypeGroupFilterNode) {
+        this.selectedAssetTypeGroupFilterNode = selectedAssetTypeGroupFilterNode;
+    }
+
+    public String getAssetTypeGroupFilterText() {
+        return assetTypeGroupFilterText;
+    }
+
+    public void setAssetTypeGroupFilterText(String assetTypeGroupFilterText) {
+        this.assetTypeGroupFilterText = assetTypeGroupFilterText;
+    }
+
+    public void onAssetTypeGroupSearch() {
+        String keyword = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("keyword");
+        this.assetTypeGroupFilterText = keyword;
+        assetTypeGroupSelectItems = null;
+    }
+
+    public void onAssetTypeGroupSearchInput() {
+        assetTypeGroupSelectItems = null;
+    }
+
+    public String getSelectedAssetTypeGroupDisplayName() {
+        return selectedAssetTypeGroupDisplayName;
+    }
+
+    public String getSelectedAssetTypeGroupUid() {
+        return selectedAssetTypeGroupUid;
+    }
+
+    public void setSelectedAssetTypeGroupUid(String selectedAssetTypeGroupUid) {
+        this.selectedAssetTypeGroupUid = selectedAssetTypeGroupUid;
+    }
+
+    public List<AssetTypeGroup> getAssetTypeGroupSelectItems() {
+        if (assetTypeGroupSelectItems == null) {
+            buildAssetTypeGroupSelectItems();
         }
+        return assetTypeGroupSelectItems;
+    }
 
-        if (filterAssetTypeGroup != null) {
-            List<AssetTypeGroup> assetTypeGroupsMatchingByName = this.assetTypeGroupList.stream().filter(item -> item.getName().equals(filterAssetTypeGroup)).collect(Collectors.toList());
-            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(assetTypeGroupsMatchingByName, assetTypeGroupList);
-            assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
-        } else {
-            assetTypeGroupEncodedSet = Collections.emptySet();
+    public boolean isKeepAssetTypeFilterPanelOpen() {
+        return keepAssetTypeFilterPanelOpen;
+    }
+
+    private void buildAssetTypeGroupSelectItems() {
+        assetTypeGroupSelectItems = new ArrayList<>();
+        try {
+            if (assetTypeGroupFilterTree == null) {
+                assetTypeGroupFilterTree = assetTypeService.buildSysAuthGroupInTree(user.getTenantUID());
+                assetTypeGroupFilterTree.setExpanded(true);
+            }
+            if (allAssetTypeGroupList == null) {
+                allAssetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchy(user.getTenantUID());
+            }
+            String keyword = (assetTypeGroupFilterText != null) ? assetTypeGroupFilterText.trim().toLowerCase() : "";
+            // 遍历一级分类
+            for (TreeNode child : assetTypeGroupFilterTree.getChildren()) {
+                AssetTypeGroup data = (AssetTypeGroup) child.getData();
+                if (data == null) continue;
+                // 判断是否展开：手动展开 或 搜索匹配
+                boolean isExpanded = data.getUid().equals(expandedAssetTypeGroupUid);
+                if (!keyword.isEmpty() && !isExpanded) {
+                    // 搜索时：一级分类名称匹配 或 任一子分类名称匹配，则自动展开
+                    boolean nameMatch = data.getDisplayName().toLowerCase().contains(keyword);
+                    boolean childMatch = false;
+                    for (TreeNode grandChild : child.getChildren()) {
+                        AssetTypeGroup childData = (AssetTypeGroup) grandChild.getData();
+                        if (childData != null && childData.getDisplayName().toLowerCase().contains(keyword)) {
+                            childMatch = true;
+                            break;
+                        }
+                    }
+                    isExpanded = nameMatch || childMatch;
+                }
+                String label = isExpanded ? "\u25bc " + data.getDisplayName() : "\u25b6 " + data.getDisplayName();
+                AssetTypeGroup item = new AssetTypeGroup(label, null, null, data.getEncoded());
+                item.setUid(data.getUid());
+                assetTypeGroupSelectItems.add(item);
+                // 展开的一级分类下面显示其子分类
+                if (isExpanded) {
+                    for (TreeNode grandChild : child.getChildren()) {
+                        AssetTypeGroup childData = (AssetTypeGroup) grandChild.getData();
+                        if (childData == null) continue;
+                        // 搜索模式下只展示匹配的子分类，无搜索时展示全部
+                        if (!keyword.isEmpty() && !childData.getDisplayName().toLowerCase().contains(keyword)
+                                && !data.getDisplayName().toLowerCase().contains(keyword)) {
+                            continue;
+                        }
+                        AssetTypeGroup childItem = new AssetTypeGroup("\u00a0\u00a0\u00a0\u00a0" + childData.getDisplayName(), null, null, childData.getEncoded());
+                        childItem.setUid(childData.getUid());
+                        assetTypeGroupSelectItems.add(childItem);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("buildAssetTypeGroupSelectItems error", e);
         }
     }
 
-    public List<String> autoCompleteAssetTypeGroupName(String query) {
-        if (assetTypeGroupList == null) {
-            return Collections.emptyList();
+    public void onAssetTypeGroupFilterChange() {
+        if (selectedAssetTypeGroupUid == null) {
+            clearAssetTypeGroupFilter();
+            return;
         }
-        List<AssetTypeGroup> res = this.assetTypeGroupList.stream()
-                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query))
+        if (allAssetTypeGroupList == null) {
+            allAssetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchy(user.getTenantUID());
+        }
+        // 判断选中的是一级分类还是子分类
+        boolean isTopLevel = false;
+        if (assetTypeGroupFilterTree != null) {
+            for (TreeNode child : assetTypeGroupFilterTree.getChildren()) {
+                AssetTypeGroup data = (AssetTypeGroup) child.getData();
+                if (data != null && data.getUid().equals(selectedAssetTypeGroupUid)) {
+                    isTopLevel = true;
+                    break;
+                }
+            }
+        }
+        if (isTopLevel) {
+            // 一级分类：切换展开/收起
+            if (selectedAssetTypeGroupUid.equals(expandedAssetTypeGroupUid)) {
+                expandedAssetTypeGroupUid = null;
+            } else {
+                expandedAssetTypeGroupUid = selectedAssetTypeGroupUid;
+            }
+            // 不筛选数据，只更新下拉列表
+            assetTypeGroupSelectItems = null;
+            RequestContext.getCurrentInstance().execute("PF('assetTypeGroupFilterWidget').show();");
+        } else {
+            // 子分类：按该子分类及其子节点筛选数据
+            List<AssetTypeGroup> matchingGroups = allAssetTypeGroupList.stream()
+                    .filter(item -> item.getUid().equals(selectedAssetTypeGroupUid))
+                    .collect(Collectors.toList());
+            if (matchingGroups.isEmpty()) return;
+            AssetTypeGroup selected = matchingGroups.get(0);
+            selectedAssetTypeGroupDisplayName = selected.getDisplayName();
+            Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(matchingGroups, allAssetTypeGroupList);
+            assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+            // 二级分类查询时不打开面板，让其自然关闭
+        }
+    }
+
+    private void buildAssetTypeGroupFilterTree() {
+        // 使用与 Mgr.xhtml 相同的数据源，展示租户下所有资产分类
+        assetTypeGroupFilterTree = assetTypeService.buildSysAuthGroupInTree(user.getTenantUID());
+        assetTypeGroupFilterTree.setExpanded(true);
+        // 缓存全量列表用于搜索子节点收集
+        if (allAssetTypeGroupList == null) {
+            allAssetTypeGroupList = assetTypeGroupRepository.listAssetTypeGroupInHierarchy(user.getTenantUID());
+        }
+    }
+
+    public void filterAssetTypeGroupNodes() {
+        if (assetTypeGroupFilterTree == null) {
+            buildAssetTypeGroupFilterTree();
+        }
+        String keyword = (assetTypeGroupFilterText == null || assetTypeGroupFilterText.trim().isEmpty()) ? "" : assetTypeGroupFilterText.trim();
+        // 完全对齐 Mgr.xhtml 的过滤模式：先全部隐藏，再把匹配节点及祖先恢复可见
+        List<TreeNode> visibleNodes = new ArrayList<>();
+        collectMatchingNodes(visibleNodes, assetTypeGroupFilterTree, keyword);
+        // 先把所有节点设为 hidden
+        setAllNodesHidden(assetTypeGroupFilterTree);
+        // 把匹配节点及其祖先恢复为可见，并自动展开
+        for (TreeNode node : visibleNodes) {
+            node.setType("sysAuthGroup");
+            if (!keyword.isEmpty()) {
+                node.setExpanded(true);
+            }
+        }
+    }
+
+    private void collectMatchingNodes(List<TreeNode> nodeList, TreeNode node, String keyword) {
+        for (TreeNode child : node.getChildren()) {
+            collectMatchingNodes(nodeList, child, keyword);
+            AssetTypeGroup data = (AssetTypeGroup) child.getData();
+            if (data != null && data.getName() != null && data.getName().contains(keyword)) {
+                nodeList.add(child);
+                TreeNode pNode = node;
+                while (pNode != null) {
+                    nodeList.add(pNode);
+                    pNode = pNode.getParent();
+                }
+            }
+        }
+    }
+
+    private void setAllNodesHidden(TreeNode node) {
+        for (TreeNode child : node.getChildren()) {
+            child.setType("hidden");
+            setAllNodesHidden(child);
+        }
+    }
+
+    public void onAssetTypeGroupTreeNodeSelect(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        AssetTypeGroup selected = (AssetTypeGroup) node.getData();
+        if (selected == null) return;
+        selectedAssetTypeGroupDisplayName = selected.getDisplayName();
+        // 使用全量列表收集子节点，确保所有层级的子分类都能被找到
+        List<AssetTypeGroup> matchingGroups = allAssetTypeGroupList.stream()
+                .filter(item -> item.getUid().equals(selected.getUid()))
                 .collect(Collectors.toList());
-        return res.stream().map(AssetTypeGroup::getName).distinct().collect(Collectors.toList());
+        Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(matchingGroups, allAssetTypeGroupList);
+        assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+    }
+
+    public void clearAssetTypeGroupFilter() {
+        selectedAssetTypeGroupFilterNode = null;
+        selectedAssetTypeGroupDisplayName = null;
+        selectedAssetTypeGroupUid = null;
+        expandedAssetTypeGroupUid = null;
+        assetTypeGroupFilterText = null;
+        assetTypeGroupEncodedSet = Collections.emptySet();
+        assetTypeGroupSelectItems = null;
+        keepAssetTypeFilterPanelOpen = false;
+        buildAssetTypeGroupFilterTree();
     }
 
     public String convertAssetTypeGroupEncodedToName(String encoded) {
@@ -2372,13 +2587,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.selectedWarrantyNodes = selectedWarrantyNodes;
     }
 
-    public String getFilterAssetTypeGroup() {
-        return filterAssetTypeGroup;
-    }
 
-    public void setFilterAssetTypeGroup(String filterAssetTypeGroup) {
-        this.filterAssetTypeGroup = filterAssetTypeGroup;
-    }
 
     public String getFilterWarrantyDate() {
         return filterWarrantyDate;

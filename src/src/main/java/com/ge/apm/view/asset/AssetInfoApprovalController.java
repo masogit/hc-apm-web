@@ -25,6 +25,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 
@@ -125,7 +126,7 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
     public void onClinicalDeptFilter(NodeSelectEvent event) {
         if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
-            if (deptOrg.getOrgType() == 4) {
+            if (Objects.equals(deptOrg.getOrgType(), 4)) {
                 fileterOrg = deptOrg;
                 return;
             }

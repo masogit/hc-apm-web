@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @ManagedBean
 @ViewScoped
@@ -235,11 +236,11 @@ public class MeasureRuleConfigController extends GenericCRUDUUIDController<RelMe
 	public List<SearchFilter> getFilter(String siteUID) {
 		List<SearchFilter> filter = new ArrayList<SearchFilter>();
 		OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
-		if (orgInfo.getOrgType() == 3) {// 院区
+		if (Objects.equals(orgInfo.getOrgType(), 3)) {// 院区
 			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		} else if (orgInfo.getOrgType() == 2) {// 医院
+		} else if (Objects.equals(orgInfo.getOrgType(), 2)) {// 医院
 			filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		} else if (orgInfo.getOrgType() == 1) {// 集团
+		} else if (Objects.equals(orgInfo.getOrgType(), 1)) {// 集团
 			filter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
 		} else {// 租户
 			filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));

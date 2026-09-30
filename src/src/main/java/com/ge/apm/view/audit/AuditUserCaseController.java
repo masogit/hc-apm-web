@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -106,9 +107,9 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
             List<AuditSystemEntry> auditSystemEntries = auditSystemEntryRepository.findByCaseUid(auditSystemCase.getUid());
             if (auditSystemEntries!=null && !auditSystemEntries.isEmpty()){
                 for (AuditSystemEntry auditSystemEntry : auditSystemEntries){
-                    if (auditSystemEntry.getType()==1){
+                    if (Objects.equals(auditSystemEntry.getType(),1)){
                         stripNum++;
-                    }else if(auditSystemEntry.getType()==2){
+                    }else if(Objects.equals(auditSystemEntry.getType(),2)){
                         BigDecimal score = new BigDecimal(scoreNum);
                         BigDecimal scoreStandard = new BigDecimal(auditSystemEntry.getScoreStandard()==null ? 0D :auditSystemEntry.getScoreStandard());
                         scoreNum=score.add(scoreStandard).doubleValue();
@@ -116,7 +117,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
                     }else {
                         String parentUid = auditSystemEntry.getParentUid();
                         AuditSystemEntry data = auditSystemEntryRepository.findByUid(parentUid);
-                        if(data!=null && data.getType()==1){
+                        if(data!=null && Objects.equals(data.getType(),1)){
                             BigDecimal score = new BigDecimal(scoreNum);
                             BigDecimal scoreStandard = new BigDecimal(auditSystemEntry.getScoreStandard()==null ? 0D :auditSystemEntry.getScoreStandard());
                             scoreNum=score.add(scoreStandard).doubleValue();
@@ -278,7 +279,7 @@ public class AuditUserCaseController extends GenericCRUDUUIDController<AuditCase
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 3) {
+        if (Objects.equals(oi.getOrgLevel(), 3)) {
             return oi.getName();
         }
         return null;

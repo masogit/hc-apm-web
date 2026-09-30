@@ -249,7 +249,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
         List<InventoryOrderDetail> inventoryOrderDetails =inventoryOrderMapper.selectInventoryDetailByCondition(pagination, wrapper);
         if(inventoryOrderDetails != null && inventoryOrderDetails.size()>0){
             for(InventoryOrderDetail inventoryOrderDetail:inventoryOrderDetails){
-                if(inventoryOrderDetail.getStatus() == 0){
+                if(Objects.equals(inventoryOrderDetail.getStatus(), 0)){
                     inventoryOrderDetail.setLastModifiedDate(null);
                     inventoryOrderDetail.setLastModifiedBy(null);
                 }
@@ -258,7 +258,7 @@ public class InspectionServiceController extends GenericCRUDUUIDController<V2_Wo
                     InventoryOrder inventoryOrder = inventoryOrderRepository.findById(inventoryOrderId);
                     inventoryOrderDetail.setPlanEndTime(inventoryOrder.getPlanEndTime());
                     inventoryOrderDetail.setPlanStartTime(inventoryOrder.getPlanStartTime());
-                    if(inventoryOrderDetail.getStatus() == 1){
+                    if(Objects.equals(inventoryOrderDetail.getStatus(), 1)){
                         InventoryIssue inventoryIssue = inventoryIssueRepository.findProjectionByAssetIdAndInventoryOrderId(assetId, inventoryOrderId);
                         if(inventoryIssue != null){
                             inventoryOrderDetail.setStatus(3);

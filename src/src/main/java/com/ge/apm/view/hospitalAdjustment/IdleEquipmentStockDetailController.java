@@ -250,7 +250,7 @@ public class IdleEquipmentStockDetailController extends GenericCRUDUUIDControlle
         application=new AdjustmentTransferApplication();
 
         IdleEquipmentStock idleEquipmentStock = dao.findByUid(selected.getUid());
-        if(idleEquipmentStock.getStatus()!=1){
+        if(!Objects.equals(idleEquipmentStock.getStatus(), 1)){
             WebUtil.addWarnMessage("设备在借用中或不可借");
             return;
         }

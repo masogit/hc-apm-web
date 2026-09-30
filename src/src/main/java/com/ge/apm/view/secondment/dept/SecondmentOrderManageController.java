@@ -156,7 +156,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
     private void serializationConfiguration() {
         secondmentConfig = new SecondmentConfig();
         String configSnapshot = selected.getConfigSnapshot();
-        if(selected.getStatus() == 2){
+        if(Objects.equals(selected.getStatus(), 2)){
             calculateTimeCharges(selected);
         }
         if(StringUtils.hasText(configSnapshot)){
@@ -289,7 +289,7 @@ public class SecondmentOrderManageController extends GenericCRUDUUIDController<S
             flag=true;
         }
         Integer borrowedStatusCurrent = assetInfo.getBorrowedStatus();
-        if(borrowedStatusCurrent != null && borrowedStatusCurrent == 1){
+        if(borrowedStatusCurrent != null && Objects.equals(borrowedStatusCurrent, 1)){
             assetInfo.setBorrowedStatus(0);
             flag=true;
         }

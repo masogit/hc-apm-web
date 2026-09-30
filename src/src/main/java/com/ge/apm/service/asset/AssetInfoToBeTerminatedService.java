@@ -47,7 +47,7 @@ public class AssetInfoToBeTerminatedService{
     }
 
     public boolean validateTermination(AssetInfo assetInfo) {
-        if (assetInfo.getStatus() != 4) {
+        if (!Objects.equals(assetInfo.getStatus(), 4)) {
             WebUtil.addErrorMessage(String.format(WebUtil.getMessage("EquipmentCannotBeTerminated"), assetInfo.getName()));
             return true;
         }

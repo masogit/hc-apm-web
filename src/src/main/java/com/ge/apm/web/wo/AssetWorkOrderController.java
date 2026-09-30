@@ -130,7 +130,7 @@ public class AssetWorkOrderController implements Serializable {
             clinicalDeptList = Collections.EMPTY_LIST;
         } else {
             clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getSiteUID());
-            List<OrgInfo> allAccessibleClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+            List<OrgInfo> allAccessibleClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
             clinicalDeptList = clinicalDeptList.stream().filter(orgInfo -> allAccessibleClinicalDeptList.contains(orgInfo)).collect(Collectors.toList());
             if(null != filterDeptOrg && !filterDeptOrg.getSiteUID().equals(selectedOrg.getSiteUID()) ){
                 filterDeptOrg = null;

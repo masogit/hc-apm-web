@@ -177,10 +177,10 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		clinicalDeptList = new ArrayList<OrgInfo>();
 		queryAsset1 = new AssetInfo();
 		queryAsset1.setTenantUID(currentUser.getTenantUID());
-		if(currentUser.getOrgLevel() != 0) {
-			if (currentUser.getOrgLevel() == 1) {
+		if(!Objects.equals(currentUser.getOrgLevel(), 0)) {
+			if (Objects.equals(currentUser.getOrgLevel(), 1)) {
 				queryAsset1.setInstitutionUID(currentUser.getInstitutionUID());
-			} else if (currentUser.getOrgLevel() == 2) {
+			} else if (Objects.equals(currentUser.getOrgLevel(), 2)) {
 				queryAsset1.setHospitalUID(currentUser.getHospitalUID());
 			} else {
 				queryAsset1.setSiteUID(currentUser.getSiteUID());
@@ -271,13 +271,13 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 		}
 
 		if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
-			if(selectedOrg.getOrgLevel() == 1){
+			if(Objects.equals(selectedOrg.getOrgLevel(), 1)){
 				queryAsset1.setInstitutionUID(selectedOrg.getInstitutionUID());
 				clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getInstitutionUID(), 4);
-			}else if(selectedOrg.getOrgLevel() == 2){
+			}else if(Objects.equals(selectedOrg.getOrgLevel(), 2)){
 				queryAsset1.setHospitalUID(selectedOrg.getHospitalUID());
 				clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getHospitalUID(), 4);
-			}else if(selectedOrg.getOrgLevel() == 3){
+			}else if(Objects.equals(selectedOrg.getOrgLevel(), 3)){
 				queryAsset1.setSiteUID(selectedOrg.getSiteUID());
 				clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getSiteUID(), 4);
 			}
@@ -937,7 +937,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
             if (!org.springframework.util.CollectionUtils.isEmpty(deptList)) {
                 assetDeptList = deptList.stream()
                         .filter(item -> {
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }

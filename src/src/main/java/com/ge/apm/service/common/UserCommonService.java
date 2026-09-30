@@ -248,7 +248,7 @@ public class UserCommonService {
             flag = true;
         }
 
-        if (cua.getOrgLevel() == tempOrgInfo.getOrgLevel() && cua.getSiteUID().equals(siteUid)) {
+        if (Objects.equals(cua.getOrgLevel(), tempOrgInfo.getOrgLevel()) && cua.getSiteUID().equals(siteUid)) {
             flag = true;
         }
 
@@ -271,7 +271,7 @@ public class UserCommonService {
             flag = true;
         }
 
-        if (cua.getOrgLevel() == oi.getOrgLevel() && cua.getSiteUID().equals(oi.getSiteUID())) {
+        if (Objects.equals(cua.getOrgLevel(), oi.getOrgLevel()) && cua.getSiteUID().equals(oi.getSiteUID())) {
             flag = true;
         }
 
@@ -316,13 +316,13 @@ public class UserCommonService {
 
     public List<SearchFilter> getUserLogicFilters(Integer loginUserOrgType,UserAccount user){
         List<SearchFilter> searchFilters = new ArrayList<>();
-        if (loginUserOrgType == 0) {
+        if (Objects.equals(loginUserOrgType, 0)) {
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-        } else if (loginUserOrgType == 1) {
+        } else if (Objects.equals(loginUserOrgType, 1)) {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-        } else if (loginUserOrgType == 2) {
+        } else if (Objects.equals(loginUserOrgType, 2)) {
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-        } else if (loginUserOrgType == 3 || loginUserOrgType == 4) {
+        } else if (Objects.equals(loginUserOrgType, 3) || Objects.equals(loginUserOrgType, 4)) {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
         }
         return searchFilters;

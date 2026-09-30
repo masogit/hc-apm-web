@@ -123,7 +123,7 @@ public class DepartmentConvertService {
         map.put(status.name(), statusName);
         List<MultiLevelApproval> multiLevelApprovals1 = new ArrayList<>();
         List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessUid(assetDepartmentConvert.getBusinessUid());
-        Map<Integer, List<MultiLevelApproval>> listMap = multiLevelApprovals.stream().filter(item -> item.getApprovalStatus() == 2).collect(Collectors.groupingBy(MultiLevelApproval::getApprovalLevel));
+        Map<Integer, List<MultiLevelApproval>> listMap = multiLevelApprovals.stream().filter(item -> Objects.equals(item.getApprovalStatus(), 2)).collect(Collectors.groupingBy(MultiLevelApproval::getApprovalLevel));
         listMap.forEach((id, approvalList) -> {
             List<MultiLevelApproval> collect = approvalList.stream().sorted(Comparator.comparing(MultiLevelApproval::getActualApproverDate,Comparator.nullsLast(Comparator.reverseOrder()))).collect(Collectors.toList());
             multiLevelApprovals1.add(collect.get(0));

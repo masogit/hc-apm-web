@@ -4,6 +4,8 @@ package com.ge.apm.domain;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -93,6 +95,11 @@ public class AssetStocked implements Serializable {
     @Column(name = "arrival_item_id", columnDefinition = "CHAR(32)")
     private String arrivalItemId;
 
+    @JoinColumn(name = "arrival_item_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private ArrivalListItem arrivalListItem;
+
     //库存来源 1、台账入库 2、转科入库 3、到货入库 4、退库入库
     @Column(name = "stock_source")
     private Integer stockSource;
@@ -105,6 +112,8 @@ public class AssetStocked implements Serializable {
     private String invoiceNum;
     @Transient
     private String contractNum;
+    @Transient
+    private String locationName;
 
     @Override
     public int hashCode() {

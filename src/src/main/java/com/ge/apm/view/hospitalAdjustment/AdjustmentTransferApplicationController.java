@@ -155,7 +155,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
             borrowClinicalDeptList = uaaService.getAllAccessibleClinicalDeptList();
         }
 
-        borrowHospitalList = orgList.stream().filter(ite->ite.getOrgType() == 2).collect(Collectors.toList());
+        borrowHospitalList = orgList.stream().filter(ite->Objects.equals(ite.getOrgType(), 2)).collect(Collectors.toList());
         this.selectedMap = new HashMap();
     }
 
@@ -218,7 +218,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
             borrowHospitalList.add(orgByUid);
             borrowClinicalDeptList= borrowClinicalDeptList.stream().filter(ite -> ite.getHospitalUID().equals(currentUserAccount.getHospitalUID())).collect(Collectors.toList());
         }else{
-            borrowHospitalList = orgList.stream().filter(ite->ite.getOrgType() == 2).collect(Collectors.toList());
+            borrowHospitalList = orgList.stream().filter(ite->Objects.equals(ite.getOrgType(), 2)).collect(Collectors.toList());
             borrowClinicalDeptList= uaaService.getBySiteUidDeptList(currentUserAccount.getInstitutionUID());
 
         }
@@ -291,7 +291,7 @@ public class AdjustmentTransferApplicationController extends GenericCRUDUUIDCont
                             if (item == null) {
                                 log.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }

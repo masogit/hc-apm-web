@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author 212688574
@@ -113,7 +114,7 @@ public class WorkOrderExportSysTemplateController extends GenericCRUDUUIDControl
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 1) {
+        if (Objects.equals(oi.getOrgLevel(), 1)) {
             return oi.getName();
         }
         return null;
@@ -124,7 +125,7 @@ public class WorkOrderExportSysTemplateController extends GenericCRUDUUIDControl
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 2) {
+        if (Objects.equals(oi.getOrgLevel(), 2)) {
             return oi.getName();
         }
         return null;
@@ -135,7 +136,7 @@ public class WorkOrderExportSysTemplateController extends GenericCRUDUUIDControl
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 3) {
+        if (Objects.equals(oi.getOrgLevel(), 3)) {
             return oi.getName();
         }
         return null;

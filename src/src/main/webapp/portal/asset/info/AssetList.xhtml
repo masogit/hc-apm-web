@@ -325,14 +325,17 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetTypeGroup'}">
-                                <p:column headerText="#{msg.assetTypeGroup}" width="100" exportable="true">
+                                <p:column width="100" exportable="true">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.assetTypeGroup}"/><br/>
-                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetTypeGroup}" appendTo="@(Body)"
-                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteAssetTypeGroupName}" size="5">
-                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetTypeGroupNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate"/>
-                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetTypeGroupNameFilterChange}" update=":AssetInfoListForm:datalist  :AssetInfoListForm:idPanelFilterWarrantyDate" />
-                                        </p:autoComplete>
+                                        <p:selectOneMenu id="assetTypeGroupFilter"
+                                                         widgetVar="assetTypeGroupFilterWidget"
+                                                         value="#{assetInfoListController.selectedAssetTypeGroupUid}"
+                                                         autoWidth="false" style="max-width:150px;font-size:12px;">
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{assetInfoListController.assetTypeGroupSelectItems}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                            <p:ajax listener="#{assetInfoListController.onAssetTypeGroupFilterChange}" update=":AssetInfoListForm:datalist :AssetInfoListForm:datalist:assetTypeGroupFilter"/>
+                                        </p:selectOneMenu>
                                     </f:facet>
                                     <h:outputText value="#{assetInfoListController.convertAssetTypeGroupEncodedToName(item.assetType)}"/>
                                 </p:column>

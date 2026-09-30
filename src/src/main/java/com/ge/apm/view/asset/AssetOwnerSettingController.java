@@ -160,7 +160,7 @@ public class AssetOwnerSettingController {
     }
 
     public boolean getIsSelect46Account() {
-        if (UserContextService.getCurrentUserAccount().getSiteId()==46&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
+        if (Objects.equals(UserContextService.getCurrentUserAccount().getSiteId(),46)&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
             return true;
         }
         return false;
@@ -194,23 +194,23 @@ public class AssetOwnerSettingController {
             selectedOrg = null;
         } else {
             selectedOrg = orgInfo;
-            if(selectedOrg.getOrgLevel()==0 && selectedOrg.getOrgType()!=4){
+            if(Objects.equals(selectedOrg.getOrgLevel(),0) && !Objects.equals(selectedOrg.getOrgType(),4)){
                 queryAsset.setTenantUID(selectedOrg.getUid());
                 clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(), 0);
             }
-            if(selectedOrg.getOrgLevel()==1 && selectedOrg.getOrgType()!=4){
+            if(Objects.equals(selectedOrg.getOrgLevel(),1) && !Objects.equals(selectedOrg.getOrgType(),4)){
                 queryAsset.setInstitutionUID(selectedOrg.getUid());
                 clinicalDeptList = assetInfoService. getClinicalDeptList(selectedOrg.getUid(),1);
             }
-            if(selectedOrg.getOrgLevel()==2 && selectedOrg.getOrgType()!=4){
+            if(Objects.equals(selectedOrg.getOrgLevel(),2) && !Objects.equals(selectedOrg.getOrgType(),4)){
                 queryAsset.setHospitalUID(selectedOrg.getUid());
                 clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(),2);
             }
-            if(selectedOrg.getOrgLevel()==3 && selectedOrg.getOrgType()!=4){
+            if(Objects.equals(selectedOrg.getOrgLevel(),3) && !Objects.equals(selectedOrg.getOrgType(),4)){
                 queryAsset.setSiteUID(selectedOrg.getUid());
                 clinicalDeptList =  assetInfoService.getClinicalDeptList(selectedOrg.getUid(),3);
             }
-            if(selectedOrg.getOrgType()==4){
+            if(Objects.equals(selectedOrg.getOrgType(),4)){
                 queryAsset.setClinicalDeptUID(selectedOrg.getUid());
                 clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(),4);
             }
@@ -256,19 +256,19 @@ public class AssetOwnerSettingController {
 
     public List<OrgInfo> getClinicalDeptList() {
         //return acServie.getClinicalDeptList(queryAsset.getSiteUID());
-        if(currentUser.getOrgLevel()==0){
+        if(Objects.equals(currentUser.getOrgLevel(),0)){
             return assetInfoService.getClinicalDeptList(currentUser.getTenantUID(),0);
         }
-        if(currentUser.getOrgLevel()==1){
+        if(Objects.equals(currentUser.getOrgLevel(),1)){
             return assetInfoService.getClinicalDeptList(currentUser.getInstitutionUID(),1);
         }
-        if(currentUser.getOrgLevel()==2){
+        if(Objects.equals(currentUser.getOrgLevel(),2)){
             return assetInfoService.getClinicalDeptList(currentUser.getHospitalUID(),2);
         }
-        if(currentUser.getOrgLevel()==3){
+        if(Objects.equals(currentUser.getOrgLevel(),3)){
             return assetInfoService.getClinicalDeptList(currentUser.getSiteUID(),3);
         }
-        if(currentUser.getOrgType()==4){
+        if(Objects.equals(currentUser.getOrgType(),4)){
             return assetInfoService.getClinicalDeptList(currentUser.getClinicalDeptUID(),4);
         }
         return null;

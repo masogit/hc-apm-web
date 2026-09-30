@@ -479,10 +479,11 @@
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['locationName']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.locationName}<span style="color:red">#{assetInstallationController.customConfig.assetFields['locationName'].arrivalRequired? '*':''}</span></label>
-                                    <p:inputText id="locationName" value="#{assetInstallationController.arrivalListItem.locationName}" required="#{assetInstallationController.customConfig.assetFields['locationName'].arrivalRequired}" 
-                                                 requiredMessage="#{msg.locationName} #{msg.ValidationRequire}">
+                                    <p:autoComplete id="locationName" dropdown="true" scrollHeight="300" value="#{assetInstallationController.arrivalListItem.locationName}" required="#{assetInstallationController.customConfig.assetFields['locationName'].arrivalRequired}"
+                                                    requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" completeMethod="#{assetInstallationController.autoCompleteLocation}">
+                                        <p:ajax event="itemSelect" listener="#{assetInstallationController.onLocationSelect}" process="@this" update="@this"/>
                                         <p:ajax process="@this" update="@this"/>
-                                    </p:inputText>
+                                    </p:autoComplete>
                                 </h:panelGroup>
                             </c:if>
                             <h:panelGroup rendered="#{userContextService.activeSupplier()}">

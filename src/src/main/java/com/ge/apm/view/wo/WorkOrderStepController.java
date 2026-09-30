@@ -1,6 +1,7 @@
 package com.ge.apm.view.wo;
 
 import java.util.List;
+import java.util.Objects;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import org.springframework.data.domain.Page;
@@ -121,7 +122,7 @@ public class WorkOrderStepController extends JpaCRUDController<WorkOrderStep> {
     }
 
     public void finishWorkOrderStep(){
-        if(selected!=null && selected.getStepId()==6){
+        if(selected!=null && Objects.equals(selected.getStepId(), 6)){
             closeWorkOrder();
             return;
         }

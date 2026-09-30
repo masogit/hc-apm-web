@@ -138,7 +138,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
 
     public List<UserAccount> findPerson() {
         List<UserAccount> userList = new ArrayList<>();
-        if (this.selected != null && this.selected.getOrgType() == 4) {//类型是科室
+        if (this.selected != null && Objects.equals(this.selected.getOrgType(), 4)) {//类型是科室
             if (this.selected.getParentOrg() != null) {
                 userList = userDao.findBySiteUID(this.selected.getSiteUID());
             }
@@ -166,8 +166,8 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
     private void componentBuild(TreeNode orgTree) {
         if (orgTree.getData() != null) {
             OrgInfo org = (OrgInfo) orgTree.getData();
-            if (org.getOrgType() == 3) {
-                if (org.getOrgLevel() == 3) {
+            if (Objects.equals(org.getOrgType(), 3)) {
+                if (Objects.equals(org.getOrgLevel(), 3)) {
                     orgTree.getChildren().clear();
                     //添加楼宇
                     List<BuildManagement> buildManagementList = buildManagementRepository.findBySiteUID(org.getUid());
@@ -188,7 +188,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
         ArrayList<TreeNode> treeNodes = new ArrayList<>();
         orgTree.getChildren().stream().forEach(item -> {
             OrgInfo org = (OrgInfo) item.getData();
-            if(org.getOrgType()==4){
+            if(Objects.equals(org.getOrgType(), 4)){
                 treeNodes.add(item);
                 return;
             }
@@ -205,7 +205,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
     }
 
     public void buildOrdTree() {
-        if (selectedTenant!=null&&selectedTenant.getId()==46) {
+        if (selectedTenant!=null&&Objects.equals(selectedTenant.getId(),46)) {
             orgTree = null;
             return;
         }
@@ -229,7 +229,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
     }
 
     public void filterNode() {
-        if (selectedTenant!=null&&selectedTenant.getId()==46) {
+        if (selectedTenant!=null&&Objects.equals(selectedTenant.getId(),46)) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithClinicalDept(loginUser.getUid(), retrieval, selectedTenant.getId());
             OrgInfo tenant = dao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
@@ -343,7 +343,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
             case 4:
                 if (selectedNode.getData() instanceof  OrgInfo) {
                     OrgInfo org = (OrgInfo) selectedNode.getData();
-                    if (org.getOrgType() != 3) {
+                    if (!Objects.equals(org.getOrgType(), 3)) {
                         MessageUtil.outPutReturnFacesMessage("请选择院区", FacesMessage.SEVERITY_INFO);
                         return;
                     }
@@ -403,7 +403,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
 
             } else {
                 //update
-                if (selected.getId().intValue() != orgInfo.getId().intValue()) {
+                if (!Objects.equals(selected.getId(), orgInfo.getId())) {
                     WebUtil.addErrorMessage(orgName + "已经存在");
                     return true;
                 }
@@ -499,7 +499,7 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
         }
 
         boolean canDeleteable;
-        if (selected.getOrgType() == 4) {
+        if (Objects.equals(selected.getOrgType(), 4)) {
             canDeleteable = canDeleteClinicalDept();
         } else {
             canDeleteable = canDeleteOrgExceptClinicalDept();
@@ -666,8 +666,8 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
             contactPerson = selected.getContactPerson();
             contactPhone = selected.getContactPhone();
             if (selected != null) {
-                isShow = selected.getOrgType() == 2;
-                acShow = selected.getOrgType() == 4;
+                isShow = Objects.equals(selected.getOrgType(), 2);
+                acShow = Objects.equals(selected.getOrgType(), 4);
             }
             selectBuild=null;
         }
@@ -761,11 +761,11 @@ public class BuildManagementController extends JpaCRUDController<OrgInfo> {
     }
 
     public boolean getIsCreateHospitalDisabled() {
-        return (selected == null) || (selected.getOrgType() == null) || (selected.getOrgType() != 1) || selected.getId() == null;
+        return (selected == null) || (selected.getOrgType() == null) || !Objects.equals(selected.getOrgType(), 1) || selected.getId() == null;
     }
 
     public boolean getIsCreateSiteDisabled() {
-        return (selected == null) || (selected.getOrgType() == null) || (selected.getOrgType() != 2) || selected.getId() == null;
+        return (selected == null) || (selected.getOrgType() == null) || !Objects.equals(selected.getOrgType(), 2) || selected.getId() == null;
     }
 
     public boolean getIsCreateDepartmentDisabled() {

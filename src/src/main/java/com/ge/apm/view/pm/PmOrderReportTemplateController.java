@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @ManagedBean
 @ViewScoped
@@ -165,7 +166,7 @@ public class PmOrderReportTemplateController extends GenericCRUDUUIDController<P
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == level) {
+        if (Objects.equals(oi.getOrgLevel(), level)) {
             return oi.getName();
         }
         return null;

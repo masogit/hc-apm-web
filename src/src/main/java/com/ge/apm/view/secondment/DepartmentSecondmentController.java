@@ -111,7 +111,7 @@ public class DepartmentSecondmentController extends GenericCRUDUUIDController<Si
         }
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uuaService.getUserAccessibleSiteListWithClinicalDept(user.getUid()).stream()
-                .filter(item -> item.getOrgType() == 4)
+                .filter(item -> Objects.equals(item.getOrgType(), 4))
                 .map(item -> item.getUid())
                 .collect(Collectors.toList());
         this.updateSearchFilter(new SearchFilter("outDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));

@@ -183,13 +183,20 @@ public class AssetInStockedController extends GenericCRUDUUIDController<AssetInS
         return page;
     }
 
-    private void pckFilters(List<SearchFilter> searchFilters) {
-        if (!this.hasFilterOnField("assetInfo.siteUID")) {
+    private void pckFilters(List<SearchFilter> filters) {
+        boolean hasFieldFilter = false;
+        for (SearchFilter filter : filters) {
+            if ("assetInfo.siteUID".equals(filter.fieldName)) {
+                hasFieldFilter = true;
+                break;
+            }
+        }
+        if (!hasFieldFilter) {
             List<String> orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getSiteUID).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            filters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
 
@@ -271,7 +278,7 @@ public class AssetInStockedController extends GenericCRUDUUIDController<AssetInS
         } else {
             // 用户在科室级别时, 可选择所在科室
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setSelectable(org.getOrgType() == 4);
+            node.setSelectable(Objects.equals(org.getOrgType(), 4));
             node.setRowKey("org_" + org.getId());
             rootNode.getChildren().add(node);
         }

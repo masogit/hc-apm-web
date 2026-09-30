@@ -258,7 +258,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());

@@ -119,7 +119,7 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         configItemMapper = WebUtil.getBean(ConfigItemMapper.class);
-        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         assetOutStockService = WebUtil.getBean(AssetOutStockService.class);
         selectedMap = new HashMap<>();
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -263,7 +263,7 @@ public class AssetOutStockController extends GenericCRUDUUIDController<ArrivalLi
         } else {
             // 用户在科室级别时, 可选择所在科室
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setSelectable(org.getOrgType() == 4);
+            node.setSelectable(Objects.equals(org.getOrgType(), 4));
             node.setRowKey("org_" + org.getId());
             rootNode.getChildren().add(node);
         }

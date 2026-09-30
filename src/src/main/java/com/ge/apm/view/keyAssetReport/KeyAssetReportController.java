@@ -555,7 +555,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         } else {
             // 用户在科室级别时, 可选择所在科室
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setSelectable(org.getOrgType() == 4);
+            node.setSelectable(Objects.equals(org.getOrgType(), 4));
             node.setRowKey("org_" + org.getId());
             rootNode.getChildren().add(node);
         }
@@ -623,7 +623,7 @@ public class KeyAssetReportController extends GenericCRUDUUIDController<KeyAsset
         assetSearchFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, dept.getHospitalUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, dept.getSiteUID(), "1*"));
         assetSearchFilter.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IsNotNull, null, "1*"));
-        if (dept.getOrgType() == 4) {
+        if (Objects.equals(dept.getOrgType(), 4)) {
             List<OrgInfo> userAccessibleSiteListWithClinicalDept = uaaService.getUserAccessibleSiteListWithClinicalDept(account.getUid());
             Set<OrgInfo> clinicalDeptSet = new HashSet<>();
             collectChildClinicalDeptInExstingList(dept, userAccessibleSiteListWithClinicalDept, clinicalDeptSet);

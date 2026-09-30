@@ -189,7 +189,7 @@ public class YearPurchaseInfoController extends JpaCRUDController<YearPurchaseIn
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
@@ -334,7 +334,7 @@ public class YearPurchaseInfoController extends JpaCRUDController<YearPurchaseIn
         } else {
             // 用户在科室级别时, 可选择所在科室
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setSelectable(org.getOrgType() == 4);
+            node.setSelectable(Objects.equals(org.getOrgType(), 4));
             node.setRowKey("org_" + org.getId());
             rootNode.getChildren().add(node);
         }

@@ -266,7 +266,7 @@ public class SparePartController extends GenericCRUDUUIDController<SparePart> {
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
     }
 
     public boolean disableUploadButton_temp() {

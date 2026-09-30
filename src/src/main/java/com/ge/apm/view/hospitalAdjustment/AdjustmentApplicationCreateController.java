@@ -196,7 +196,7 @@ public class AdjustmentApplicationCreateController extends GenericCRUDUUIDContro
         }
         List<IdleEquipmentApplication> byAssetUidAndStatusIn = dao.findByAssetUidAndStatusIn(selectedAsset.getUid(), Arrays.asList(1, 2, 3));
         if(CollectionUtils.isNotEmpty(byAssetUidAndStatusIn)){
-            boolean b = byAssetUidAndStatusIn.stream().anyMatch(i -> i.getStatus() == 3);
+            boolean b = byAssetUidAndStatusIn.stream().anyMatch(i -> Objects.equals(i.getStatus(), 3));
             if(b){
                 WebUtil.addWarnMessage("该设备已经审批通过入库");
                 return  false;

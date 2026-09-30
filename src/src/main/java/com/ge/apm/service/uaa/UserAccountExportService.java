@@ -274,7 +274,7 @@ public class UserAccountExportService {
 	}
 	private List<OrgInfo> tenantOrgInfoTypeOf4All(List<OrgInfo> orgInfos){
 		if(CollectionUtils.isEmpty(orgInfos)) return ListUtils.newArrayList();
-		return  orgInfos.stream().filter(item->item.getOrgType() != null && item.getOrgType() == 4).collect(Collectors.toList());
+		return  orgInfos.stream().filter(item->item.getOrgType() != null && Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
 	}
 	/**
 	 * use space as delimiter to group tags to export

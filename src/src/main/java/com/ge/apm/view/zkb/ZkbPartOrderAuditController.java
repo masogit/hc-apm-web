@@ -585,7 +585,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
         Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
-        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+        if(!Objects.equals(newDataFlag, oldDataFlag)){
             WebUtil.addErrorMessage("数据已被审批！");
             return "";
         }
@@ -636,7 +636,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
         Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
-        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+        if(!Objects.equals(newDataFlag, oldDataFlag)){
             WebUtil.addErrorMessage("数据已被审批！");
             return "";
         }
@@ -675,7 +675,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
         Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
-        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+        if(!Objects.equals(newDataFlag, oldDataFlag)){
             WebUtil.addErrorMessage("数据已被操作，不需要重复进行！");
             return "";
         }
@@ -796,7 +796,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
         Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
-        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+        if(!Objects.equals(newDataFlag, oldDataFlag)){
             WebUtil.addErrorMessage("数据已被审批！");
             return "";
         }
@@ -810,7 +810,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         ZkbPartOrder newZkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         Integer newDataFlag = newZkbPartOrder.getDataFlag() == null ? 0 : newZkbPartOrder.getDataFlag();
         Integer oldDataFlag = selected.getDataFlag() == null ? 0 : selected.getDataFlag();
-        if(newDataFlag.intValue() != oldDataFlag.intValue()){
+        if(!Objects.equals(newDataFlag, oldDataFlag)){
             WebUtil.addErrorMessage("数据已被审批！");
             return "";
         }

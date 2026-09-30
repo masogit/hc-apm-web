@@ -252,6 +252,11 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
             SearchFilter searchFilter = siteUID.get();
             wrapper.and().eq("measuring_item_category",Integer.valueOf((String) searchFilter.value));
         }
+        if(this.hasFilterOnField("measuringOwnerName")){
+            Optional<SearchFilter> siteUID = getFilterOnField("measuringOwnerName");
+            SearchFilter searchFilter = siteUID.get();
+            wrapper.and().like("measuring_owner_name",(String) searchFilter.value);
+        }
         if(this.hasFilterOnField("nextMeteringDate")){
             for (SearchFilter searchFilter : searchFilters) {
                 if(!searchFilter.fieldName.equals("nextMeteringDate")) continue;
@@ -286,7 +291,7 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
         OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
-        if (deptOrg.getOrgType() == 4) {
+        if (Objects.equals(deptOrg.getOrgType(), 4)) {
             filterOrg = deptOrg;
         } else {
             filterOrg = null;
@@ -296,7 +301,7 @@ public class UnmeasuredAssetListController extends JpaCRUDController<AssetInfo> 
     public void onAssetDeptFilter(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
         OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
-        if (deptOrg.getOrgType() == 4) {
+        if (Objects.equals(deptOrg.getOrgType(), 4)) {
             filterAssetDeptOrg = deptOrg;
         } else {
             filterAssetDeptOrg = null;

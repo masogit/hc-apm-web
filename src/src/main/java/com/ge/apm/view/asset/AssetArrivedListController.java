@@ -378,7 +378,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
                 if (o1.getItemNum() > o2.getItemNum()) {
                     return 1;
                 }
-                if (o1.getItemNum() == o2.getItemNum()) {
+                if (Objects.equals(o1.getItemNum(), o2.getItemNum())) {
                     return 0;
                 }
                 return -1;

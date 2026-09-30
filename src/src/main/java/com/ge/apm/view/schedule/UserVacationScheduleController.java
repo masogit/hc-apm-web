@@ -91,12 +91,12 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
         }
 
         if(userContextService.hasRole("AssetHead")){
-            if(currentUser.getOrgLevel() != 0){
-                if(currentUser.getOrgLevel() == 1){
+            if(!Objects.equals(currentUser.getOrgLevel(), 0)){
+                if(Objects.equals(currentUser.getOrgLevel(), 1)){
                     if (!this.hasFilterOnField("institutionUID")) {
                         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
                     }
-                }else if(currentUser.getOrgLevel() == 2){
+                }else if(Objects.equals(currentUser.getOrgLevel(), 2)){
                     if (!this.hasFilterOnField("hospitalUID")) {
                         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
                     }

@@ -163,7 +163,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         }else{
             siteUid = user.getSiteUID();
             orgUidList = uuaService.getUserAccessibleSiteListWithClinicalDept(user.getUid()).stream()
-                    .filter(item -> item.getOrgType() == 4)
+                    .filter(item -> Objects.equals(item.getOrgType(), 4))
                     .map(item -> item.getUid())
                     .collect(Collectors.toList());
 

@@ -916,10 +916,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public String changeruleLevelTip(){
         if(selected.getLevel() != null){
-        if(selected.getLevel() == 2){
+        if(Objects.equals(selected.getLevel(), 2)){
             ruleLevelTip = WebUtil.getMessage("SecondaryMaintenanceTip");
         }
-        if(selected.getLevel() == 3){
+        if(Objects.equals(selected.getLevel(), 3)){
             ruleLevelTip = WebUtil.getMessage("ThreelevelMaintenanceTip");
         }
         }
@@ -934,7 +934,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         if(isAssetHead){
             return false;
         }else{
-            return selected.getStatus() == 1 ? true : false;
+            return Objects.equals(selected.getStatus(), 1) ? true : false;
         }
     }
 

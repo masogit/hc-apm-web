@@ -358,7 +358,7 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
      */
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
     }
 
     /**

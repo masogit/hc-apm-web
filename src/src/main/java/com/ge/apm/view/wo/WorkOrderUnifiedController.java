@@ -411,7 +411,7 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
                             if (item == null) {
                                 LOGGER.info("null");
                             }
-                            return item.getOrgType() != null && item.getOrgType() == 4;
+                            return item.getOrgType() != null && Objects.equals(item.getOrgType(), 4);
                         })
                         .collect(Collectors.toList());
             }
@@ -461,7 +461,7 @@ public class WorkOrderUnifiedController extends GenericCRUDUUIDController<V2_Wor
                         .collect(Collectors.toList());
             }
             if (!CollectionUtils.isEmpty(orgList)) {
-                orgList = orgList.stream().filter(item -> 3 == item.getOrgType()).collect(Collectors.toList());
+                orgList = orgList.stream().filter(item -> Objects.equals(item.getOrgType(), 3)).collect(Collectors.toList());
             }
         }
         return orgList;

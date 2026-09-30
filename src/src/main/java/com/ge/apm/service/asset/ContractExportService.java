@@ -55,19 +55,19 @@ public class ContractExportService {
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 
-        if (selectedOrg != null && selectedOrg.getOrgLevel() == 0) {
+        if (selectedOrg != null && Objects.equals(selectedOrg.getOrgLevel(), 0)) {
             SearchFilter tenantFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(tenantFilter);
         }
-        if (selectedOrg != null && selectedOrg.getOrgLevel() == 1) {
+        if (selectedOrg != null && Objects.equals(selectedOrg.getOrgLevel(), 1)) {
             SearchFilter institutionFilter = new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(institutionFilter);
         }
-        if (selectedOrg != null && selectedOrg.getOrgLevel() == 2) {
+        if (selectedOrg != null && Objects.equals(selectedOrg.getOrgLevel(), 2)) {
             SearchFilter hospitalFilter = new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(hospitalFilter);
         }
-        if (selectedOrg != null && selectedOrg.getOrgLevel() == 3) {
+        if (selectedOrg != null && Objects.equals(selectedOrg.getOrgLevel(), 3)) {
             SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(siteFilter);
         }

@@ -127,7 +127,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public List<UserAccount> findPerson() {
         List<UserAccount> userList = new ArrayList<>();
-        if (this.selected != null && this.selected.getOrgType() == 4) {//类型是科室
+        if (this.selected != null && Objects.equals(this.selected.getOrgType(), 4)) {//类型是科室
             if (this.selected.getParentOrg() != null) {
                 userList = userDao.findBySiteUID(this.selected.getSiteUID());
             }
@@ -136,7 +136,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void buildOrdTree() {
-        if (selectedTenant!=null&&selectedTenant.getId()==46) {
+        if (selectedTenant!=null&&Objects.equals(selectedTenant.getId(),46)) {
             orgTree = null;
             return;
         }
@@ -161,7 +161,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void filterNode() {
-        if (selectedTenant!=null&&selectedTenant.getId()==46) {
+        if (selectedTenant!=null&&Objects.equals(selectedTenant.getId(),46)) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithCondition(retrieval, selectedTenant.getId());
             OrgInfo tenant = dao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
@@ -326,7 +326,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
             } else {
                 //update
-                if (selected.getId().intValue() != orgInfo.getId().intValue()) {
+                if (!Objects.equals(selected.getId(), orgInfo.getId())) {
                     WebUtil.addErrorMessage(orgName + "已经存在");
                     return true;
                 }
@@ -384,7 +384,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         //重复增加不被允许
         boolean isDuplicate = checkName();
         if (isDuplicate) return;
-        if (selected.getOrgType() == 2 && checkHospitalUcmid()) {
+        if (Objects.equals(selected.getOrgType(), 2) && checkHospitalUcmid()) {
             return;
         }
 //        if (selected.getOrgType() == 2 && checkOrgCode()) {
@@ -413,7 +413,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
         if (isNew) {
             //如果是增加小科室，并且它的父科室已经属于用户，则把小科室的权限可见性也加进去。
-            if (selected.getOrgType() == 4 && selected.getParentOrg().getOrgType() == 4) {
+            if (Objects.equals(selected.getOrgType(), 4) && Objects.equals(selected.getParentOrg().getOrgType(), 4)) {
 
                 List<String> userUids = userOrgDao.findUserUidListByOrgUid(selected.getParentOrg().getUid());
                 for (String userUid : userUids) {
@@ -429,14 +429,14 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
                 }
             }
         } else {
-            if (selected.getOrgType() == 4) {
+            if (Objects.equals(selected.getOrgType(), 4)) {
                 updateClinicalDeptOrgName(Objects.requireNonNull(TreeNodeUtil.findNodeFromTree(orgTree, selected)));
             }
 
         }
 
         initWorkflowConfig();
-        if(selected.getSiteId()==46){
+        if(Objects.equals(selected.getSiteId(),46)){
             buildOrdTree46AfterSave(selected.getInstitutionUID());
         }else{
             buildOrdTree();
@@ -521,7 +521,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
 
         boolean canDeleteable;
-        if (selected.getOrgType() == 4) {
+        if (Objects.equals(selected.getOrgType(), 4)) {
             canDeleteable = canDeleteClinicalDept();
         } else {
             canDeleteable = canDeleteOrgExceptClinicalDept();
@@ -701,8 +701,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         gradeNature = selected.getGradeNature();
         region = selected.getRegion();
         if (selected != null) {
-            isShow = selected.getOrgType() == 2;
-            acShow = selected.getOrgType() == 4;
+            isShow = Objects.equals(selected.getOrgType(), 2);
+            acShow = Objects.equals(selected.getOrgType(), 4);
         }
     }
 
@@ -824,11 +824,11 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public boolean getIsCreateHospitalDisabled() {
-        return (selected == null) || (selected.getOrgType() == null) || (selected.getOrgType() != 1) || selected.getId() == null;
+        return (selected == null) || (selected.getOrgType() == null) || !Objects.equals(selected.getOrgType(), 1) || selected.getId() == null;
     }
 
     public boolean getIsCreateSiteDisabled() {
-        return (selected == null) || (selected.getOrgType() == null) || (selected.getOrgType() != 2) || selected.getId() == null;
+        return (selected == null) || (selected.getOrgType() == null) || !Objects.equals(selected.getOrgType(), 2) || selected.getId() == null;
     }
 
     public boolean getIsCreateDepartmentDisabled() {

@@ -556,7 +556,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     private void loadClinicalDeptList() {
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
@@ -726,7 +726,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     }
 
     public boolean validateTermination(AssetInfo assetInfo) {
-        if (assetInfo.getStatus() != 4) {
+        if (!Objects.equals(assetInfo.getStatus(), 4)) {
             WebUtil.addErrorMessage(String.format(WebUtil.getMessage("EquipmentCannotBeTerminated"), assetInfo.getName()));
             return true;
         }

@@ -427,8 +427,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 break;
         }
 
-        multiLevelApproval.setApplicationDepartment(org==null?null:org.getOrgType()==4?org.getName():null);
-        multiLevelApproval.setApplicationDepartmentUid(org==null?null:org.getOrgType()==4?org.getUid():null);
+        multiLevelApproval.setApplicationDepartment(org==null?null:Objects.equals(org.getOrgType(),4)?org.getName():null);
+        multiLevelApproval.setApplicationDepartmentUid(org==null?null:Objects.equals(org.getOrgType(),4)?org.getUid():null);
 
     }
 
@@ -478,7 +478,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             String clinicalDeptUID=null;
             switch (businessType) {
                 case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
-                    if(roleApproveCondition.getCondition()==1) {
+                    if(Objects.equals(roleApproveCondition.getCondition(),1)) {
                         V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(businessUid);
                         if(v2WorkOrder==null){
                             return Collections.emptyList();
@@ -558,7 +558,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
                 List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessTypeAndBusinessUid(ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT, multiLevelApproval.getBusinessUid());
-                List<MultiLevelApproval> filterList = multiLevelApprovals.stream().filter(item -> item.getApprovalNodeStatus() == 0).collect(Collectors.toList());
+                List<MultiLevelApproval> filterList = multiLevelApprovals.stream().filter(item -> Objects.equals(item.getApprovalNodeStatus(), 0)).collect(Collectors.toList());
                 if(CollectionUtils.isEmpty(filterList)){
                     v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_DISAGREE);
                     v2_WorkOrderRepository.save(v2WorkOrder);
@@ -1015,7 +1015,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 if (null != list) {
                     for (int i = 0; i < list.size(); i++) {
                         MultiLevelApproval multi = list.get(i);
-                        if (multi != null && multi.getApprovalLevelNow() != level) {
+                        if (multi != null && !Objects.equals(multi.getApprovalLevelNow(), level)) {
                             multi.setApprovalLevelNow(level);
                             multiLevelApprovalRepository.save(multi);
                         }
@@ -1074,7 +1074,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                                 List<V2_WorkOrder_Detail> workOrderDetails = woService.getWorkOrderDetails(v2WorkOrder.getId());
                                 List<V2_WorkOrder_Detail> collect = workOrderDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
                                 List<MultiLevelApproval> multiLevelApprovals = multiLevelApprovalRepository.findByBusinessTypeAndBusinessUid(ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT, multiLevelApproval.getBusinessUid());
-                                List<MultiLevelApproval> filterList = multiLevelApprovals.stream().filter(item -> item.getApprovalNodeStatus() == 0).collect(Collectors.toList());
+                                List<MultiLevelApproval> filterList = multiLevelApprovals.stream().filter(item -> Objects.equals(item.getApprovalNodeStatus(), 0)).collect(Collectors.toList());
                                 if(CollectionUtils.isEmpty(filterList)){
                                     v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_AGREE);//审批同意
                                     v2_WorkOrderRepository.save(v2WorkOrder);
@@ -1310,7 +1310,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 if (null != list) {
                     for (int i = 0; i < list.size(); i++) {
                         MultiLevelApproval multi = list.get(i);
-                        if (multi != null && multi.getApprovalLevelNow() != level) {
+                        if (multi != null && !Objects.equals(multi.getApprovalLevelNow(), level)) {
                             multi.setApprovalLevelNow(level);
                             multiLevelApprovalRepository.save(multi);
                         }
@@ -1487,7 +1487,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
                 if (null != list) {
                     for (int i = 0; i < list.size(); i++) {
                         MultiLevelApproval multi = list.get(i);
-                        if (multi != null && multi.getApprovalLevelNow() != level) {
+                        if (multi != null && !Objects.equals(multi.getApprovalLevelNow(), level)) {
                             multi.setApprovalLevelNow(level);
                             multiLevelApprovalRepository.save(multi);
                         }
@@ -2089,7 +2089,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         List<MultiLevelApproval> list = this.getMultiLevelApproval(multiLevelApproval);
         MultiLevelApproval multiLevelApprovalReturn = list.get(list.size() - 2);
 
-        if(multiLevelApprovalReturn.getApprovalNodeStatus()!=ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN){
+        if(!Objects.equals(multiLevelApprovalReturn.getApprovalNodeStatus(),ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_RETURN)){
            return;
         }
         List<UserAccount> userAccounts=new ArrayList<>();

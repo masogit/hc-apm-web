@@ -228,10 +228,10 @@ public class WorkOrderImportService {
     public String getDescriptionByWorkOrder(V2_WorkOrder workOrder,V2_ServiceRequest serviceRequest) {
         Map<String, Object> map = new HashMap<>();
         map.put("status", workOrder.getCurrentStepId());
-        if (workOrder.getStatus() == 1) {
+        if (Objects.equals(workOrder.getStatus(), 1)) {
             map.put("title", workOrder.getCurrentStepName());
             map.put("messages", Arrays.asList("报修编号：" + serviceRequest.getSrNum()));
-        } else if (workOrder.getStatus() == 3) {
+        } else if (Objects.equals(workOrder.getStatus(), 3)) {
             map.put("title", "已取消");
             map.put("messages", Arrays.asList("报修编号：" + serviceRequest.getSrNum()));
         } else {

@@ -191,7 +191,7 @@ public class AssetInfoService {
         OrgInfo orgInfo = (OrgInfo) node.getData();
 
 //        String name = padLeft(orgInfo.getName(), orgInfo.getOrgType());
-        SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", orgInfo.getOrgType() != 4);
+        SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", !Objects.equals(orgInfo.getOrgType(), 4));
         itemList.add(selectItem);
 
         if (!node.isLeaf()) {

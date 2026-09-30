@@ -304,7 +304,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
                     addMissingChildClinical(item, selectedTreeNodeList);
                 }
             }
-        } else if (data.getOrgType() == 5 || data.getOrgType() == 4) {
+        } else if (Objects.equals(data.getOrgType(), 5) || Objects.equals(data.getOrgType(), 4)) {
             //if site is selected, will not traverse here
             if (node.isSelected()) {
                 selectedTreeNodeList.add(data);
@@ -408,13 +408,13 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         String messageType = this.selected.getRuleParam().getMessageType();
         Integer pushType = this.selected.getRuleParam().getPushType();
         String comment = "";
-        if (pushType == 1) {
+        if (Objects.equals(pushType, 1)) {
             if ("overdue".equals(messageType)) {
                 comment = "(业务发生后按周期提醒1次)";
             } else {
                 comment = "(业务发生前按周期提醒1次)";
             }
-        } else if (pushType == 2) {
+        } else if (Objects.equals(pushType, 2)) {
             if ("overdue".equals(messageType)) {
                 comment = "(业务发生后按周期、次数进行提醒)";
             } else {

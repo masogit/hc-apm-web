@@ -217,7 +217,7 @@ public class UaaService {
             }
             //判断是否是智康宝用户，如果不是就移除掉智康宝的角色
             if(srVO.getName().equals("zkbDealerSales") || srVO.getName().equals("zkbDealerFE")){
-                if(null != ti.getType() && ti.getType()!=3){
+                if(null != ti.getType() && !Objects.equals(ti.getType(), 3)){
                     continue;
                 }
             }
@@ -571,7 +571,7 @@ public class UaaService {
     }
 
     public boolean isIbSiteAdmin(UserAccount userAccount) {
-        if (userAccount.getSiteId() == 46) {
+        if (Objects.equals(userAccount.getSiteId(), 46)) {
             List<OrgInfo> orgListByUser = getOrgListByUser(userAccount.getUid());
             // available to see the all institutions in ib site
             boolean allSite = orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
@@ -585,7 +585,7 @@ public class UaaService {
         TreeNode root = new DefaultTreeNode("root", null, null);
         List<OrgInfo> userScopeList = getOrgListByUser(user.getUid());
         for (OrgInfo item : userScopeList) {
-            if (item.getOrgType() == 4) {
+            if (Objects.equals(item.getOrgType(), 4)) {
                 new DefaultTreeNode("org", item, root);
             } else {
                 root.getChildren().add(getOrgTreeBySite(item.getSiteUID()).getChildren().get(0));
@@ -737,7 +737,7 @@ public class UaaService {
     public void setDefaultScope(UserAccount user) {
         userOrgDao.deleteByUserUid(user.getUid());
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
-        if (ownnedOrg.getOrgType() == 4) {
+        if (Objects.equals(ownnedOrg.getOrgType(), 4)) {
             //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
             List<OrgInfo> hospitalChildrenByUids = orgInfoDao.getHospitalChildrenByUids(Arrays.asList(ownnedOrg.getUid()));
             List<UserOrgInfo> collect = hospitalChildrenByUids.stream().map(item -> {
@@ -995,9 +995,9 @@ public class UaaService {
     public List<OrgInfo> getUserAccessibleSiteList(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites
-        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        List<String> orgUidSet1 = accessList.stream().filter(item -> !Objects.equals(item.getOrgType(), 4)).map(OrgInfo::getUid).collect(Collectors.toList());
         //for sites of accessible departments
-        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
+        Set<String> orgUidSet2 = accessList.stream().filter(item -> Objects.equals(item.getOrgType(), 4)).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
 
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
@@ -1034,14 +1034,14 @@ public class UaaService {
     public List<OrgInfo> getUserAccessibleSiteListWithClinicalDept(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         for (OrgInfo orgInfo : accessList){
-            if(orgInfo.getTenantUID().equals(orgInfo.getSiteUID())&&orgInfo.getSiteId()==46){
+            if(orgInfo.getTenantUID().equals(orgInfo.getSiteUID())&& Objects.equals(orgInfo.getSiteId(), 46)){
                 return new ArrayList<OrgInfo>();
             }
         }
         //for accessible sites
-        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        List<String> orgUidSet1 = accessList.stream().filter(item -> !Objects.equals(item.getOrgType(), 4)).map(OrgInfo::getUid).collect(Collectors.toList());
         //for sites of accessible departments
-        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
+        Set<String> orgUidSet2 = accessList.stream().filter(item -> Objects.equals(item.getOrgType(), 4)).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
 
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
@@ -1066,9 +1066,9 @@ public class UaaService {
         }
         List<OrgInfo> deptList;
         List<OrgInfo> accessList = getOrgListByUser(userUid);
-        Set<String> orgUidSet = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
+        Set<String> orgUidSet = accessList.stream().filter(item -> Objects.equals(item.getOrgType(), 4)).map(item -> item.getSiteUID()).collect(Collectors.toSet());
         if (orgUidSet.contains(siteUid)) {
-            deptList = accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
+            deptList = accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         } else {
             deptList = getClinicalDeptListBySiteUID(siteUid);
         }
@@ -1085,7 +1085,7 @@ public class UaaService {
     }
     public List<String>  getAllAccessibleClinicalDeptStringList(){
         List<OrgInfo> orgInfos = this.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         List<String> list = new ArrayList<>();
         if (!orgInfos.isEmpty()){
             for ( OrgInfo orgInfo:orgInfos) {
@@ -1197,7 +1197,7 @@ public class UaaService {
         boolean flag = false;
         String tenantUid = null;
         for (OrgInfo orgInfo : accessList){
-            if(orgInfo.getTenantUID().equals(orgInfo.getSiteUID())&&orgInfo.getSiteId()==46){
+            if(orgInfo.getTenantUID().equals(orgInfo.getSiteUID())&& Objects.equals(orgInfo.getSiteId(), 46)){
                 tenantUid = orgInfo.getTenantUID();
                 flag = true;
             }
@@ -1226,9 +1226,9 @@ public class UaaService {
             }
             List<OrgInfo> listAll = orgInfoDao.findBySearchFilter(orgInfoFilters);
             //for accessible sites
-            Set<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toSet());
+            Set<String> orgUidSet1 = accessList.stream().filter(item -> !Objects.equals(item.getOrgType(), 4)).map(OrgInfo::getUid).collect(Collectors.toSet());
             //for sites of accessible departments
-            Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
+            Set<String> orgUidSet2 = accessList.stream().filter(item -> Objects.equals(item.getOrgType(), 4)).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
 
             List<OrgInfo> list = new ArrayList<>();
             if(orgUidSet1!=null&&orgUidSet1.size()>0){
@@ -1372,7 +1372,7 @@ public class UaaService {
     public TreeNode getOrgTreeByParentIdWithClinicalDeptSelected(String parentOrgId, Integer selectableLevel, String condition) {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
-        List<OrgInfo> orgInfoFullList2 = orgInfoFullList.stream().filter(t -> (t.getOrgType() == 4 && t.getName().toLowerCase().contains(condition.toLowerCase())) || t.getOrgType() != 4).collect(Collectors.toList());
+        List<OrgInfo> orgInfoFullList2 = orgInfoFullList.stream().filter(t -> (Objects.equals(t.getOrgType(), 4) && t.getName().toLowerCase().contains(condition.toLowerCase())) || !Objects.equals(t.getOrgType(), 4)).collect(Collectors.toList());
         return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList2, selectableLevel);
     }
     public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid, Integer selectableLevel, String condition) {
@@ -1382,7 +1382,7 @@ public class UaaService {
     public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid, Integer selectableLevel, String condition,boolean expandAll) {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
-        List<OrgInfo> orgInfoFullList2 = orgInfoFullList.stream().filter(t -> (t.getOrgType() == 4 && t.getName().toLowerCase().contains(condition.toLowerCase())) || t.getOrgType() != 4).collect(Collectors.toList());
+        List<OrgInfo> orgInfoFullList2 = orgInfoFullList.stream().filter(t -> (Objects.equals(t.getOrgType(), 4) && t.getName().toLowerCase().contains(condition.toLowerCase())) || !Objects.equals(t.getOrgType(), 4)).collect(Collectors.toList());
         List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
 
         return buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList2, orgInfoSelectableList, selectableLevel,expandAll);
@@ -1508,7 +1508,7 @@ public class UaaService {
     }
 
     public boolean isTemporaryAccount(String role) {
-        Optional<SysRole> optionalSysRole = sysRoles.values().stream().filter(sysRole -> sysRole.getRoleDesc().equals(role) && sysRole.getId() == 9).findFirst();
+        Optional<SysRole> optionalSysRole = sysRoles.values().stream().filter(sysRole -> sysRole.getRoleDesc().equals(role) && Objects.equals(sysRole.getId(), 9)).findFirst();
 
         if (optionalSysRole.isPresent()) {
             return true;
@@ -1744,7 +1744,7 @@ public class UaaService {
     //获取该用户下的所有组织树
     public TreeNode buildEnableOrgTree (String userUid,String orgUid,OrgInfo orgInfo){
         List<OrgInfo> enableList = new ArrayList<>();
-        if (null != orgInfo && 4 == orgInfo.getOrgType()) {
+        if (null != orgInfo && Objects.equals(orgInfo.getOrgType(), 4)) {
             //enableList = orgInfoDao.getByUser(userUid);
             enableList = collectChildOrgs(orgInfoDao.getByUid(orgUid), enableList);
         }else{
@@ -1755,7 +1755,7 @@ public class UaaService {
     }
 
     public List<OrgInfo> collectChildOrgs(OrgInfo info, List<OrgInfo> clinicalOrgSet) {
-        if (4 == info.getOrgType().intValue()) {
+        if (Objects.equals(info.getOrgType(), 4)) {
             //System.out.println("keshi----->" +info.getName());
             clinicalOrgSet.add(info);
         }

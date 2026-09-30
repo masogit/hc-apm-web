@@ -292,7 +292,7 @@ public class UserAccountService {
             userOrg.setUserUid(userUid);
             userOrgInfos.add(userOrg);
         }
-		if(46==userAccount.getSiteId()){
+		if(Objects.equals(userAccount.getSiteId(), 46)){
 			if(selectAllButton){//如果为全选状态
 				List<UserOrgInfo> userOrgList = new ArrayList();
 				UserOrgInfo userOrg = new UserOrgInfo();

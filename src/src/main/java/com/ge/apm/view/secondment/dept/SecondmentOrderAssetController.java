@@ -141,7 +141,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
     }
     private void addFilter(){
         String orgInfoUID = userAccount.getOrgInfoUID();
-        List<String> scope = cacheOrgList.stream().filter(item -> !item.getUid().equals(orgInfoUID) && item.getOrgType() == 4).map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> scope = cacheOrgList.stream().filter(item -> !item.getUid().equals(orgInfoUID) && Objects.equals(item.getOrgType(), 4)).map(item -> item.getUid()).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(scope)){
             scope.add("-1");
         }
@@ -311,7 +311,7 @@ public class SecondmentOrderAssetController extends GenericCRUDController<AssetI
             String uid = item.getUid();
             String siteUID = item.getSiteUID();
             Integer orgType = item.getOrgType();
-            return orgType != null && orgType ==4 && !uid.equals(filterDeptUid) && siteUID.equals(siteUid);
+            return orgType != null && Objects.equals(orgType, 4) && !uid.equals(filterDeptUid) && siteUID.equals(siteUid);
         }).collect(Collectors.toList());
     }
     public String getBorrowDeptName(String uid){

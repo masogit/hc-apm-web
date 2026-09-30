@@ -124,7 +124,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         medicalInstrumentsClassificationCompCtrl.registerController(this);
         assetTypeGroupTreeComponentController = WebUtil.getBean(AssetTypeGroupTreeComponentController.class);
         assetTypeGroupTreeComponentController.registerController(this);
-        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
     }
 
     @Override
@@ -305,7 +305,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public void onClinicalDeptFilter(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
         OrgInfo deptOrg = (OrgInfo) selectedNode.getData();
-        if (deptOrg.getOrgType() == 4) {
+        if (Objects.equals(deptOrg.getOrgType(), 4)) {
             fileterDeptOrg = deptOrg;
         } else {
             fileterDeptOrg = null;

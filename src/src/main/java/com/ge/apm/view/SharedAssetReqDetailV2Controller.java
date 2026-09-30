@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -386,7 +387,7 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
         info.setClinicalDeptUID(UserContextService.getCurrentUserAccount().getSiteUID());
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-        if(userOrg.getOrgType()==4){
+        if(Objects.equals(userOrg.getOrgType(),4)){
             info.setClinicalDeptName(userOrg.getName());
             info.setClinicalDeptUID(userOrg.getUid());
         }

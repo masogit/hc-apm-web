@@ -781,7 +781,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             return user.getName();
 
         }
-        if(4 == org.getOrgType()){
+        if(Objects.equals(org.getOrgType(), 4)){
             return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
         }
         return user.getName() + "-" + org.getName();

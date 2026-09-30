@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -232,14 +233,14 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
 
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
-        if(currentStatus==1){
+        if(Objects.equals(currentStatus, 1)){
             currentStatus = 3;
         }
         needConfirmTime = false;
     }
 
     public void onStatusChange() {
-        if (selectedAsset !=null && currentStatus == 2 && selectedAsset.getStatus() != 2) {
+        if (selectedAsset !=null && Objects.equals(currentStatus, 2) && !Objects.equals(selectedAsset.getStatus(), 2)) {
             needConfirmTime = true;
         } else {
             needConfirmTime = false;

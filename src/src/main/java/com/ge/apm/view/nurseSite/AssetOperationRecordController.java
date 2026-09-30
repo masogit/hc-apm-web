@@ -28,6 +28,7 @@ import javax.faces.bean.ViewScoped;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -85,11 +86,11 @@ public class AssetOperationRecordController extends MyCRUDController<AssetOperat
             this.searchFilters = new HashSet<>();
         }
         searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
-        if (selectOrgInfo.getOrgType() == 1) {
+        if (Objects.equals(selectOrgInfo.getOrgType(), 1)) {
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
-        } else if (selectOrgInfo.getOrgType() == 2) {
+        } else if (Objects.equals(selectOrgInfo.getOrgType(), 2)) {
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
-        } else if (selectOrgInfo.getOrgType() == 3) {
+        } else if (Objects.equals(selectOrgInfo.getOrgType(), 3)) {
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
         }
         searchFilters.add(new SearchFilter("assetInfo.orgUidList", SearchFilter.Operator.IN, orgUidList, "1*2+"));

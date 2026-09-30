@@ -698,12 +698,12 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
 
     public void saveMeasure() {
         MeasureOrderActionForm formData = new MeasureOrderActionForm();
-        if (selectedAsset.getStatus() == 5) {
+        if (Objects.equals(selectedAsset.getStatus(), 5)) {
             WebUtil.addErrorMessage("所选设备停用,不能保养");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
-        if (selectedAsset.getStatus() == 4) {
+        if (Objects.equals(selectedAsset.getStatus(), 4)) {
             WebUtil.addErrorMessage("所选设备待报废,不能保养");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
@@ -747,9 +747,9 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
 
     public void onStatusChange() {
         if (null != selectedAsset) {//new sr
-            needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
+            needConfirmTime = Objects.equals(currentStatus, 2) && !Objects.equals(selectedAsset.getStatus(), 2);
         } else {//update sr
-            needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
+            needConfirmTime = Objects.equals(currentStatus, 2) && !Objects.equals(selected.getAssetInfo().getStatus(), 2);
         }
     }
 
@@ -829,7 +829,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
 
     public void saveServiceRequest() {
 
-        if(currentStatus!=2 && currentStatus!=3){
+        if(!Objects.equals(currentStatus, 2) && !Objects.equals(currentStatus, 3)){
             WebUtil.addErrorMessage("必须选择当前状态");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("status", true);
@@ -837,7 +837,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         if(newServiceRequest.getRequestReason()==null){
             newServiceRequest.setRequestReason("设备故障");
         }
-        if (selectedAsset.getStatus() == 4) {
+        if (Objects.equals(selectedAsset.getStatus(), 4)) {
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -1526,7 +1526,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
        /* clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
                 .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());*/
         clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+                .stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
@@ -1593,7 +1593,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
         dptName = asset.getClinicalDeptName();//orgDao.getByUid(orgInfoUID).getName();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
-        if (currentStatus == 1) {
+        if (Objects.equals(currentStatus, 1)) {
             currentStatus = 3;
         }
         needConfirmTime = false;

@@ -209,7 +209,7 @@ public class QrCodeService {
         BufferedImage img = null;
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,siteUid);
         //一机一码
-        if(qrCodeLib != null && qrCodeLib.getType()!=null && qrCodeLib.getType()==1){
+        if(qrCodeLib != null && qrCodeLib.getType()!=null && Objects.equals(qrCodeLib.getType(), 1)){
             try {
                 img = qrCodeDrawService.getQrCodeImageWithGeLogo(qrCodeLib);
             } catch (Exception ex) {
@@ -744,7 +744,7 @@ public class QrCodeService {
         List<AssetInfo> assetList = assetDao.findByQrCodeAndSiteUID(qrCode, siteUid);
         if (null != assetList && !assetList.isEmpty()) {
             assetList.forEach(val -> {
-                if (val.getStatus() == 4 && !val.getIsValid()) {
+                if (Objects.equals(val.getStatus(), 4) && !val.getIsValid()) {
                     invalidAsset.add(val);
                 } else {
                     validAsset.add(val);

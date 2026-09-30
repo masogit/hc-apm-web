@@ -401,7 +401,7 @@ public class MeasuringService {
             tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
             // 上次检测单位
             tempAssetInfo.setLastCheckCompany(needUpdateAssetMcd.getCheckCompany());
-            if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
+            if (Objects.equals(needUpdateAssetMcd.getStatus(), 2)) {//计量不合格
                 tempAssetInfo.setUsageStatus(2);//停用
                 tempAssetInfo.setStatus(5);
             }

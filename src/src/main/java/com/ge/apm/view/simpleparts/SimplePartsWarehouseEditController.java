@@ -25,6 +25,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author: csh
@@ -102,7 +103,7 @@ public class SimplePartsWarehouseEditController extends GenericCRUDUUIDControlle
         this.partsWarehouse.setInstitutionUid(this.selectedUserOrg.getInstitutionUID());
         this.partsWarehouse.setTenantUid(this.selectedUserOrg.getTenantUID());
 
-        if(StringUtils.isNotEmpty(partsWarehouse.getId()) && partsWarehouse.getStatus() != null && partsWarehouse.getStatus() == 0){
+        if(StringUtils.isNotEmpty(partsWarehouse.getId()) && partsWarehouse.getStatus() != null && Objects.equals(partsWarehouse.getStatus(), 0)){
             List<SimplePartsInventory> listPartsInventory = partsInventoryService.findByWarehouseId(partsWarehouse.getId());
             int inventory =listPartsInventory.stream().mapToInt(p -> p.getOnhandQty()).sum();
             if(inventory >0 ){

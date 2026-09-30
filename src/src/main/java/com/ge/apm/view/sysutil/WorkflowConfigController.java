@@ -330,7 +330,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 1) {
+        if (Objects.equals(oi.getOrgLevel(), 1)) {
             return oi.getName();
         }
         return null;
@@ -341,7 +341,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 2) {
+        if (Objects.equals(oi.getOrgLevel(), 2)) {
             return oi.getName();
         }
         return null;
@@ -352,7 +352,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         if (oi == null) {
             return null;
         }
-        if (oi.getOrgLevel() == 3) {
+        if (Objects.equals(oi.getOrgLevel(), 3)) {
             return oi.getName();
         }
         return null;
@@ -572,7 +572,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			}
 		}*/
 
-        if (selected.getGenerateMethod() != null && selected.getGenerateMethod() == 1) {
+        if (selected.getGenerateMethod() != null && Objects.equals(selected.getGenerateMethod(), 1)) {
             if (StringUtils.isEmpty(selected.getPrefix())) {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage(WebUtil.getMessage("prefixIsNull"));
@@ -601,7 +601,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
                 }
             }
 
-        } else if (selected.getGenerateMethod() != null && selected.getGenerateMethod() == 3) {
+        } else if (selected.getGenerateMethod() != null && Objects.equals(selected.getGenerateMethod(), 3)) {
             if (StringUtils.isEmpty(selected.getPrefix())) {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage(WebUtil.getMessage("prefixIsNull"));
@@ -611,7 +611,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         //前缀+年份+流水号不能超过16位
         int preLength = selected.getPrefix() == null ? 0 : selected.getPrefix().length();
         int flowNum = selected.getFormat() == null ? 0 : selected.getFormat().length();
-        if (selected.getGenerateMethod() == 1) {//国标码
+        if (Objects.equals(selected.getGenerateMethod(), 1)) {//国标码
             if (preLength + 7 + flowNum > 16) {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage(WebUtil.getMessage("srNumTooLong"));
@@ -905,7 +905,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
             return false;
         }
 
-        if (this.selected.getGenerateMethod() == 0 || this.selected.getGenerateMethod() == 2) {
+        if (Objects.equals(this.selected.getGenerateMethod(), 0) || Objects.equals(this.selected.getGenerateMethod(), 2)) {
             return false;
         }
 

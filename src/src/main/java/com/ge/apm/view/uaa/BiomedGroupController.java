@@ -21,6 +21,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by 212605082 on 2017/5/15.
@@ -80,10 +81,10 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
         queryUserAccount.setSiteId(currentUser.getSiteId());
         queryUserAccount.setTenantUID(currentUser.getTenantUID());
 
-        if(currentUser.getOrgLevel() != 0) {
-            if (currentUser.getOrgLevel() == 1) {
+        if(!Objects.equals(currentUser.getOrgLevel(), 0)) {
+            if (Objects.equals(currentUser.getOrgLevel(), 1)) {
                 queryUserAccount.setInstitutionUID(currentUser.getInstitutionUID());
-            } else if (currentUser.getOrgLevel() == 2) {
+            } else if (Objects.equals(currentUser.getOrgLevel(), 2)) {
                 queryUserAccount.setHospitalUID(currentUser.getHospitalUID());
             } else {
                 queryUserAccount.setSiteUID(currentUser.getSiteUID());
@@ -107,10 +108,10 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
         List<SearchFilter> searchFilters = this.searchFilters;
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
 
-        if(currentUser.getOrgLevel() != 0) {
-            if (currentUser.getOrgLevel() == 1) {
+        if(!Objects.equals(currentUser.getOrgLevel(), 0)) {
+            if (Objects.equals(currentUser.getOrgLevel(), 1)) {
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-            } else if (currentUser.getOrgLevel() == 2) {
+            } else if (Objects.equals(currentUser.getOrgLevel(), 2)) {
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
             } else {
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
@@ -244,11 +245,11 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
         }
 
         if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
-            if(selectedOrg.getOrgLevel() == 1){
+            if(Objects.equals(selectedOrg.getOrgLevel(), 1)){
                 queryUserAccount.setInstitutionUID(selectedOrg.getInstitutionUID());
-            }else if(selectedOrg.getOrgLevel() == 2){
+            }else if(Objects.equals(selectedOrg.getOrgLevel(), 2)){
                 queryUserAccount.setHospitalUID(selectedOrg.getHospitalUID());
-            }else if(selectedOrg.getOrgLevel() == 3){
+            }else if(Objects.equals(selectedOrg.getOrgLevel(), 3)){
                 queryUserAccount.setSiteUID(selectedOrg.getSiteUID());
             }
         }

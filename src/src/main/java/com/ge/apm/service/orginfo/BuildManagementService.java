@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,7 +50,7 @@ public class BuildManagementService {
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;
-        if (46 == user.getSiteId()) {
+        if (Objects.equals(user.getSiteId(), 46)) {
             //1.获取对应住户下的所有集团
             List<OrgInfo> orginfoInstitutionlist = orgDao.getHospitalByTenantUIDAndType(user.getTenantUID());
             OrgInfo parent = orgDao.getOrgInfoByUid(user.getTenantUID());
@@ -153,25 +154,25 @@ public class BuildManagementService {
             orgType = buildManagement.getBuildType();
         }
         Map<String, Object> map = new HashMap<>();
-        if (orgType == 1) {
+        if (Objects.equals(orgType, 1)) {
             map.put("集团", orgInfo.getName());
-        } else if (orgType == 2) {
+        } else if (Objects.equals(orgType, 2)) {
             OrgInfo institutionLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
             map.put("集团", institutionLevelOrg.getName());
             map.put("医院", orgInfo.getName());
-        } else if (orgType == 3) {
+        } else if (Objects.equals(orgType, 3)) {
             OrgInfo hospitalLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
             OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
             map.put("集团", institutionLevelOrg.getName());
             map.put("医院", hospitalLevelOrg.getName());
             map.put("院区", orgInfo.getName());
-        } else if (orgType == 4) {
-            if (orgInfo.getOrgLevel() == 0) {
+        } else if (Objects.equals(orgType, 4)) {
+            if (Objects.equals(orgInfo.getOrgLevel(), 0)) {
 
-            } else if (orgInfo.getOrgLevel() == 1) {
+            } else if (Objects.equals(orgInfo.getOrgLevel(), 1)) {
                 OrgInfo institutionLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 map.put("集团", institutionLevelOrg.getName());
-            } else if (orgInfo.getOrgLevel() == 2) {
+            } else if (Objects.equals(orgInfo.getOrgLevel(), 2)) {
                 OrgInfo hospitalLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
                 map.put("集团", institutionLevelOrg.getName());
@@ -184,13 +185,13 @@ public class BuildManagementService {
                 map.put("院区", orgInfo.getName());
             }
             map.put("楼栋名称", buildManagement.getName());
-        } else if (orgType == 5) {
-            if (orgInfo.getOrgLevel() == 0) {
+        } else if (Objects.equals(orgType, 5)) {
+            if (Objects.equals(orgInfo.getOrgLevel(), 0)) {
 
-            } else if (orgInfo.getOrgLevel() == 1) {
+            } else if (Objects.equals(orgInfo.getOrgLevel(), 1)) {
                 OrgInfo institutionLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 map.put("集团", institutionLevelOrg.getName());
-            } else if (orgInfo.getOrgLevel() == 2) {
+            } else if (Objects.equals(orgInfo.getOrgLevel(), 2)) {
                 OrgInfo hospitalLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
                 map.put("集团", institutionLevelOrg.getName());
@@ -204,13 +205,13 @@ public class BuildManagementService {
             }
             map.put("楼栋名称", buildManagementMap.get(buildManagement.getParentID()).getName());
             map.put("楼层名称", buildManagement.getName());
-        } else if (orgType == 6) {
-            if (orgInfo.getOrgLevel() == 0) {
+        } else if (Objects.equals(orgType, 6)) {
+            if (Objects.equals(orgInfo.getOrgLevel(), 0)) {
 
-            } else if (orgInfo.getOrgLevel() == 1) {
+            } else if (Objects.equals(orgInfo.getOrgLevel(), 1)) {
                 OrgInfo institutionLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 map.put("集团", institutionLevelOrg.getName());
-            } else if (orgInfo.getOrgLevel() == 2) {
+            } else if (Objects.equals(orgInfo.getOrgLevel(), 2)) {
                 OrgInfo hospitalLevelOrg = getParentHospitalForDepartment(orgInfo, orgInfoMap);
                 OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
                 map.put("集团", institutionLevelOrg.getName());
@@ -381,14 +382,14 @@ public class BuildManagementService {
         if (child.getData() instanceof OrgInfo) {
             OrgInfo orgInfo = (OrgInfo) child.getData();
             Integer orgType = orgInfo.getOrgType();
-            if (orgType == 1) {
+            if (Objects.equals(orgType, 1)) {
                 map.put("institutionName", orgInfo.getName());
-            } else if (orgType == 2) {
+            } else if (Objects.equals(orgType, 2)) {
                 TreeNode parent = child.getParent();
                 OrgInfo orgInfo1 = (OrgInfo) parent.getData();
                 map.put("institutionName", orgInfo1.getName());
                 map.put("hospitalName", orgInfo.getName());
-            } else if (orgType == 3) {
+            } else if (Objects.equals(orgType, 3)) {
                 TreeNode parent = child.getParent();
                 OrgInfo orgInfo1 = (OrgInfo) parent.getData();
                 map.put("hospitalName", orgInfo1.getName());
@@ -403,11 +404,11 @@ public class BuildManagementService {
 
             BuildManagement buildManagement = (BuildManagement) child.getData();
             Integer orgType = buildManagement.getBuildType();
-            if (orgType == 4) {
+            if (Objects.equals(orgType, 4)) {
                 map.put("buildingName", buildManagement.getName());
                 map.put("buildingNameEn", buildManagement.getNameEn());
                 treeNode = child;
-            } else if (orgType == 5) {
+            } else if (Objects.equals(orgType, 5)) {
                 TreeNode parent = child.getParent();
                 BuildManagement buildManagement1 = (BuildManagement) parent.getData();
                 map.put("buildingName", buildManagement1.getName());
@@ -416,7 +417,7 @@ public class BuildManagementService {
                 map.put("floorNameEn", buildManagement.getNameEn());
 
                 treeNode = parent;
-            } else if (orgType == 6) {
+            } else if (Objects.equals(orgType, 6)) {
                 TreeNode parent = child.getParent();
                 BuildManagement buildManagement1 = (BuildManagement) parent.getData();
                 TreeNode parent1 = parent.getParent();

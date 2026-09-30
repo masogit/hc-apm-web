@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import webapp.framework.dao.NativeSqlUtil;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -109,7 +110,7 @@ public class WoProcessController extends JpaCRUDController<WorkOrder> {
         UserAccount currentPerson = userDao.findById(workOrder.getCurrentPersonId());
         workOrder.setCurrentPersonName(currentPerson.getName());
         
-        if(workOrder.getCurrentStepId()==1)
+        if(Objects.equals(workOrder.getCurrentStepId(), 1))
             workOrder.setCurrentStepId(2);
     }
 

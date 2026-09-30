@@ -2,6 +2,7 @@ package com.ge.apm.view.nurseSite;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -55,7 +56,7 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 		dao = WebUtil.getBean(AssetOptRecordMapper.class);
 		uaaService = WebUtil.getBean(UaaService.class);
 		orgUidList = uaaService.getOrgListByUser(currentUser.getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
-		clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+		clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> Objects.equals(item.getOrgType(), 4)).collect(Collectors.toList());
 		this.selectOrgInfo = service.fetchOrgInfoByUid(currentUser.getSiteUID());
 		customRoleAuth=UserContextService.getCustomRoleAuth(currentUser.getId(), CustomRoleAuthConstant.NURSE_SITE_OPTRECORD);
 	}
@@ -69,11 +70,11 @@ public class AssetOptRecordController extends MyCRUDController<AssetOptRecord> {
 			this.searchFilters = new HashSet<>();
 		}
 		searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
-		if (selectOrgInfo.getOrgType() == 1) {
+		if (Objects.equals(selectOrgInfo.getOrgType(), 1)) {
 			searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
-		} else if (selectOrgInfo.getOrgType() == 2) {
+		} else if (Objects.equals(selectOrgInfo.getOrgType(), 2)) {
 			searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
-		} else if (selectOrgInfo.getOrgType() == 3) {
+		} else if (Objects.equals(selectOrgInfo.getOrgType(), 3)) {
 			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.EQ, selectOrgInfo.getUid(), "1*"));
 		}
 		searchFilters.add(new SearchFilter("assetInfo.orgUidList", SearchFilter.Operator.IN, orgUidList, "1*2+"));
