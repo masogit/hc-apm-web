@@ -139,6 +139,7 @@ public class AssetFileImportService extends AssetFileImportBaseService {
                 assetRow.setFieldDoubleValue("采购价格", "setPurchasePrice");
                 assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
                 assetRow.setFieldDoubleValue("使用年限", "setLifecycleInYear");
+                assetRow.setFieldDoubleValue("折旧年限", "setDepreciationLifecycleInYear");
 
                 assetRow.setFieldDropdownValue("折旧算法", "setDepreciationMethod", depreciationMethod, map, null);
 

@@ -53,7 +53,7 @@ public class AssetDepreciationService {
 		if(assetInfo == null || whichYear == null){
 			return result.doubleValue();
 		}
-		if(assetInfo.getPurchasePrice() != null && assetInfo.getLifecycle() != null && assetInfo.getDepreciationMethod() != null){
+		if(assetInfo.getPurchasePrice() != null && assetInfo.getEffectiveDepreciationLifecycle() != null && assetInfo.getDepreciationMethod() != null){
 			BigDecimal purchasePrice = new BigDecimal(assetInfo.getPurchasePrice());
 			BigDecimal salvageValue;
 			if(assetInfo.getSalvageValue() != null){
@@ -61,7 +61,7 @@ public class AssetDepreciationService {
 			}else{
 				salvageValue = new BigDecimal(0);
 			}
-			int lifeCycleFromYear = convertMonthToYear(assetInfo.getLifecycle());
+			int lifeCycleFromYear = convertMonthToYear(assetInfo.getEffectiveDepreciationLifecycle());
 			BigDecimal lifeCycle = new BigDecimal(lifeCycleFromYear);//以年为单位
 			BigDecimal unit = BigDecimal.valueOf(2d).divide(lifeCycle,2, RoundingMode.HALF_UP);
 			int depreciationMethod = assetInfo.getDepreciationMethod();
@@ -115,14 +115,14 @@ public class AssetDepreciationService {
 			return;
 		}
 
-		if (assetInfo.getPurchasePrice() == null || assetInfo.getLifecycle() == null
+		if (assetInfo.getPurchasePrice() == null || assetInfo.getEffectiveDepreciationLifecycle() == null
 				|| assetInfo.getDepreciationMethod() == null || assetInfo.getSalvageValue() == null
 				|| assetInfo.getPurchaseDate() == null) {
 			assetDepreciationRepository.deleteByAssetIdAndContractType(assetInfo.getId(), -1);
 		}
 
 		if (assetInfo.getPurchasePrice() != null && assetInfo.getSalvageValue() != null
-				&& assetInfo.getLifecycle() != null && assetInfo.getPurchaseDate() != null) {
+				&& assetInfo.getEffectiveDepreciationLifecycle() != null && assetInfo.getPurchaseDate() != null) {
 			Date purchaseDate = assetInfo.getPurchaseDate();
 			DateTime first = new DateTime(purchaseDate);
 			if (first.isAfterNow()) {// 未来时间暂不录入
@@ -134,7 +134,7 @@ public class AssetDepreciationService {
 			}
 			assetDepreciationRepository.deleteByAssetIdAndContractType(assetInfo.getId(), -1);
 			
-			int lifecycle = assetInfo.getLifecycle();// 以月为单位，不足1年的默认为1年
+			int lifecycle = assetInfo.getEffectiveDepreciationLifecycle();// 以月为单位，不足1年的默认为1年
 			DateTime last = first.plusMonths(lifecycle);
 			String yyyyMM = null;
 			Double depreciationAmount = null;
