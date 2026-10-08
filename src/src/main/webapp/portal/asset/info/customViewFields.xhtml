@@ -409,7 +409,7 @@
             <p:inputText id="assetLocation" value="#{assetInfoDetailController.selected.assetLocation}" readonly="true" title="#{assetInfoDetailController.selected.assetLocation}"/>
         </h:panelGroup>
     </c:if>
-    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'status')}">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'status') and assetInfoDetailController.selected.isValid eq true}">
         <h:panelGroup >
             <label class="label">#{msg.status}</label>
             <p:selectOneRadio id="status"  label="#{msg.status}" value="#{assetInfoDetailController.selected.status}" disabled="true">
