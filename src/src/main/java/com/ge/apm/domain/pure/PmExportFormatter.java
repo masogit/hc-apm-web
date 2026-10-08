@@ -9,6 +9,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import webapp.framework.web.WebUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PmExportFormatter<T> {
@@ -104,6 +105,8 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
             map.put(ExportFields.TRAVELTIME.getChinese(), this.getTravelTime());
             map.put(ExportFields.ENDTIME.getChinese(), v2_pmOrder.getEndTime());
+            map.put(ExportFields.MANHOURS.getChinese(), this.getManHours());
+            map.put(ExportFields.WORKHOURDETAIL.getChinese(), this.getWorkHourDetail());
             if(queryIndex == 7){
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getChinese(), this.getActualCompletionTime());
             }
@@ -140,6 +143,8 @@ public class PmExportFormatter<T> {
                 map.put(ExportFields.ACTUALCOMPLETIONTIME.getEnglish(), this.getActualCompletionTime());
             }
             map.put(ExportFields.ENDTIME.getEnglish(), v2_pmOrder.getEndTime());
+            map.put(ExportFields.MANHOURS.getEnglish(), this.getManHours());
+            map.put(ExportFields.WORKHOURDETAIL.getEnglish(), this.getWorkHourDetail());
         }
         return map;
     }
@@ -277,5 +282,25 @@ public class PmExportFormatter<T> {
         return v2_pmOrder.getTravelTime();
     }
 
+    public Double getManHours() {
+        return v2_pmOrder.getManHours();
+    }
+
+    public String getWorkHourDetail() {
+        List<V2_PmOrderManHoursDetail> details = v2_pmOrder.getPmOrderManHoursDetails();
+        if (details == null || details.isEmpty()) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        StringBuilder sb = new StringBuilder();
+        for (V2_PmOrderManHoursDetail detail : details) {
+            sb.append("开始时间:").append(detail.getStartTime() != null ? sdf.format(detail.getStartTime()) : "")
+              .append("结束时间:").append(detail.getEndTime() != null ? sdf.format(detail.getEndTime()) : "")
+              .append("工时:").append(detail.getHours() != null ? detail.getHours() : "")
+              .append("备注:").append(detail.getRemark() != null ? detail.getRemark() : "")
+              .append(";");
+        }
+        return sb.toString();
+    }
 
 }
