@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<div class="ui-g">
+    <div class="ui-g-12">
+        <div class="ui-g-12 card">
+            <h:form id="TaskListForm">
+                <p:dataTable id="tasklist" value="#{hisAdjustBusinessJobController.lazyModel}" var="item"
+                             widgetVar="varTaskList"
+                             selectionMode="single" selection="#{hisAdjustBusinessJobController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="filter" listener="#{hisAdjustBusinessJobController.onFilter}"/>
+
+                    <p:column headerText="业务ID" sortBy="#{item.businessId}" filterBy="#{item.businessId}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.businessId}" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;"/>
+                    </p:column>
+                    <p:column headerText="任务状态" sortBy="#{item.taskStatus}" filterBy="#{item.taskStatus}"
+                              filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varTaskList').filter()" value="#{hisAdjustBusinessJobController.filterTaskStatus}">
+                                <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{hisAdjustBusinessJobController.taskStatusList}" var="opt" itemLabel="#{opt.value}" itemValue="#{opt.label}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="待执行" rendered="#{item.taskStatus == 0}" style="color:#e6a23c;"/>
+                        <h:outputText value="已执行" rendered="#{item.taskStatus == 1}" style="color:#67c23a;"/>
+                        <h:outputText value="执行失败" rendered="#{item.taskStatus == 2}" style="color:#f56c6c;font-weight:bold;"/>
+                    </p:column>
+                    <p:column headerText="数据开始时间" sortBy="#{item.dataStartDate}">
+                        <h:outputText value="#{item.dataStartDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="数据结束时间" sortBy="#{item.dataEndDate}">
+                        <h:outputText value="#{item.dataEndDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="创建人" sortBy="#{item.createdBy}" filterBy="#{item.createdBy}"
+                              filterMatchMode="LIKE">
+                        <h:outputText value="#{item.createdBy}"/>
+                    </p:column>
+                    <p:column headerText="创建日期" sortBy="#{item.createdDate}">
+                        <h:outputText value="#{item.createdDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+<!--                    <p:column headerText="执行日志" sortBy="#{item.comment}">-->
+<!--                        <h:outputText value="#{item.comment}" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;" title="#{item.comment}"/>-->
+<!--                    </p:column>-->
+                    <p:column headerText="操作" exportable="false">
+                        <p:commandButton value="重置为待执行"
+                                         actionListener="#{hisAdjustBusinessJobController.initResetTask(item)}"
+                                         update="@(form)"
+                                         oncomplete="PF('resetTaskDialog').show()"
+                                         rendered="#{item.taskStatus == 2}"
+                                         style="background-color:#f56c6c;border-color:#f56c6c;"/>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                         class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="tasklist" fileName="TaskList_export"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+
+        </div>
+    </div>
+</div>
+</html>
