@@ -302,6 +302,9 @@ public class AssetInfoBulkEditService {
             if (selectedColumns.contains("lifecycle")) {
                 item.setLifecycle(targetAsset.getLifecycle());
             }
+            if (selectedColumns.contains("depreciationLifecycle")) {
+                item.setDepreciationLifecycle(targetAsset.getDepreciationLifecycle());
+            }
             if (selectedColumns.contains("depreciationMethod")) {
                 item.setDepreciationMethod(targetAsset.getDepreciationMethod());
             }

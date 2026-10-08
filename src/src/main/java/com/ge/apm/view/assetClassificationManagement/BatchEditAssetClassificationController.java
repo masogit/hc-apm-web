@@ -75,6 +75,14 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
     private String manufacture;//制造商
 
     private String makerShortName;
+
+    // 筛选：是否配置32分类（all=全部, configured=已配置, unconfigured=未配置）
+    @Getter @Setter
+    private String classification32Filter = "all";
+
+    // 表格1当前页码（0-based）
+    private int currentPage1 = 0;
+
     @Getter @Setter
     private List<OrgInfo> clinicalDeptList;
 
@@ -272,6 +280,7 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
     }
 
     public void getQueryAssetsList() {
+        currentPage1 = 0;
         if(CollectionUtils.isNotEmpty(selectsDeptOrg)){
             selectAssetInfos = getAssetListByDept(selectedOrg, selectsDeptOrg);
         }else{
@@ -315,6 +324,12 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
             searchFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE,makerShortName, "1*"));
         }
 
+        if ("configured".equals(classification32Filter)) {
+            searchFilters.add(new SearchFilter("assetClassification32", SearchFilter.Operator.IsNotNull, null, "1*"));
+        } else if ("unconfigured".equals(classification32Filter)) {
+            searchFilters.add(new SearchFilter("assetClassification32", SearchFilter.Operator.IsNull, null, "1*"));
+        }
+
         List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(this.searchFilters);
 
 
@@ -330,7 +345,10 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
         } else {
             selectedAssetsed1.remove(asset);
         }
-        allSelected1=selectAssetInfos.stream().allMatch(item-> Optional.ofNullable(selectedAssetUidTable1.get(item.getUid())).orElse(Boolean.FALSE));
+        // 全选状态仅基于当前页判断
+        List<AssetInfo> currentPageItems = getCurrentPageItems1();
+        allSelected1 = !currentPageItems.isEmpty() && currentPageItems.stream().allMatch(item ->
+                Boolean.TRUE.equals(selectedAssetUidTable1.get(item.getUid())));
     }
     public void updateSelctedAssetList2(AjaxBehaviorEvent event) {
         SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
@@ -344,20 +362,64 @@ public class BatchEditAssetClassificationController extends GenericCRUDControlle
     }
 
 
+    public void onPageTable1(org.primefaces.event.data.PageEvent event) {
+        this.currentPage1 = event.getPage();
+        this.allSelected1 = Boolean.FALSE;
+        log.debug("onPageTable1: currentPage1={}", currentPage1);
+    }
+
+    /**
+     * 获取表格1当前页的数据项
+     */
+    private List<AssetInfo> getCurrentPageItems1() {
+        if (selectAssetInfos == null || selectAssetInfos.isEmpty()) {
+            return Collections.emptyList();
+        }
+        int pageSize = 10;
+        int page = currentPage1;
+
+        // 优先从DataTable组件获取实时的分页信息
+        try {
+            javax.faces.component.UIComponent component = javax.faces.context.FacesContext.getCurrentInstance()
+                    .getViewRoot().findComponent("batchEditAssetClassificationForm:datalist");
+            if (component instanceof org.primefaces.component.datatable.DataTable) {
+                org.primefaces.component.datatable.DataTable dt = (org.primefaces.component.datatable.DataTable) component;
+                page = dt.getPage();
+                int rows = dt.getRows();
+                if (rows > 0) {
+                    pageSize = rows;
+                }
+                this.currentPage1 = page;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get DataTable component, using tracked page: {}", currentPage1);
+        }
+
+        int start = page * pageSize;
+        int end = Math.min(start + pageSize, selectAssetInfos.size());
+        if (start >= selectAssetInfos.size()) {
+            return Collections.emptyList();
+        }
+        return selectAssetInfos.subList(start, end);
+    }
+
     public void addAssetsOfCurrentPage1(AjaxBehaviorEvent event) {
-        log.debug("value of isAllSelected: {}", this.allSelected1);
+        log.debug("addAssetsOfCurrentPage1: allSelected1={}, currentPage1={}", this.allSelected1, this.currentPage1);
+        List<AssetInfo> currentPageItems = getCurrentPageItems1();
+        log.debug("addAssetsOfCurrentPage1: currentPageItems.size={}", currentPageItems.size());
+
         if(allSelected1) {
-            selectAssetInfos.stream().forEach(t -> {
+            for (AssetInfo t : currentPageItems) {
                 selectedAssetUidTable1.put(t.getUid(), Boolean.TRUE);
                 selectedAssetsed1.add(t);
-            });
+            }
         } else {
-            selectAssetInfos.stream().forEach(t -> {
+            for (AssetInfo t : currentPageItems) {
                 selectedAssetUidTable1.put(t.getUid(), Boolean.FALSE);
                 selectedAssetsed1.remove(t);
-            });
+            }
         }
-        log.debug("size of selectedAssetUids: {}", selectedAssetUidTable1.size());
+        log.debug("addAssetsOfCurrentPage1: selectedAssetUidTable1.size={}", selectedAssetUidTable1.size());
     }
     public void addAssetsOfCurrentPage2(AjaxBehaviorEvent event) {
         log.debug("value of allSelected2: {}", this.allSelected2);

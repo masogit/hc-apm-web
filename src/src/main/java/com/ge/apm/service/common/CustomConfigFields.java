@@ -81,6 +81,7 @@ public enum CustomConfigFields {
     purchasePrice(fieldName, "purchasePrice" ,Text),  //采购价格(元)
     salvageValue(fieldName, "salvageValue" ,Text),   //最终残值(元)
     lifecycle(fieldName, "lifecycle" ,Text),               //使用年限
+    depreciationLifecycle(fieldName, "depreciationLifecycle" ,Text), //折旧年限
     depreciationMethod(fieldName, "depreciationMethod" ,Text), //折旧算法
     isPm(fieldName, "isAssetPMed" ,Text),   //是否是保养
     isFixed(fieldName, "isFixed" ,Text),  //是否固定资产

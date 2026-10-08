@@ -80,7 +80,7 @@
                                 </h:outputText>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.arrivalListContractNum}2</label>
+                                <label class="label">#{msg.arrivalListContractNum}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.contractNum}" />
                                 <p:link style="margin-left: 10px;" href="#{assetInstallationController.contractUrl(assetInstallationController.arrivalListItem.arrivalList.contractItemId)}" value="查看合同" target="_blank" rendered="#{not empty assetInstallationController.arrivalListItem.arrivalList.contractItemId}"/>
                             </h:panelGroup>

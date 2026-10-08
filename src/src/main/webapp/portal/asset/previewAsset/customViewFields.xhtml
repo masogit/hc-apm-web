@@ -531,6 +531,12 @@
             </p:inputText>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'depreciationLifecycle')}">
+        <h:panelGroup>
+            <label class="label">#{msg.depreciationLifecycle}</label>
+            <p:inputText id="depreciationLifecycle" value="#{assetInfoDetailController.selected.depreciationLifecycleInYear}" readonly="true" title="#{assetInfoDetailController.selected.depreciationLifecycleInYear}"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'warrantyMonth')}">
         <h:panelGroup>
             <label class="label">#{msg.warrantyMonth}</label>

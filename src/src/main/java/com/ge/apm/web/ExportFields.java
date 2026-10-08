@@ -25,6 +25,8 @@ public enum ExportFields {
     SITENAME("所属院区","Site Name"),
     TRAVELTIME("路途工时","Travel Time"),
     ENDTIME("实际完成时间","End Time"),
+    MANHOURS("保养工程师工时", "Maintenance Engineer Manhours"),
+    WORKHOURDETAIL("保养工时详情", "Maintenance Hours Detail"),
     ;
 
     private final String english;

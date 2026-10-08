@@ -29,7 +29,24 @@
                     <p:tab title="数据导入" id="import">
                         <ui:include src="hisSfxmImport.xhtml"/>
                     </p:tab>
+                    <p:tab title="运行中的任务" id="taskList">
+                        <f:event type="preRenderComponent" listener="#{hisAdjustBusinessJobController.setTaskType(1)}"/>
+                        <ui:include src="../hisAsset/hisTaskList.xhtml"/>
+                    </p:tab>
                 </p:tabView>
+
+                <p:dialog id="resetTaskDialog" widgetVar="resetTaskDialog" modal="true" resizable="true" draggable="true" header="确认重置" width="40%">
+                    <h:form id="resetTaskForm">
+                        <p:fieldset legend="重置任务状态">
+                            <h:outputText value="确定将该任务状态重置为待执行吗？" style="font-size:14px;"/>
+                        </p:fieldset>
+                        <p:commandButton value="#{msg.Confirm}" icon="ui-icon-check"
+                                         actionListener="#{hisAdjustBusinessJobController.resetFailedTask()}"
+                                         update=":HisGroupTab:TaskListForm :growl"
+                                         oncomplete="handleSubmit(args, 'resetTaskDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('resetTaskDialog').hide()"/>
+                    </h:form>
+                </p:dialog>
             </div>
         </div>
     </ui:define>

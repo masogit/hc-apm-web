@@ -11,7 +11,6 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.qrcode.QrCodeSupportUtil;
-import com.ge.healthcare.cn.common.utils.date.DateUnit;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
@@ -34,7 +33,7 @@ import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
-public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainInfo> {
+public class TrianInSiteEditController extends GenericCRUDUUIDController<TrainInfo> {
 
     private TrainInfoRepository dao;
 
@@ -45,60 +44,82 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     private TrainManageService trainManageService;
     private QrCodeDrawService qrCodeDrawService;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String actionName = "";
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String detailActionName = "";
-    @Setter @Getter
+    @Setter
+    @Getter
     List<String> selectedOrgUid;
-    @Getter @Setter
+    @Getter
+    @Setter
     List<OrgDto> orgsForSelected = new ArrayList<>(); //待选科室
-    @Getter @Setter
+    @Getter
+    @Setter
     List<String> selectedRoleId;
-    @Getter @Setter
+    @Getter
+    @Setter
     List<TrainRoleDto> rolesForSelected = new ArrayList<>();
 
-    @Getter@Setter
+    @Getter
+    @Setter
     List<V2_BlobObject> blobObjectList = new ArrayList<>();
 
-    @Getter@Setter
+    @Getter
+    @Setter
     List<V2_BlobObject> resultBlobObjectList = new ArrayList<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean canEdit = true;
-    @Getter@Setter
+    @Getter
+    @Setter
     private String filterClinicalDeptOrg; //选定的所属科室
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<OrgInfo> clinicalDeptList;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<TrainDetail> trainDetailList = new ArrayList<>();
 
-    @Getter@Setter
+    @Getter
+    @Setter
     private List<TrainDetailSign> trainDetailSignList = new ArrayList<>();//签到信息List
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private TrainDetail selectedTrainDetail;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private TrainDetailSign selectedTrainDetailSign;
 
-    @Getter@Setter
+    @Getter
+    @Setter
     V2_BlobObject selectedBlobObject;
-    @Getter@Setter
+    @Getter
+    @Setter
     String fileName;
-    @Getter@Setter
+    @Getter
+    @Setter
     String fileType;
-    @Getter @Setter
+    @Getter
+    @Setter
     private OrgInfo selectSite; //选定的所属院区
-    @Getter @Setter
+    @Getter
+    @Setter
     private String filterSigner;
     @Setter
     private List<UserAccount> clinicalOwnerList;
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<OrgInfo> orgInfoList;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer signTotal;
 
     @Override
@@ -116,7 +137,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
 
         if ("Create".equalsIgnoreCase(actionName)) {
             prepareCreate();
-        }else if("Edit".equalsIgnoreCase(actionName)){
+        } else if ("Edit".equalsIgnoreCase(actionName)) {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             selected = dao.findById(selectedId);
             prepareEdit();
@@ -124,7 +145,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
 
     }
 
-    public void prepareCreate(){
+    public void prepareCreate() {
         selected = new TrainInfo();
         selected.setCreatedDate(new Date());
         orgsForSelected = trainManageService.onCreateInventory();
@@ -132,24 +153,24 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         canEdit = true;
     }
 
-    public void prepareEdit(){
-        if(CollectionUtils.isEmpty(orgsForSelected)){
+    public void prepareEdit() {
+        if (CollectionUtils.isEmpty(orgsForSelected)) {
             orgsForSelected = trainManageService.onCreateInventory();
         }
-        if(StrUtil.isNotEmpty(selected.getTrainingDeptUid())){
+        if (StrUtil.isNotEmpty(selected.getTrainingDeptUid())) {
             selectedOrgUid = Arrays.asList(selected.getTrainingDeptUid().split(","));
         }
-        if(CollectionUtils.isEmpty(rolesForSelected)){
+        if (CollectionUtils.isEmpty(rolesForSelected)) {
             rolesForSelected = trainManageService.queryTrainRole(loginUser);
         }
-        if(StrUtil.isNotEmpty(selected.getTrainingRoleUid())){
+        if (StrUtil.isNotEmpty(selected.getTrainingRoleUid())) {
             selectedRoleId = Arrays.asList(selected.getTrainingRoleUid().split(","));
         }
         trainDetailList = trainManageService.queryDetailByTrainId(selected.getId());
         UserAccount userAccount = uaaService.getUserByUid(selected.getCreatedUid());
-        if(!userAccount.getOrgInfoUID().equals(loginUser.getOrgInfoUID())){
+        if (!userAccount.getOrgInfoUID().equals(loginUser.getOrgInfoUID())) {
             canEdit = false;
-        }else{
+        } else {
             canEdit = true;
         }
         if (selected.getStatus().equals(TrainDetail.Status.Completed.name())) {
@@ -157,11 +178,11 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         }
     }
 
-    public void roleChange(){
-        if(CollectionUtils.isEmpty(selectedRoleId)){
+    public void roleChange() {
+        if (CollectionUtils.isEmpty(selectedRoleId)) {
             return;
         }
-        if(CollectionUtils.isEmpty(selectedOrgUid)){
+        if (CollectionUtils.isEmpty(selectedOrgUid)) {
             return;
         }
         Integer i = trainManageService.queryUserCountByRoles(selectedRoleId, selectedOrgUid);
@@ -171,17 +192,17 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     /**
      * 保存主课程信息
      */
-    public String saveData(){
-        if(!trainManageService.saveCheck(selected, trainDetailList)){
+    public String saveData() {
+        if (!trainManageService.saveCheck(selected, trainDetailList)) {
             return "";
         }
         trainManageService.save(selected, loginUser, selectedOrgUid, selectedRoleId);
         WebUtil.addSuccessMessage("保存成功！");
 
         String url = "";
-        if(actionName.equals("Edit")){
+        if (actionName.equals("Edit")) {
             url = UrlEncryptController.encodeUrlParam("trainEdit?faces-redirect=true&actionName=Edit".concat("&selectedid=").concat(selected.getId()));
-        }else{
+        } else {
             url = "trainMain?faces-redirect=true";
         }
         System.out.println(url);
@@ -191,10 +212,10 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     /**
      * 返回训练主页面的导航路径
      */
-    public String backList(){
+    public String backList() {
         if (actionName.equals("Edit")) {
             TrainInfo old = dao.findById(selected.getId());
-            if(!selected.equals(old)){
+            if (!selected.equals(old)) {
                 WebUtil.addErrorMessage("修改信息未保存，请先点击【保存】后返回！");
                 return "";
             }
@@ -203,7 +224,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     }
 
 
-    public void clearData(){
+    public void clearData() {
         selected = null;
         selectedOrgUid = new ArrayList<>();
         selectedRoleId = new ArrayList<>();
@@ -214,7 +235,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     /**
      * 子课程新增前方法
      */
-    public void prepareItemCreate(){
+    public void prepareItemCreate() {
         detailActionName = "Create";
         selectedTrainDetail = new TrainDetail();
         selectedTrainDetail.setTrainId(selected.getId());
@@ -227,31 +248,32 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         signTotal = null;
         //selectedTrainDetail.setCreatedDate(new Date());
     }
+
     /**
      * 子课程编辑前方法
      */
-    public void prepareItemEdit(){
+    public void prepareItemEdit() {
         detailActionName = "Edit";
         blobObjectList = trainManageService.queryBlobByDetailId(selectedTrainDetail.getId());
         trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetail.getId());
         resultBlobObjectList = trainManageService.queryResultBlobByDetailId(selectedTrainDetail.getId());
 
-        if(CollectionUtils.isNotEmpty(trainDetailSignList)){
-            if(StrUtil.isEmpty(selectedTrainDetail.getCompleteRecorder())){
+        if (CollectionUtils.isNotEmpty(trainDetailSignList)) {
+            if (StrUtil.isEmpty(selectedTrainDetail.getCompleteRecorder())) {
                 selectedTrainDetail.setCompleteRecorder(loginUser.getName());
             }
             signTotal = trainDetailSignList.size();
         }
     }
 
-    public String getDeleteConformation(){
-        if(selectedTrainDetail == null){
+    public String getDeleteConformation() {
+        if (selectedTrainDetail == null) {
             return "";
         }
         List<TrainDetailSign> trainDetailSigns = trainManageService.queryDetailSignByDetailId(selectedTrainDetail.getId());
-        if(CollectionUtils.isNotEmpty(trainDetailSigns)){
+        if (CollectionUtils.isNotEmpty(trainDetailSigns)) {
             return "该子课程已产生签到记录，删除后所有关联数据将永久清除，且无法恢复。请确认是否继续删除？";
-        }else{
+        } else {
             return "是否确认删除？";
         }
     }
@@ -264,21 +286,23 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
         }
     }
+
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
         }
         if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
             filterClinicalDeptOrg = null;
-        }else{
+        } else {
             OrgInfo orgInfo = clinicalDeptList.stream().filter(item -> filterClinicalDeptOrg.equals(item.getName())).findFirst().get();
             selectedTrainDetailSign.setSignDeptName(orgInfo.getName());
             selectedTrainDetailSign.setSignDeptUid(orgInfo.getUid());
         }
-        if(StrUtil.isNotEmpty(filterClinicalDeptOrg)){
+        if (StrUtil.isNotEmpty(filterClinicalDeptOrg)) {
             getClinicalOwnerList();
         }
     }
+
     public List<String> autoCompleteDeptName(String query) {
         if (clinicalDeptList == null) {
             return Collections.emptyList();
@@ -309,14 +333,15 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
             clinicalOwnerList = Collections.emptyList();
         }
     }
+
     public void onSignerFilterChange(AjaxBehaviorEvent event) {
         UserAccount userAccount = null;
         if (event instanceof SelectEvent) {
             userAccount = (UserAccount) ((SelectEvent) event).getObject();
         }
-        if(userAccount == null){
+        if (userAccount == null) {
             filterSigner = null;
-        }else{
+        } else {
             selectedTrainDetailSign.setSignerUid(userAccount.getUid());
             selectedTrainDetailSign.setSignerName(userAccount.getName());
             filterSigner = userAccount.getUid();
@@ -330,9 +355,9 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         }*/
     }
 
-    public void signDeptUidValueChage(){
+    public void signDeptUidValueChage() {
         String uid = selectedTrainDetailSign.getSignDeptUid();
-        if(StrUtil.isEmpty(uid)){
+        if (StrUtil.isEmpty(uid)) {
             return;
         }
         OrgInfo orgInfo = orgInfoList.stream().filter(t -> t.getUid().equals(uid)).findFirst().get();
@@ -342,7 +367,7 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     /**
      * 签到新增前方法
      */
-    public void prepareSignCreate(){
+    public void prepareSignCreate() {
         loadClinicalDeptList();
         selectedTrainDetailSign = new TrainDetailSign();
         selectedTrainDetailSign.setSignDate(new Date());
@@ -351,32 +376,34 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     }
 
     List<TrainDetailSign> deleteSignList = new ArrayList<>();
+
     /**
      * 删除签到信息
      */
-    public void deleteSign(){
-        if(StrUtil.isNotEmpty(selectedTrainDetailSign.getDetailId())){
+    public void deleteSign() {
+        if (StrUtil.isNotEmpty(selectedTrainDetailSign.getDetailId())) {
             //trainManageService.deleteSign(selectedTrainDetailSign);
             deleteSignList.add(selectedTrainDetailSign);
         }
         trainDetailSignList.remove(selectedTrainDetailSign);
-        if(CollectionUtils.isNotEmpty(trainDetailSignList)){
-            for(int i = 0; i < trainDetailSignList.size(); i++){
+        if (CollectionUtils.isNotEmpty(trainDetailSignList)) {
+            for (int i = 0; i < trainDetailSignList.size(); i++) {
                 TrainDetailSign trainDetailSign = trainDetailSignList.get(i);
-                trainDetailSign.setSignOrder(i+1);
+                trainDetailSign.setSignOrder(i + 1);
             }
         }
         //trainDetailSignList = trainManageService.queryDetailSignByDetailId(selectedTrainDetailSign.getDetailId());
         signTotal = trainDetailSignList.size();
         selectedTrainDetail.setActualSignTotal(trainDetailSignList.size());
     }
+
     /**
      * 保存签到信息
      */
-    public void saveSign(){
+    public void saveSign() {
         selectedTrainDetailSign.setSignDate(new Date());
         selectedTrainDetailSign.setSignOrder(trainDetailSignList.size() + 1);
-        if(StrUtil.isEmpty(selectedTrainDetailSign.getId())){
+        if (StrUtil.isEmpty(selectedTrainDetailSign.getId())) {
             selectedTrainDetailSign.setId(UUID.randomUUID().toString());
         }
         trainDetailSignList.add(selectedTrainDetailSign);
@@ -388,16 +415,17 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     /**
      * 生成签到二维码
      */
-    public void generateQrCode(){
+    public void generateQrCode() {
         trainManageService.generateQrCode(selectedTrainDetail);
     }
 
     public String qrCodeView() throws Exception {
-        if(selectedTrainDetail != null && StrUtil.isNotEmpty(selectedTrainDetail.getQrCodeStr())){
-            String url = trainManageService.getBaseURL().replace("gateway","") + "wx/training/signin";
-            url = url + "?" + selectedTrainDetail.getQrCodeStr();
-            return  qrCodeDrawService.getImageBase64(QrCodeSupportUtil.createQrCodeWithoutLogo(selectedTrainDetail.getQrCodeStr(), url, Color.WHITE));
-        }else{
+        if (selectedTrainDetail != null && StrUtil.isNotEmpty(selectedTrainDetail.getQrCodeStr())) {
+            String url = trainManageService.getBaseURL().replace("gateway", "") + "wx/training/signin";
+//            url = url + "?" + selectedTrainDetail.getQrCodeStr();
+            url = url + "?tenantUid=" + selectSite.getTenantUID() + "&" + selectedTrainDetail.getQrCodeStr();
+            return qrCodeDrawService.getImageBase64(QrCodeSupportUtil.createQrCodeWithoutLogo(selectedTrainDetail.getQrCodeStr(), url, Color.WHITE));
+        } else {
             return "";
         }
     }
@@ -405,34 +433,34 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     /**
      * 子课程完成操作
      */
-    public void completeDetail(){
+    public void completeDetail() {
         /*if(CollectionUtils.isEmpty(trainDetailSignList)){
             WebUtil.addErrorMessage("签到信息不能为空！");
             return;
         }*/
-        if(selectedTrainDetail.getActualTrainDate() == null){
+        if (selectedTrainDetail.getActualTrainDate() == null) {
             WebUtil.addErrorMessage("实际培训完成日期不能为空！");
             return;
         }
-        trainDetailList = trainManageService.completeDetail(selectedTrainDetail,detailActionName, blobObjectList, selected,loginUser, resultBlobObjectList, trainDetailSignList);
+        trainDetailList = trainManageService.completeDetail(selectedTrainDetail, detailActionName, blobObjectList, selected, loginUser, resultBlobObjectList, trainDetailSignList);
 
         selectedTrainDetail = null;
         trainDetailSignList = new ArrayList<>();
     }
 
-    public void cancelDetail(){
-        trainManageService.cancelDetail(selectedTrainDetail, selected,loginUser);
+    public void cancelDetail() {
+        trainManageService.cancelDetail(selectedTrainDetail, selected, loginUser);
         selectedTrainDetail = null;
     }
 
-    public void backDetail(){
+    public void backDetail() {
         selectedTrainDetail = null;
     }
 
     /**
      * 子课程保存操作
      */
-    public void saveDetail(){
+    public void saveDetail() {
         // 调用服务层保存培训详情信息
         trainDetailList = trainManageService.saveDetail(selectedTrainDetail, detailActionName, blobObjectList, selected, resultBlobObjectList, trainDetailSignList, deleteSignList);
         // 重置选中的培训详情对象和培训详情标识列表
@@ -441,14 +469,14 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
     }
 
 
-    public List<V2_BlobObject> queryFileByDetailId(String id ){
+    public List<V2_BlobObject> queryFileByDetailId(String id) {
         return trainManageService.queryBlobByDetailId(id);
     }
 
-    public void deleteItem(){
-        if(selectedTrainDetail != null){
-            for(TrainDetail t : trainDetailList){
-                if(t.getId().equals(selectedTrainDetail.getId())){
+    public void deleteItem() {
+        if (selectedTrainDetail != null) {
+            for (TrainDetail t : trainDetailList) {
+                if (t.getId().equals(selectedTrainDetail.getId())) {
                     trainDetailList.remove(t);
                     trainManageService.deleteItem(selectedTrainDetail, selected);
                     selectedTrainDetail = null;
@@ -458,64 +486,67 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         }
     }
 
-    public void handleFileUpload(FileUploadEvent event){
+    public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject v2BlobObject = trainManageService.handleFileUpload(event, V2_BlobObject.BO_TYPE_TRAIN_DETAIL, null);
-        if(v2BlobObject != null){
+        if (v2BlobObject != null) {
             blobObjectList.add(v2BlobObject);
         }
     }
-    public void handleResultFileUpload(FileUploadEvent event){
+
+    public void handleResultFileUpload(FileUploadEvent event) {
         V2_BlobObject v2BlobObject = trainManageService.handleFileUpload(event, V2_BlobObject.BO_TYPE_TRAIN_SIGN_FILE, V2_BlobObject.BO_TYPE_TRAIN_SIGN_RESULT);
-        if(v2BlobObject != null){
-            resultBlobObjectList.add(v2BlobObject);
-        }
-    }
-    public void handlePhotoFileUpload(FileUploadEvent event){
-        V2_BlobObject v2BlobObject = trainManageService.handleFileUpload(event, V2_BlobObject.BO_TYPE_TRAIN_SIGN_FILE, V2_BlobObject.BO_TYPE_TRAIN_SIGN_PHOTO);
-        if(v2BlobObject != null){
+        if (v2BlobObject != null) {
             resultBlobObjectList.add(v2BlobObject);
         }
     }
 
-    public List<V2_BlobObject> getResultBlobList(String type){
-        if(CollectionUtils.isEmpty(resultBlobObjectList)){
+    public void handlePhotoFileUpload(FileUploadEvent event) {
+        V2_BlobObject v2BlobObject = trainManageService.handleFileUpload(event, V2_BlobObject.BO_TYPE_TRAIN_SIGN_FILE, V2_BlobObject.BO_TYPE_TRAIN_SIGN_PHOTO);
+        if (v2BlobObject != null) {
+            resultBlobObjectList.add(v2BlobObject);
+        }
+    }
+
+    public List<V2_BlobObject> getResultBlobList(String type) {
+        if (CollectionUtils.isEmpty(resultBlobObjectList)) {
             return new ArrayList<>();
         }
         return resultBlobObjectList.stream().filter(t -> t.getBoSubType().equals(type)).collect(Collectors.toList());
     }
 
-    public void removeFile(V2_BlobObject v2BlobObject){
+    public void removeFile(V2_BlobObject v2BlobObject) {
         trainManageService.removeBlob(v2BlobObject);
         resultBlobObjectList.remove(v2BlobObject);
     }
 
-    public void removeResultFile(V2_BlobObject v2BlobObject){
+    public void removeResultFile(V2_BlobObject v2BlobObject) {
         trainManageService.removeBlob(v2BlobObject);
         resultBlobObjectList.remove(v2BlobObject);
     }
 
-    public void prepareEditFile(V2_BlobObject v2BlobObject){
+    public void prepareEditFile(V2_BlobObject v2BlobObject) {
         selectedBlobObject = v2BlobObject;
 
         int index = selectedBlobObject.getObjectName().lastIndexOf(".");
         fileName = selectedBlobObject.getObjectName().substring(0, index);
         fileType = selectedBlobObject.getObjectName().substring(index, selectedBlobObject.getObjectName().length());
     }
-    public void saveModifyFileName(){
+
+    public void saveModifyFileName() {
         String fn = fileName + fileType;
         selectedBlobObject.setObjectName(fn);
         trainManageService.saveModifyFileName(selectedBlobObject);
     }
 
-    public String getPrintSignDate(){
-        if(selectedTrainDetail == null){
+    public String getPrintSignDate() {
+        if (selectedTrainDetail == null) {
             return "";
         }
         return DateUtil.format(selectedTrainDetail.getPlanTrainDate(), "yyyy-MM-dd") + " " + DateUtil.format(selectedTrainDetail.getStartTime(), "HH:mm");
     }
 
-    public String getTrainInstructors(){
-        if(selectedTrainDetail == null){
+    public String getTrainInstructors() {
+        if (selectedTrainDetail == null) {
             return "";
         }
         String internalInstructors = StrUtil.isEmpty(selectedTrainDetail.getInternalInstructors()) ? "" : selectedTrainDetail.getInternalInstructors();
@@ -524,9 +555,10 @@ public class TrianInSiteEditController  extends GenericCRUDUUIDController<TrainI
         return internalInstructors.concat(" ").concat(externalInstructors).concat(" ").concat(externalInstructorsCompany);
     }
 
-    public String getExportFileName(){
+    public String getExportFileName() {
         return selected.getCourseName().concat("_").concat(selectedTrainDetail.getName()).concat("_").concat(DateUtil.format(new Date(), "yyyyMMddHHmmss"));
     }
+
     @Override
     protected GenericRepositoryUUID<TrainInfo> getDAO() {
         return dao;
