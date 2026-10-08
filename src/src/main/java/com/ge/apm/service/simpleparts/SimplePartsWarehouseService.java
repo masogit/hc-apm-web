@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
  * @version: 1.0
  */
 @Service
-@Transactional
 public class SimplePartsWarehouseService {
 
     @Autowired
@@ -55,6 +54,7 @@ public class SimplePartsWarehouseService {
      * @return java.util.List<com.ge.apm.domain.simpleparts.PartsWarehouse>
      * @date 2020/7/13 13:54
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsWarehouse> findAll() {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         List<SimplePartsWarehouse> list =  partsWarehouseRepository.findAllWarehouseList(currentUserAccount.getTenantUID());
@@ -66,10 +66,12 @@ public class SimplePartsWarehouseService {
      * @date 2020/7/13 18:18
      * 保存数据
      */
+    @Transactional
     public SimplePartsWarehouse save(SimplePartsWarehouse sparePartsWarehouse) {
         return partsWarehouseRepository.save(sparePartsWarehouse);
     }
 
+    @Transactional(readOnly = true)
     public TreeNode buildSparePartsInTree(String tenantUID) {
         List<OrgInfo> resultList = orgInfoRepository.getOrgHierarchyExceptClinicalDeptForTenant(tenantUID);
         Map<String, TreeNode> treeNodeMap = new HashMap<>();
@@ -114,6 +116,7 @@ public class SimplePartsWarehouseService {
      * @date 2020/7/22 15:21
      * 根据id查询
      */
+    @Transactional(readOnly = true)
     public SimplePartsWarehouse findWarehouseNameById(String id) {
         return partsWarehouseRepository.getById(id);
     }
@@ -135,6 +138,7 @@ public class SimplePartsWarehouseService {
      * @date 2020/7/13 13:54
      * 根据siteUid和userId 查找备件所属仓库
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsWarehouse> findAllByPartsItemId(String partsItemId, String siteUid) {
         List<SimplePartsWarehouse> result = Lists.newArrayList();
         Set<String> idSets = new HashSet<>();
@@ -166,6 +170,7 @@ public class SimplePartsWarehouseService {
      * @date 2020/7/13 13:54
      * 根据siteUid和userId 查找可用仓库
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsWarehouse> findAllBySiteUidAndUserId(String siteUid) {
         List<SimplePartsWarehouse> result = Lists.newArrayList();
         Set<String> idSets = Sets.newHashSet();
@@ -191,6 +196,7 @@ public class SimplePartsWarehouseService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public Optional<SimplePartsWarehouse> findDefaultWarehouseByAssetInfoForCurrentUser(AssetInfo assetInfo) {
 
         List<SimplePartsWarehouse> warehouseList = findWarehouseListMappedBySiteUid(assetInfo.getSiteUID());
@@ -202,6 +208,7 @@ public class SimplePartsWarehouseService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsWarehouse> findWarehouseListMappedBySiteUid(String siteUid) {
 
         Set<String> idSets = Sets.newHashSet();
@@ -222,6 +229,7 @@ public class SimplePartsWarehouseService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsWarehouse> findWarehouseListInRequest() {
 
         Set<String> idSets = Sets.newHashSet();
@@ -252,6 +260,7 @@ public class SimplePartsWarehouseService {
 
     }
 
+    @Transactional(readOnly = true)
     public SimplePartsWareHouseLocator findWarehouseLocatorNameById(String id) {
         return simplePartsWarehouseLocatorRepository.findById(id);
     }

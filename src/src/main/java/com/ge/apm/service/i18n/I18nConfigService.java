@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 public class I18nConfigService {
 
     @Autowired
@@ -36,6 +35,7 @@ public class I18nConfigService {
         }
     }
 
+    @Transactional(readOnly = true)
     public boolean beforeDeleteCheck(String msgType, String msgKey, Integer tenantId){
 
         TenantInfo tenantInfo = tenantInfoRepository.findById(tenantId);

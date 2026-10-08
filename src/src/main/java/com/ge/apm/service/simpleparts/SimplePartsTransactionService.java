@@ -6,7 +6,6 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author csh
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @package com.ge.apm.service.spareparts
  */
 @Service
-@Transactional
 public class SimplePartsTransactionService {
 
     @Autowired

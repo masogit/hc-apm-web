@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
  * @author System Generated
  */
 @Service
-@Transactional
 public class WorkOrderUnifiedService {
     protected static final Logger LOGGER = LoggerFactory.getLogger(WorkOrderUnifiedService.class);
 
@@ -38,6 +37,7 @@ public class WorkOrderUnifiedService {
      * @param filters 过滤条件
      * @return 分页的工单列表
      */
+    @Transactional(readOnly = true)
     public Page<V2_WorkOrder> findUnifiedWorkOrders(PageRequest pageRequest, Map<String, Object> filters) {
         try {
             filters.put("pageSize", pageRequest.getPageSize());

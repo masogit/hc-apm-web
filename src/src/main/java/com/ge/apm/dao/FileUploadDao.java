@@ -22,7 +22,6 @@ import webapp.framework.web.WebUtil;
  * @author 212579464
  */
 @Repository
-@Transactional(readOnly = true)
 public class FileUploadDao {
 
     JdbcTemplate template = WebUtil.getServiceBean("jdbcTemplate", JdbcTemplate.class);
@@ -41,6 +40,7 @@ public class FileUploadDao {
         this.lobHandler = lobHandler;
     }
 
+    @Transactional
     public Integer saveUploadFile(InputStream contentStream, int contentLength, String fileName) throws SQLException {
         Connection con = template.getDataSource().getConnection();
         ResultSet rs = null;
@@ -57,6 +57,7 @@ public class FileUploadDao {
         }
     }
 
+    @Transactional
     public int deleteUploadFile(Integer id) {
         return template.update(SQL_DELETE, id);
     }
