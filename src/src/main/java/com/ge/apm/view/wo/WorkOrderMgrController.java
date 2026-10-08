@@ -409,9 +409,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             if (!myWorkOrderInitialized) {
-                Boolean savedMyWorkOrder = (Boolean) FacesContext.getCurrentInstance()
+                Boolean saved = (Boolean) FacesContext.getCurrentInstance()
                         .getExternalContext().getSessionMap().get("myWorkOrderSaved");
-                myWorkOrder = (savedMyWorkOrder != null) ? savedMyWorkOrder : userContextService.hasRole("AssetHead");
+                myWorkOrder = (saved != null) ? saved : true;
                 myWorkOrderInitialized = true;
             }
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
