@@ -154,7 +154,6 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
-        systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
         ruleMap = new HashMap<>();
         this.selectedMap = new HashMap<>();
         this.currentPageAssets = new ArrayList<>();
@@ -463,21 +462,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             }
             deleteAssetUids.add(entry.getKey());
         }
-        UserAccount currentUser = UserContextService.getCurrentUserAccount();
         dao.deleteByAssetUids(deleteAssetUids);
-        try {
-            JSONObject eventData = new JSONObject();
-            eventData.put("action", "batchDelete");
-            eventData.put("deleteCount", deleteAssetUids.size());
-            eventData.put("assetUids", deleteAssetUids);
-            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(
-                    currentUser, SystemEventAuditEnum.PM_ORDER_RULE_DELETE,
-                    null, Boolean.TRUE, "",
-                    AuditBoTypeEnum.PM_ORDER_RULE.getBoType(), eventData.toJSONString());
-            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
-        } catch (Exception e) {
-            logger.error("批量删除绑定-写入审计表失败", e);
-        }
         this.selectedMap.clear();
     }
 
@@ -676,12 +661,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                 .filter(item -> StringUtils.isBlank(item.getRuleUID())
                         && StringUtils.isBlank(item.getRuleUID1())
                         && StringUtils.isBlank(item.getRuleUID2())
-                        && StringUtils.isBlank(item.getRuleUID4())
-                        && StringUtils.isBlank(item.getRuleUIDInspection())).collect(Collectors.toList());
+                        && StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
 
         List<RelRuleAsset> saveRelRuleAsset = currentEditAssets.stream()
-                .filter(item -> !deleteRelRuleAsset.contains(item)).collect(Collectors.toList());
-
+                .filter(item -> StringUtils.isNotBlank(item.getRuleUID())
+                        || StringUtils.isBlank(item.getRuleUID1())
+                        || StringUtils.isBlank(item.getRuleUID2())
+                        || StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(saveRelRuleAsset)) {
             dao.save(saveRelRuleAsset);
         }
