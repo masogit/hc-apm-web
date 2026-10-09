@@ -64,11 +64,8 @@
 <!--                      <p:column headerText="#{msg.dispatchMode}" sortBy="#{item.dispatchMode}" filterBy="#{item.dispatchMode}" filterMatchMode="EQ">
                     <h:outputText value="#{fieldMsg.fieldValue('dispatchMode',item.dispatchMode)}"/>
                </p:column> -->
-                    <p:column headerText="#{msg.repair}#{msg.dispatchUserName}" sortBy="#{item.dispatchUserName}" filterBy="#{item.dispatchUserName}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.dispatchUserName}"/>
-                    </p:column>
-                     <p:column headerText="#{msg.repair}#{msg.dispatchUserName}2" sortBy="#{item.dispatchUserName2}" filterBy="#{item.dispatchUserName2}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.dispatchUserName2}"/>
+                    <p:column headerText="#{msg.repair}维修派工角色" sortBy="#{item.dispatchRoleName}" filterBy="#{item.dispatchRoleName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.dispatchRoleName}"/>
                     </p:column>
                     <p:column headerText="#{msg.timeoutDispatch}" sortBy="#{item.timeoutDispatch}" filterBy="#{item.timeoutDispatch}" filterMatchMode="EQ">
                         <h:outputText value="#{item.timeoutDispatch}"/>

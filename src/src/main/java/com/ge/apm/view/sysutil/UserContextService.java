@@ -911,8 +911,20 @@ public class UserContextService implements Serializable {
 
     private void getUserPrivilege() {
         List<WorkflowConfig> wcList = getSiteConfigurations();
-        isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item. getDispatchUserId()).orElse(0).equals(userAccount.getId())
-                || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+        isDispatcher = false;
+
+        // 检查当前用户是否属于配置的派工角色
+        List<Integer> dispatchRoleIds = wcList.stream()
+                .map(WorkflowConfig::getDispatchRoleId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(dispatchRoleIds)) {
+            UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
+            List<UserRole> userCustomRoles = userRoleDao.findByUserIdAndRoleType(userAccount.getId(), 1);
+            isDispatcher = userCustomRoles.stream()
+                    .anyMatch(ur -> dispatchRoleIds.contains(ur.getRoleId()));
+        }
 
         isPmDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getPmDispatchUserId()).orElse(0).equals(userAccount.getId())
                 || Optional.ofNullable(item.getPmDispatchUserId2()).orElse(0).equals(userAccount.getId()));
