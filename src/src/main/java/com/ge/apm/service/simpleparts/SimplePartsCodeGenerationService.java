@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @descript 备件明细Service
  * @package com.ge.apm.service.spareparts
  */
-@Transactional
 @Service
 public class SimplePartsCodeGenerationService {
 
@@ -27,6 +26,7 @@ public class SimplePartsCodeGenerationService {
      * @date 2020/7/15 9:57
      * 调用微服务接口初始化编号
      */
+    @Transactional(readOnly = true)
     public String getNextRequestCode(Integer type) {
         try {
             DateTime now = new DateTime();

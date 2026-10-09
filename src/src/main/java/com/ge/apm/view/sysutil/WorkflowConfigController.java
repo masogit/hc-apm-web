@@ -10,8 +10,10 @@ import javax.faces.bean.ViewScoped;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.CustomRoleRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigCacheService;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import com.ge.apm.service.constant.WorkFlowConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -78,6 +80,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     private String treeNodeNameFilter;
 
     private ConfigCacheService cacheService;
+    private CustomRoleRepository customRoleDao;
+    private List<CustomRole> dispatchRoleList = new ArrayList<>();
 
     @Override
     protected void init() {
@@ -89,6 +93,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         cacheService = WebUtil.getBean(ConfigCacheService.class);
+        customRoleDao = WebUtil.getBean(CustomRoleRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         isInsulate = UserContextService.isInsulate();
@@ -183,7 +188,47 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         updateDispater();
         updateApproverList();
         updateDispatherClinical();
+        updateDispatchRoleList();
         selected.setSiteUID(selectedUserOrg.getSiteUID());
+    }
+
+    /**
+     * 收集当前组织的四级UID并去重（tenantUID/institutionUID/hospitalUID/siteUID）
+     * 院区级4个不同UID，医院级3个，集团级2个，租户级1个
+     */
+    private List<String> collectOrgUids(OrgInfo org) {
+        Set<String> uids = new LinkedHashSet<>();
+        if (org.getTenantUID() != null) uids.add(org.getTenantUID());
+        if (org.getInstitutionUID() != null) uids.add(org.getInstitutionUID());
+        if (org.getHospitalUID() != null) uids.add(org.getHospitalUID());
+        if (org.getSiteUID() != null) uids.add(org.getSiteUID());
+        return new ArrayList<>(uids);
+    }
+
+    /**
+     * 向上查找同时拥有 REPAIR_ORDER_VIEW 和 REPAIR_ORDER_DISPATCH 的自定义派工角色
+     */
+    public void updateDispatchRoleList() {
+        dispatchRoleList.clear();
+        if (selectedUserOrg == null) return;
+        List<String> orgUids = collectOrgUids(selectedUserOrg);
+        List<CustomRole> viewRoles = customRoleDao
+                .findCustomRolesBySiteUIdsAndFunction(orgUids, ApmFunction.REPAIR_ORDER_VIEW.name());
+        List<CustomRole> dispatchRoles = customRoleDao
+                .findCustomRolesBySiteUIdsAndFunction(orgUids, ApmFunction.REPAIR_ORDER_DISPATCH.name());
+        Set<Integer> dispatchRoleIds = dispatchRoles.stream()
+                .map(CustomRole::getId).collect(Collectors.toSet());
+        dispatchRoleList.addAll(viewRoles.stream()
+                .filter(r -> dispatchRoleIds.contains(r.getId()))
+                .collect(Collectors.toList()));
+    }
+
+    public List<CustomRole> getDispatchRoleList() {
+        return dispatchRoleList;
+    }
+
+    public void setDispatchRoleList(List<CustomRole> dispatchRoleList) {
+        this.dispatchRoleList = dispatchRoleList;
     }
 
     private void updateDispatherClinical() {
@@ -490,6 +535,16 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
             selected.setMeasureDispatchUserName2(null);
         }
 
+        //dispatch role
+        if (selected.getDispatchRoleId() != null) {
+            CustomRole dispatchRole = customRoleDao.findById(selected.getDispatchRoleId());
+            if (dispatchRole != null) {
+                selected.setDispatchRoleName(dispatchRole.getName());
+            }
+        } else {
+            selected.setDispatchRoleName(null);
+        }
+
         if (this.telRepStart != null) {
             selected.setTelReportStart(new DateTime(telRepStart).toString("HH:mm:ss"));
         }
@@ -522,7 +577,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 
 
         if (isManual != null && isManual) {
-            if (selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null) {
+            if (selected.getDispatchRoleId() == null
+                    && selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null) {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 WebUtil.addErrorMessage(WebUtil.getMessage("WoNeedDispather"));
                 return;
@@ -718,6 +774,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         updateDispater();
         updateApproverList();
         updateDispatherClinical();
+        updateDispatchRoleList();
         parseSwapCenter();
         parseAttachCategory();
     }
@@ -759,6 +816,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         dispatchUserList.clear();
         approveUserList.clear();
         dispatchUserList.clear();
+        dispatchRoleList.clear();
         attachmentCategories.clear();
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

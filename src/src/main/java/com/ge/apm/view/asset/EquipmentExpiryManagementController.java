@@ -8,6 +8,7 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.AssetTypeGroupService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
@@ -17,6 +18,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
@@ -36,6 +38,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -306,6 +309,20 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
 
     public boolean isChecked() {
         return selectedMap.containsValue(true);
+    }
+
+    public void onSelectAsset() throws IOException {
+        if (null == selected) {
+            return;
+        }
+
+        String url = "actionName=View&selectedid="
+                + selected.getUid()
+                + "&asset_name=" + selected.getName();
+        url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public void batchEditUsageDateBefore() {

@@ -836,6 +836,11 @@
                                     <h:outputText value="#{item.lifecycle == null ? null : item.lifecycle / 12}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'depreciationLifecycle'}">
+                                <p:column headerText="#{msg.depreciationLifecycle}" sortBy="#{item.depreciationLifecycle}" filterBy="#{item.depreciationLifecycle}" filterMatchMode="EQ">
+                                    <h:outputText value="#{item.depreciationLifecycle == null ? null : item.depreciationLifecycle / 12}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'warrantyMonth'}">
                                 <p:column headerText="#{msg.warrantyMonth}">
                                     <h:outputText value="#{item.warrantyMonth}"/>

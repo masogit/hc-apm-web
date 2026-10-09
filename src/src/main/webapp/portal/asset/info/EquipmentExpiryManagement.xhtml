@@ -75,6 +75,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="rowSelect" listener="#{equipmentExpiryManagementController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                         <p:ajax event="filter" listener="#{equipmentExpiryManagementController.onFilter}"
                                 oncomplete="updateSelectAllCheckBox();" update="searchForm"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
@@ -311,6 +312,15 @@
                     PF('ActiveDlg').show();
                 }
             }
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
             function updateSelectAllCheckBox() {
                 var checkboxlist = $(".selectCheckBox");
                 var selectAllstatus = true;

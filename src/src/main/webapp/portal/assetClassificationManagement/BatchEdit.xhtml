@@ -7,6 +7,14 @@
 
     <ui:define name="content">
         <style>
+            #batchEditAssetClassificationForm .form-group .ui-inputtext:not(#batchEditAssetClassificationForm\:selectedOrgName),
+            #batchEditAssetClassificationForm .form-group .ui-selectonemenu,
+            #batchEditAssetClassificationForm .form-group .ui-selectcheckboxmenu {
+                width: 100% !important;
+            }
+            #batchEditAssetClassificationForm\:selectedOrgName {
+                width: calc(100% - 32px) !important;
+            }
 
         </style>
         <div class="ui-g">
@@ -61,6 +69,7 @@
                                                itemLabel="#{item.name}" itemValue="#{item}"/>
 
                                 <p:ajax process="@this" event="change" listener="#{batchEditAssetClassificationController.onClinicalDeptChange}" update="datalist"/>
+                                <p:ajax event="toggleSelect" listener="#{batchEditAssetClassificationController.onClinicalDeptChange}" update="datalist"/>
 
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
@@ -92,6 +101,15 @@
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class='label'>是否配置32分类</label>
+                            <p:selectOneMenu value="#{batchEditAssetClassificationController.classification32Filter}" style="width:100%">
+                                <f:selectItem itemLabel="全部" itemValue="all"/>
+                                <f:selectItem itemLabel="已配置" itemValue="configured"/>
+                                <f:selectItem itemLabel="未配置" itemValue="unconfigured"/>
+                                <p:ajax/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <p:commandButton actionListener="#{batchEditAssetClassificationController.getQueryAssetsList()}"
                                              value="查询" update="datalist"  validateClient="true"
                                              icon="ui-icon-check"
@@ -112,7 +130,7 @@
                                          rows="10" emptyMessage="#{msg.noRecordFound}"
                                          rowsPerPageTemplate="5,10,20,50">
                                 <p:ajax event="filter" listener="#{batchEditAssetClassificationController.onFilter}" update="datalist"/>
-                                <p:ajax event="page" />
+                                <p:ajax event="page" listener="#{batchEditAssetClassificationController.onPageTable1}" oncomplete="updateSelectAllCheckBox1()"/>
                                 <p:column width="40" id="checkBoxCol">
                                     <p:selectBooleanCheckbox value="#{batchEditAssetClassificationController.selectedAssetUidTable1[item.uid]}" class="selectCheckBox1">
                                         <p:ajax event="change" listener="#{batchEditAssetClassificationController.updateSelctedAssetList1}" update="@(.selectCheckBoxHeader1)"/>
@@ -255,7 +273,41 @@
         </div>
 
         <script>
-
+            function updateSelectAllCheckBox1() {
+                var checkboxlist = $(".selectCheckBox1");
+                var selectAllStatus = true;
+                checkboxlist.each(function () {
+                    selectAllStatus = selectAllStatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                var headerEl = $(".selectCheckBoxHeader1")[0];
+                if (headerEl) {
+                    if (selectAllStatus &amp;&amp; checkboxlist.length > 0) {
+                        headerEl.children[1].classList.add("ui-state-active");
+                    } else {
+                        headerEl.children[1].classList.remove("ui-state-active");
+                    }
+                }
+            }
+        </script>
+        <script type="text/javascript">
+        //<![CDATA[
+            $(function() {
+                var form = $('#batchEditAssetClassificationForm');
+                form.find('.ui-selectonemenu-trigger .ui-icon, .ui-selectcheckboxmenu-trigger .ui-icon').each(function() {
+                    var el = $(this);
+                    el.removeClass('ui-icon ui-icon-triangle-1-s');
+                    el.css({
+                        'background': 'none',
+                        'backgroundImage': 'none',
+                        'textIndent': '0',
+                        'overflow': 'visible',
+                        'font-size': '13px',
+                        'line-height': '1'
+                    });
+                    el.html('\u25BC');
+                });
+            });
+        //]]>
         </script>
         <p:dialog id="batchAssetClassification32Dialog"
                   widgetVar="batchAssetClassification32Dialog"

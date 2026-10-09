@@ -19,6 +19,6 @@ public interface NurseSiteMaintainMapper extends BaseMapper<NurseSiteMaintain> {
 
     List<NurseSiteMaintain> searchMaintain(Map<String, Object> param);
 
-    @Select("SELECT nsmi.status, nsmi.check_date checkDate, nsmi.schedule_date scheduleDate, ua.name checker FROM nurse_site_maintain_item nsmi LEFT JOIN nurse_site_maintain nsm ON nsmi.parent_id = nsm.ID left join user_account ua on nsmi.update_by = ua.uid WHERE 1=1 ${ew.sqlSegment} ")
+    @Select("SELECT nsmi.status, nsmi.check_date checkDate, nsmi.update_date updateDate,nsmi.schedule_date scheduleDate, ua.name checker FROM nurse_site_maintain_item nsmi LEFT JOIN nurse_site_maintain nsm ON nsmi.parent_id = nsm.ID left join user_account ua on nsmi.update_by = ua.uid WHERE 1=1 ${ew.sqlSegment} ")
     List<NurseSiteMaintainExport> getEventRecord(Pagination pagination, @Param("ew") Wrapper wrapper);
 }

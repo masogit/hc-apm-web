@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  * @package com.ge.apm.service.spareparts
  */
 @Service
-@Transactional
 public class SimplePartsInventoryService {
 
     Logger logger = LoggerFactory.getLogger(getClass());
@@ -54,6 +53,7 @@ public class SimplePartsInventoryService {
      * @createTime 2020/6/8 14:53
      * @description 查找所有的备件库存信息
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsItem> findAll() {
         List<SimplePartsItem> list = Lists.newArrayList();
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
@@ -81,6 +81,7 @@ public class SimplePartsInventoryService {
         return list;
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsItem> findByIds(Set<String> ids) {
         return partsItemRepository.findAll(ids);
     }
@@ -91,6 +92,7 @@ public class SimplePartsInventoryService {
      * @createTime 2020/6/16 9:41
      * @description 批量保存
      */
+    @Transactional
     public void save(List<SimplePartsInventory> partsInventoryLists) {
         partsInventoryRepository.save(partsInventoryLists);
     }
@@ -102,6 +104,7 @@ public class SimplePartsInventoryService {
      * @createTime 2020/6/18 13:33
      * @description 保存单个数据
      */
+    @Transactional
     public SimplePartsInventory save(SimplePartsInventory partsInventory) {
         return partsInventoryRepository.save(partsInventory);
     }
@@ -112,6 +115,7 @@ public class SimplePartsInventoryService {
      * @date 2020/7/21 18:39
      * 根据仓库id查询
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsInventory> findByWarehouseId(String warehouseId) {
         if(StringUtils.isEmpty(warehouseId)){
             //修改 : 原先是查询租户下所有库存,现在是查询仓库机构映射下以及仓库管理员下,所有仓库,再根据这些仓库去查询库存
@@ -128,6 +132,7 @@ public class SimplePartsInventoryService {
         return partsInventoryRepository.findByPartsWarehouseId(warehouseId);
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsInventory> findByWarehouseIdAndLocatorId(String warehouseId, String locatorId) {
         return partsInventoryRepository.findByWarehouseIdAndLocatorId(warehouseId, locatorId);
     }
@@ -142,14 +147,17 @@ public class SimplePartsInventoryService {
         partsInventory.setClinicalDeptUID(currentUserAccount.getClinicalDeptUID());
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsInventory> findByPartsItemIdAndPartsWarehouseId(String partsItemId, String partsWarehouseId) {
         return partsInventoryRepository.findByPartsItemIdAndPartsWarehouseId(partsItemId,partsWarehouseId);
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsInventory> findByPartsItemId(String partsItemId) {
         return partsInventoryRepository.findByPartsItemId(partsItemId);
     }
 
+    @Transactional(readOnly = true)
     public boolean isVirtualLocatorExistsInInventory(String partsWarehouseId) {
         int count = partsInventoryRepository.countOfVirtualLocatorsByPartsWarehouseId(partsWarehouseId);
         if (count == 0) {
@@ -167,6 +175,7 @@ public class SimplePartsInventoryService {
      * @createTime 2020/6/8 14:53
      * @description 查找所有的备件库存信息
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsItem> findAllByName(String name) {
         List<SimplePartsItem> list = Lists.newArrayList();
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();

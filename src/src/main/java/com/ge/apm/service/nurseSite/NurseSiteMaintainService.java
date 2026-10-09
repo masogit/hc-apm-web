@@ -1533,6 +1533,38 @@ public class NurseSiteMaintainService {
 		}
 	}
 
+	public String saveMaintainSignatureAttachment(String content, String maintainId) {
+		V2_BlobObject blobObject = null;
+		try {
+			blobObject = blobFileService.uploadFileString(content);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+		if (null != blobObject) {
+			blobObject.setBoType(V2_BlobObject.BO_TYPE_NurseSiteMaintain);
+			blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_SIGNATURE);
+			blobObject.setBoUuid(maintainId);
+			UserAccount currentUser = UserContextService.getCurrentUserAccount();
+			if (currentUser != null) {
+				blobObject.setCreatedBy(currentUser.getUid());
+			}
+			blobObject.setCreatedDate(new Date());
+			blobFileService.saveBlobObject(blobObject);
+			return blobObject.getId();
+		} else {
+			return null;
+		}
+	}
+
+	public List<V2_BlobObject> findMaintainSignatures(String maintainId) {
+		return blobObjectRepository.fetchBlobObjectByUuidAndType(
+			maintainId,
+			V2_BlobObject.BO_TYPE_NurseSiteMaintain,
+			V2_BlobObject.BO_SUB_TYPE_SIGNATURE
+		);
+	}
+
 	public String getMaintainSignatureWeb(String signatureId) {
 		StreamedContent streamedContent = blobFileService.getBlobObjectByStorageId(signatureId);
 		InputStream input = streamedContent.getStream();

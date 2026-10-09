@@ -1,5 +1,7 @@
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.aop.SystemEventAuditAopAspect;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoService;
@@ -11,6 +13,8 @@ import com.ge.apm.service.pm.RelRuleAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
+import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
@@ -25,6 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -47,6 +53,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class RelRuleAssetManagerController extends GenericCRUDUUIDController<RelRuleAsset> {
 
+    private static final Logger logger = LoggerFactory.getLogger(RelRuleAssetManagerController.class);
     private static final long serialVersionUID = -1L;
 
     private RelRuleAssetRepository dao = null;
@@ -130,6 +137,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
     @Setter
     private Map<String, PmOrderRule> ruleMap;
     private ConfigCacheService configCacheService;
+    private SystemEventAuditAopAspect systemEventAuditAopAspect;
 
     @Override
     protected void init() {
@@ -146,6 +154,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
+        systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
         ruleMap = new HashMap<>();
         this.selectedMap = new HashMap<>();
         this.currentPageAssets = new ArrayList<>();
@@ -454,7 +463,21 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             }
             deleteAssetUids.add(entry.getKey());
         }
+        UserAccount currentUser = UserContextService.getCurrentUserAccount();
         dao.deleteByAssetUids(deleteAssetUids);
+        try {
+            JSONObject eventData = new JSONObject();
+            eventData.put("action", "batchDelete");
+            eventData.put("deleteCount", deleteAssetUids.size());
+            eventData.put("assetUids", deleteAssetUids);
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(
+                    currentUser, SystemEventAuditEnum.PM_ORDER_RULE_DELETE,
+                    null, Boolean.TRUE, "",
+                    AuditBoTypeEnum.PM_ORDER_RULE.getBoType(), eventData.toJSONString());
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        } catch (Exception e) {
+            logger.error("批量删除绑定-写入审计表失败", e);
+        }
         this.selectedMap.clear();
     }
 
@@ -617,6 +640,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             clearCache();
             return;
         }
+        UserAccount currentUser = UserContextService.getCurrentUserAccount();
+        List<String> affectedAssetUids = currentEditAssets.stream().map(RelRuleAsset::getAssetUID).collect(Collectors.toList());
         String alert = null;
         if (deleteRule2) {
             currentEditAssets.forEach(item -> item.setRuleUID2(null));
@@ -651,18 +676,33 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
                 .filter(item -> StringUtils.isBlank(item.getRuleUID())
                         && StringUtils.isBlank(item.getRuleUID1())
                         && StringUtils.isBlank(item.getRuleUID2())
-                        && StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
+                        && StringUtils.isBlank(item.getRuleUID4())
+                        && StringUtils.isBlank(item.getRuleUIDInspection())).collect(Collectors.toList());
 
         List<RelRuleAsset> saveRelRuleAsset = currentEditAssets.stream()
-                .filter(item -> StringUtils.isNotBlank(item.getRuleUID())
-                        || StringUtils.isBlank(item.getRuleUID1())
-                        || StringUtils.isBlank(item.getRuleUID2())
-                        || StringUtils.isBlank(item.getRuleUID4())).collect(Collectors.toList());
+                .filter(item -> !deleteRelRuleAsset.contains(item)).collect(Collectors.toList());
+
         if (CollectionUtils.isNotEmpty(saveRelRuleAsset)) {
             dao.save(saveRelRuleAsset);
         }
         if (CollectionUtils.isNotEmpty(deleteRelRuleAsset)) {
             dao.delete(deleteRelRuleAsset);
+        }
+        try {
+            JSONObject eventData = new JSONObject();
+            eventData.put("action", "deleteRule");
+            eventData.put("deletedRules", alert);
+            eventData.put("affectedCount", affectedAssetUids.size());
+            eventData.put("assetUids", affectedAssetUids);
+            eventData.put("fullDeleteCount", deleteRelRuleAsset.size());
+            eventData.put("updateFieldCount", saveRelRuleAsset.size());
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(
+                    currentUser, SystemEventAuditEnum.PM_ORDER_RULE_UPDATE,
+                    null, Boolean.TRUE, "",
+                    AuditBoTypeEnum.PM_ORDER_RULE.getBoType(), eventData.toJSONString());
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        } catch (Exception e) {
+            logger.error("解除绑定-写入审计表失败", e);
         }
         clearCache();
         WebUtil.addSuccessMessage(alert);

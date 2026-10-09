@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
  * @descript 备件明细Service
  * @package com.ge.apm.service.spareparts
  */
-@Transactional
 @Service
 public class SimplePartsRequestLineItemService {
 
@@ -62,6 +61,7 @@ public class SimplePartsRequestLineItemService {
      * @createTime 2020/6/16 8:54
      * @description 批量保存数据
      */
+    @Transactional
     public void save(List<SimplePartsRequestLineItem> partsRequestLineItemLists) {
         partsRequestLineItemRepository.save(partsRequestLineItemLists);
     }
@@ -73,6 +73,7 @@ public class SimplePartsRequestLineItemService {
      * @createTime 2020/6/16 10:42
      * @description 单个更新或保存
      */
+    @Transactional
     public SimplePartsRequestLineItem save(SimplePartsRequestLineItem partsRequestLineItem) {
        return partsRequestLineItemRepository.save(partsRequestLineItem);
     }
@@ -84,6 +85,7 @@ public class SimplePartsRequestLineItemService {
      * @createTime 2020/6/16 9:23
      * @description 根据申购单的编号查询
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsRequestLineItem> findLineItemsByRequestCode(String requestCode) {
         return partsRequestLineItemRepository.findPartsRequestLineItemsByRequestCode(requestCode);
     }

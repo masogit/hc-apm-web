@@ -61,6 +61,12 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "dispatch_user_name2")
     private String dispatchUserName2;
 
+    @Column(name = "dispatch_role_id")
+    private Integer dispatchRoleId;
+
+    @Column(name = "dispatch_role_name")
+    private String dispatchRoleName;
+
     @Column(name = "is_take_order_enabled")
     private Boolean isTakeOrderEnabled; //是否允许抢单
 
@@ -1285,6 +1291,22 @@ public class WorkflowConfig implements Serializable {
 
     public void setDispatchUserName2(String dispatchUserName2) {
         this.dispatchUserName2 = dispatchUserName2;
+    }
+
+    public Integer getDispatchRoleId() {
+        return dispatchRoleId;
+    }
+
+    public void setDispatchRoleId(Integer dispatchRoleId) {
+        this.dispatchRoleId = dispatchRoleId;
+    }
+
+    public String getDispatchRoleName() {
+        return dispatchRoleName;
+    }
+
+    public void setDispatchRoleName(String dispatchRoleName) {
+        this.dispatchRoleName = dispatchRoleName;
     }
 
     public Double getUnitPriceElectricity() {

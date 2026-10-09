@@ -19,7 +19,6 @@ import static com.ge.apm.service.constant.SimplePartsConstant.TRANSACTION_TYPE_I
 import static com.ge.apm.service.constant.SimplePartsConstant.TRANSACTION_TYPE_OUT_STOCK;
 
 @Service
-@Transactional
 public class SimplePartsTransferService {
 
     @Autowired

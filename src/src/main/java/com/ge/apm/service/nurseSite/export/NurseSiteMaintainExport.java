@@ -17,6 +17,8 @@ public class NurseSiteMaintainExport implements Serializable {
 
     private Date checkDate;
 
+    private Date updateDate;
+
     private String principal;
 
     private String checker;
@@ -29,6 +31,14 @@ public class NurseSiteMaintainExport implements Serializable {
     private List<NurseSiteMaintainData> checkData;
 
     private String configId;
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
     public Date getScheduleDate() {
         return scheduleDate;
     }

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 public class SparePartStockRecordService {
 
     private Logger logger = LoggerFactory.getLogger(SparePartStockRecordService.class);
@@ -159,6 +158,7 @@ public class SparePartStockRecordService {
         public String fileName;
     }
 
+    @Transactional(readOnly = true)
     public Integer getValidQuantity(StockRecord record) {
         Integer quantity = record.getQuantity();
         List<StockRecord> stockRecords = new ArrayList<>();

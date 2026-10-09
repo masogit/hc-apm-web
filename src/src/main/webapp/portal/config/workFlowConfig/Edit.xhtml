@@ -89,21 +89,12 @@
                 <p:fieldset id="wo" legend="#{msg.RepairConfiguration}">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                         <h:panelGroup >
-                            <label class="label">#{msg.Repair}#{msg.dispatchUserName}</label>
-                            <p:selectOneMenu id="dispatchUserId" value="#{workflowConfigController.selected.dispatchUserId}"
-                                             required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
+                            <label class="label">#{msg.Repair}派工角色</label>
+                            <p:selectOneMenu id="dispatchRoleId" value="#{workflowConfigController.selected.dispatchRoleId}"
+                                             required="false" requiredMessage="维修派工角色 #{msg.ValidationRequire}" >
                                 <p:ajax process="@this" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{workflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
-                        <h:panelGroup >
-                            <label class="label">#{msg.Repair}#{msg.dispatchUserName}2</label>
-                            <p:selectOneMenu id="dispatchUserId2" value="#{workflowConfigController.selected.dispatchUserId2}"
-                                             required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
-                                <p:ajax process="@this" />
-                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{workflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{workflowConfigController.dispatchRoleList}" var="role" itemLabel="#{role.name}" itemValue="#{role.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
