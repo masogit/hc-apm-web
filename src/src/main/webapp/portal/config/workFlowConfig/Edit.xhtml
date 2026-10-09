@@ -89,7 +89,7 @@
                 <p:fieldset id="wo" legend="#{msg.RepairConfiguration}">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                         <h:panelGroup >
-                            <label class="label">#{msg.Repair}维修派工角色</label>
+                            <label class="label">#{msg.Repair}派工角色</label>
                             <p:selectOneMenu id="dispatchRoleId" value="#{workflowConfigController.selected.dispatchRoleId}"
                                              required="false" requiredMessage="维修派工角色 #{msg.ValidationRequire}" >
                                 <p:ajax process="@this" />

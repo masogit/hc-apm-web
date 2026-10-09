@@ -8,7 +8,8 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
-        <p:dialog id="maintainBatchCompleteDlg" widgetVar="maintainBatchCompleteDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量完成">
+        <p:dialog id="maintainBatchCompleteDlg" widgetVar="maintainBatchCompleteDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量完成" width="550"
+                  onShow="if(PF('globalSig'))PF('globalSig').clear();">
             <h:form id="maintainBatchCompleteForm">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
@@ -19,14 +20,57 @@
                         <label class="label">结束时间*</label>
                         <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{maintainController.endBatchDate}" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true" maxdate="#{maintainController.currentDate}"/>
                     </h:panelGroup>
-                    <h:panelGroup>
-                		<label class="label">签名</label>
-						<p:signature id="globalSignatureContent" style="width:400px;height:200px" widgetVar="globalSig" base64Value="#{maintainController.signatureContent}" required="false" guideline="true" requiredMessage="签名 #{msg.ValidationRequire}"/>
-					</h:panelGroup>
                 </p:panelGrid>
+
+                <!-- 已确认签名查看区域 -->
+                <h:panelGroup rendered="#{maintainController.batchSignatureCount > 0 and !maintainController.showBatchSignaturePad}" layout="block" style="margin:10px 0;">
+                    <h:panelGroup layout="block" style="text-align:center;margin-bottom:8px;">
+                        <h:outputText value="#{maintainController.batchSignatureCountText}" style="font-weight:bold;font-size:14px;color:#333;" />
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" style="text-align:center;min-height:160px;display:flex;align-items:center;justify-content:center;">
+                        <p:graphicImage value="#{maintainController.batchCurrentSignatureImage}" stream="false"
+                            style="max-width:400px;max-height:200px;" />
+                    </h:panelGroup>
+                    <!-- 分页导航栏 -->
+                    <h:panelGroup layout="block" style="text-align:center;margin-top:12px;padding:8px 0;"
+                        rendered="#{maintainController.hasBatchMultipleSignatures}">
+                        <p:commandLink actionListener="#{maintainController.batchPreviousSignature()}" update=":maintainBatchCompleteForm"
+                            style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;margin:0 4px;#{maintainController.hasBatchPreviousSignature ? 'color:#0078d7;border:1px solid #0078d7;' : 'color:#ccc;border:1px solid #ddd;'}text-decoration:none;font-size:14px;"
+                            disabled="#{!maintainController.hasBatchPreviousSignature}">
+                            <h:outputText value="&amp;lt;" escape="false" />
+                        </p:commandLink>
+                        <p:repeat value="#{maintainController.batchSignatureList}" var="sig" varStatus="loop">
+                            <p:commandLink actionListener="#{maintainController.batchSelectSignature(loop.index)}" update=":maintainBatchCompleteForm"
+                                style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;margin:0 3px;font-size:12px;font-weight:bold;text-decoration:none;#{loop.index == maintainController.batchCurrentSignatureIndex ? 'background:#0078d7;color:#fff;' : 'background:#f0f0f0;color:#666;'}">
+                                <h:outputText value="#{loop.index + 1}" />
+                            </p:commandLink>
+                        </p:repeat>
+                        <p:commandLink actionListener="#{maintainController.batchNextSignature()}" update=":maintainBatchCompleteForm"
+                            style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;margin:0 4px;#{maintainController.hasBatchNextSignature ? 'color:#0078d7;border:1px solid #0078d7;' : 'color:#ccc;border:1px solid #ddd;'}text-decoration:none;font-size:14px;"
+                            disabled="#{!maintainController.hasBatchNextSignature}">
+                            <h:outputText value="&amp;gt;" escape="false" />
+                        </p:commandLink>
+                    </h:panelGroup>
+                    <!-- 新增签名按钮 -->
+                    <h:panelGroup layout="block" style="text-align:center;margin-top:10px;">
+                        <p:commandButton value="新增签名" actionListener="#{maintainController.addBatchNewSignature()}" update=":maintainBatchCompleteForm" />
+                    </h:panelGroup>
+                </h:panelGroup>
+
+                <!-- 签名板区域 -->
+                <h:panelGroup rendered="#{maintainController.batchSignatureCount == 0 or maintainController.showBatchSignaturePad}" layout="block" style="margin:10px 0;">
+                    <label class="label">签名</label>
+                    <p:signature id="globalSignatureContent" style="width:400px;height:200px" widgetVar="globalSig" base64Value="#{maintainController.signatureContent}" required="false" guideline="false" requiredMessage="签名 #{msg.ValidationRequire}"/>
+                    <h:panelGroup layout="block" style="text-align:center;margin-top:8px;">
+                        <p:commandButton value="确认" actionListener="#{maintainController.saveBatchSignature()}" update=":maintainBatchCompleteForm"
+                            oncomplete="if(PF('globalSig'))PF('globalSig').clear();" />
+                        <p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update=":maintainBatchCompleteForm:globalSignatureContent"
+                            oncomplete="PF('globalSig').clear()" style="margin-left:5px;" />
+                    </h:panelGroup>
+                </h:panelGroup>
+
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":messages" icon="ui-icon-check" oncomplete="PF('maintainBatchCompleteDialog').hide()" timeout="180000"/>
-                <p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update="@parent" oncomplete="PF('globalSig').clear()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchCompleteDialog').hide()"/>
             </h:form>
         </p:dialog>

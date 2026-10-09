@@ -1057,6 +1057,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
+        map.put(getMessage("assetClassification32"), assetInfo.getAssetClassification32());
         map.put(getMessage("usageCount"), assetInfo.getUsageCount());
         map.put(getMessage("ratingUsageCount"), assetInfo.getRatingUsageCount());
         map.put(getMessage("epc"), assetInfo.getEpc());
@@ -1202,6 +1203,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
+        map.put(getMessage("assetClassification32"), assetInfo.getAssetClassification32());
 
         map.put(getMessage("spare01"), this.getSpare01AsString());
         map.put(getMessage("spare02"), this.getSpare02AsString());

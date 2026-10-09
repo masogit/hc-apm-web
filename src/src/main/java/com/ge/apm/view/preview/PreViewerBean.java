@@ -82,10 +82,11 @@ public class PreViewerBean implements ServerEventInterface {
             if(!CollectionUtils.isEmpty(allByObjectStorageId)) {
                 V2_BlobObject blobObject = allByObjectStorageId.get(0);
                 if (StringUtils.isBlank(blobObject.getObjectType())) {
-                     Collection<String> collection = new ArrayList<>();
-                     collection.add(blobObject.getObjectStorageId());
-                     List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(collection);
-                     blobObject.setObjectType(fileInfoResults.get(0).getObjectType());
+                    Collection<String> collection = new ArrayList<>();
+                    collection.add(blobObject.getObjectStorageId());
+                    List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(collection);
+                    blobObject.setObjectType(fileInfoResults.get(0).getObjectType());
+                    blobObject.setObjectName(fileInfoResults.get(0).getObjectName());
                 }
             }
              if(!CollectionUtils.isEmpty(allByObjectStorageId)){

@@ -101,7 +101,6 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 		allFunction = Arrays.stream(ApmFunction.values()).filter(f -> apmFunctions.contains(f.name())
 				&& !f.name().startsWith("PLATFORM_")
 				&& !f.name().startsWith("CONFIG_")
-				&& !f.name().equals("REPAIR_ORDER_DISPATCH")
 				&& !f.name().startsWith("REPAIR_ORDER_TAKE")
 				&& !f.name().startsWith("REPAIR_ORDER_ACCEPT")
 				&& !f.name().equals("REPAIR_ORDER_APPROVE")
