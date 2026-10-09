@@ -2424,12 +2424,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         if (isTopLevel) {
             // 一级分类：切换展开/收起
-            if (selectedAssetTypeGroupUid.equals(expandedAssetTypeGroupUid)) {
+            boolean isCollapsing = selectedAssetTypeGroupUid.equals(expandedAssetTypeGroupUid);
+            if (isCollapsing) {
                 expandedAssetTypeGroupUid = null;
+                // 收起时清除筛选
+                assetTypeGroupEncodedSet = Collections.emptySet();
+                selectedAssetTypeGroupDisplayName = null;
             } else {
                 expandedAssetTypeGroupUid = selectedAssetTypeGroupUid;
+                // 筛选该一级分类及其所有子分类的数据
+                List<AssetTypeGroup> matchingGroups = allAssetTypeGroupList.stream()
+                        .filter(item -> item.getUid().equals(selectedAssetTypeGroupUid))
+                        .collect(Collectors.toList());
+                if (!matchingGroups.isEmpty()) {
+                    AssetTypeGroup selected = matchingGroups.get(0);
+                    selectedAssetTypeGroupDisplayName = selected.getDisplayName();
+                    Set<AssetTypeGroup> matchedList = assetTypeGroupService.collectChildAssetTypeGroupInExstingList(matchingGroups, allAssetTypeGroupList);
+                    assetTypeGroupEncodedSet = matchedList.stream().map(AssetTypeGroup::getEncoded).collect(Collectors.toSet());
+                }
             }
-            // 不筛选数据，只更新下拉列表
+            // 更新下拉列表展示展开的子分类
             assetTypeGroupSelectItems = null;
             RequestContext.getCurrentInstance().execute("PF('assetTypeGroupFilterWidget').show();");
         } else {
