@@ -2,41 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ge.apm.dao.mapper.SurgeryAnesthesiaEquipmentInfoMapper">
 
-    <!-- 公共 CTE + FROM + WHERE 片段 -->
-    <sql id="commonQuery">
-        WITH surgery_stats AS (
-            SELECT
-                asset_uid,
-                COALESCE(SUM(usage_count)::INTEGER, 0) AS total_usage_count,
-                ROUND(COALESCE(SUM(usage_duration), 0) / 1440.0, 2) AS total_occupation_days,
-                COUNT(DISTINCT NULLIF(operating_room_name, '')) AS operating_room_coverage_count
-            FROM surgery_anesthesia_data_result
-            WHERE tenant_uid = #{tenantUid}
-            AND surgery_date BETWEEN #{startDate}::date AND #{endDate}::date
-            <if test="siteUid != null and siteUid != ''">
-                AND site_uid = #{siteUid}
-            </if>
-            GROUP BY asset_uid
-        )
-        SELECT
-            e.uid,
-            e.asset_uid AS "assetUid",
-             ai.name AS "assetName",
-            e.display_name AS "displayName",
-             ai.function_type AS "functionType",
-           ai.depart_num AS "departNum",
-             ai.serial_num AS "serialNum",
-             ai.qr_code AS "qrCode",
-            ai.make_short_name AS "makerShortName",
-            ai.clinical_dept_name AS "clinicalDeptName",
-            ai.asset_group AS "assetGroup",
-            e.positive_rate AS "positiveRate",
-            COALESCE(s.total_usage_count, 0) AS "totalUsageCount",
-            COALESCE(s.total_occupation_days, 0) AS "totalOccupationDays",
-            COALESCE(s.operating_room_coverage_count, 0) AS "operatingRoomCoverageCount"
-        FROM surgery_anesthesia_equipment_info e
-        LEFT JOIN asset_info ai ON e.asset_uid = ai.uid
-        LEFT JOIN surgery_stats s ON e.asset_uid = s.asset_uid
+    <!-- 公共 WHERE 条件片段（不含 CTE，供 selectListCount 复用） -->
+    <sql id="commonWhere">
         WHERE e.tenant_uid = #{tenantUid}
         <if test="siteUid != null and siteUid != ''">
             AND e.site_uid = #{siteUid}
@@ -104,20 +71,55 @@
     </sql>
 
     <select id="selectList" resultType="com.ge.apm.domain.surgeryAnesthesia.SurgeryAnesthesiaEquipmentInfo">
-        <include refid="commonQuery"/>
+        WITH surgery_stats AS (
+            SELECT
+                asset_uid,
+                COALESCE(SUM(usage_count)::INTEGER, 0) AS total_usage_count,
+                ROUND(COALESCE(SUM(usage_duration), 0) / 1440.0, 2) AS total_occupation_days,
+                COUNT(DISTINCT NULLIF(operating_room_name, '')) AS operating_room_coverage_count
+            FROM surgery_anesthesia_data_result
+            WHERE tenant_uid = #{tenantUid}
+            AND surgery_date BETWEEN #{startDate}::date AND #{endDate}::date
+            <if test="siteUid != null and siteUid != ''">
+                AND site_uid = #{siteUid}
+            </if>
+            GROUP BY asset_uid
+        )
+        SELECT
+            e.uid,
+            e.asset_uid AS "assetUid",
+            ai.name AS "assetName",
+            e.display_name AS "displayName",
+            ai.function_type AS "functionType",
+            ai.depart_num AS "departNum",
+            ai.serial_num AS "serialNum",
+            ai.qr_code AS "qrCode",
+            ai.make_short_name AS "makerShortName",
+            ai.clinical_dept_name AS "clinicalDeptName",
+            ai.asset_group AS "assetGroup",
+            e.positive_rate AS "positiveRate",
+            COALESCE(s.total_usage_count, 0) AS "totalUsageCount",
+            COALESCE(s.total_occupation_days, 0) AS "totalOccupationDays",
+            COALESCE(s.operating_room_coverage_count, 0) AS "operatingRoomCoverageCount"
+        FROM surgery_anesthesia_equipment_info e
+        LEFT JOIN asset_info ai ON e.asset_uid = ai.uid
+        LEFT JOIN surgery_stats s ON e.asset_uid = s.asset_uid
+        <include refid="commonWhere"/>
         <if test="orderBy != null and orderBy != ''">
             ORDER BY ${orderBy}
         </if>
         <if test="orderBy == null or orderBy == ''">
-            ORDER BY e.uid DESC
+            ORDER BY e.created_date DESC
         </if>
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
+    <!-- count 查询：不需要 CTE 统计数据，直接 count 匹配行 -->
     <select id="selectListCount" resultType="long">
-        SELECT COUNT(*) FROM (
-            <include refid="commonQuery"/>
-        ) t
+        SELECT COUNT(*)
+        FROM surgery_anesthesia_equipment_info e
+        LEFT JOIN asset_info ai ON e.asset_uid = ai.uid
+        <include refid="commonWhere"/>
     </select>
 
     <update id="updateBatch">
