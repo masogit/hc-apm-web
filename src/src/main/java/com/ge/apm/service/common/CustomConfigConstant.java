@@ -81,7 +81,7 @@ public class CustomConfigConstant {
                 "capitalSource2", "measureGrade", "riskGrade", "estimatedRiskLevel", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "status","isPm", "isFixed","isChecked", "assetValueCategory", "deviceStatus",
                 "warranty", "subjectProject", "proprietaryClass", "tags", "UCMID", "createdDate",
-                "createdBy","mainDirectory","secondDirectory","geDeviceType","UUID"
+                "createdBy","mainDirectory","secondDirectory","geDeviceType","assetClassification32","UUID"
         );
     }
 
