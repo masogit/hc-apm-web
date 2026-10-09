@@ -163,8 +163,8 @@
                         <p:inputText value="#{supplierController.selected.licenseScope}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.LicenseApprovalDate}*</label>
-                        <p:calendar timeZone="GMT+8" id="licenseApprovalDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.licenseApprovalDate}" required="true" requiredMessage="#{msg.LicenseApprovalDate} #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <label class="label">#{msg.LicenseApprovalDate}</label>
+                        <p:calendar timeZone="GMT+8" id="licenseApprovalDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.licenseApprovalDate}" required="false" requiredMessage="#{msg.LicenseApprovalDate} #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup>
