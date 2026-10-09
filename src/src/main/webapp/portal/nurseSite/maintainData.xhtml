@@ -119,7 +119,8 @@
 					</p:commandButton>
 					<p:commandButton id="openSignature" immediate="true"
 									 actionListener="#{maintainController.getMaintainSignature(maintainController.nurseSiteMaintain.signatureId,maintainController.nurseSiteMaintain.signatureSourceType)}"
-									 value="查看签名" update=":signatureDlg" oncomplete="PF('signatureDlg').show();" />
+									 value="查看签名"
+									 update=":signatureDlg :signatureForm" oncomplete="PF('signatureDlg').show();" />
 				</div>
 			</div>
 

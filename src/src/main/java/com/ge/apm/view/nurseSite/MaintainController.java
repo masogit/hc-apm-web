@@ -3,6 +3,7 @@ package com.ge.apm.view.nurseSite;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.mapper.NurseSiteMaintainConfigMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.nurseSite.export.NurseSiteMaintainExport;
 import com.ge.apm.service.uaa.UaaService;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleModel;
 import org.primefaces.model.StreamedContent;
@@ -29,6 +31,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,6 +76,14 @@ public class MaintainController implements ServerEventInterface{
 	private StreamedContent signatureContentStream;
 	private StreamedContent signatureContentWeiXin;
 	private boolean blnWebSignatureEidt;
+	private List<V2_BlobObject> signatureList;
+	private int currentSignatureIndex;
+	private StreamedContent currentSignatureContent;
+	private boolean showSignaturePad;
+	// 批量签名
+	private List<String> batchSignatureList;
+	private int batchCurrentSignatureIndex;
+	private boolean showBatchSignaturePad;
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	private List<String> orgUidList = Collections.singletonList("-1");
 	private SearchController searchController;
@@ -438,7 +449,19 @@ public class MaintainController implements ServerEventInterface{
 
 	public void saveMaintainSignature() {
 		if (StringUtils.isNotEmpty(signatureContent)) {
-			nurseSiteMaintain.setSignatureId(nurseSiteMaintainService.saveMaintainSignature(signatureContent, nurseSiteMaintain.getId()));
+			String objectStorageId = nurseSiteMaintainService.saveMaintainSignature(signatureContent, nurseSiteMaintain.getId());
+			nurseSiteMaintain.setSignatureId(objectStorageId);
+			// 同时保存为新附件形式（多签名支持）
+			nurseSiteMaintainService.saveMaintainSignatureAttachment(signatureContent, nurseSiteMaintain.getId());
+			// 刷新签名列表并定位到最新签名，保持签名板可继续输入
+			signatureContent = null;
+			signatureContentStream = null;
+			loadSignatureList();
+			if (signatureList != null && !signatureList.isEmpty()) {
+				currentSignatureIndex = signatureList.size() - 1;
+				loadCurrentSignatureImage();
+			}
+			showSignaturePad = false;
 		}
 	}
 
@@ -446,7 +469,15 @@ public class MaintainController implements ServerEventInterface{
 		signatureContent = null;
 		signatureContentWeiXin = null;
 		signatureContentStream = null;
-		if (StringUtils.isNotEmpty(signatureId)) {
+		currentSignatureContent = null;
+		currentSignatureIndex = 0;
+		showSignaturePad = false;
+		loadSignatureList();
+		if (signatureList != null && !signatureList.isEmpty()) {
+			currentSignatureIndex = signatureList.size() - 1;
+			loadCurrentSignatureImage();
+		} else if (StringUtils.isNotEmpty(signatureId)) {
+			// 兼容旧签名
 			if (signatureSourceType == null) {
 				blnWebSignatureEidt = true;
 			} else if (signatureSourceType == 0) {
@@ -461,9 +492,185 @@ public class MaintainController implements ServerEventInterface{
 		}
 	}
 
+	private void loadSignatureList() {
+		signatureList = new ArrayList<>();
+		if (nurseSiteMaintain != null && nurseSiteMaintain.getId() != null) {
+			List<V2_BlobObject> attachmentSignatures = nurseSiteMaintainService.findMaintainSignatures(nurseSiteMaintain.getId());
+			if (attachmentSignatures != null) {
+				signatureList.addAll(attachmentSignatures);
+			}
+		}
+	}
+
+	private void loadCurrentSignatureImage() {
+		if (signatureList == null || signatureList.isEmpty() || currentSignatureIndex < 0 || currentSignatureIndex >= signatureList.size()) {
+			currentSignatureContent = null;
+			return;
+		}
+		try {
+			V2_BlobObject blobObject = signatureList.get(currentSignatureIndex);
+			String objectStorageId = blobObject.getObjectStorageId();
+			String objectType = blobObject.getObjectType();
+			if (objectType != null && objectType.contains("text")) {
+				currentSignatureContent = nurseSiteMaintainService.getMaintainSignatureWebToStream(objectStorageId);
+			} else {
+				currentSignatureContent = nurseSiteMaintainService.getMaintainSignatureWeiXin(objectStorageId);
+			}
+			blnWebSignatureEidt = false;
+		} catch (Exception e) {
+			LOGGER.error("loadCurrentSignatureImage error: {}", e.getMessage());
+			currentSignatureContent = null;
+		}
+	}
+
+	public void nextSignature() {
+		if (signatureList != null && currentSignatureIndex < signatureList.size() - 1) {
+			currentSignatureIndex++;
+			loadCurrentSignatureImage();
+		}
+	}
+
+	public void previousSignature() {
+		if (signatureList != null && currentSignatureIndex > 0) {
+			currentSignatureIndex--;
+			loadCurrentSignatureImage();
+		}
+	}
+
+	public void selectSignature(int index) {
+		if (signatureList != null && index >= 0 && index < signatureList.size()) {
+			currentSignatureIndex = index;
+			loadCurrentSignatureImage();
+		}
+	}
+
+	public void addNewSignature() {
+		signatureContent = null;
+		signatureContentStream = null;
+		showSignaturePad = true;
+	}
+
+	public String getSignatureCountText() {
+		if (signatureList == null || signatureList.isEmpty()) {
+			return "";
+		}
+		return "签名 " + (currentSignatureIndex + 1) + "/" + signatureList.size();
+	}
+
+	public int getSignatureCount() {
+		return signatureList == null ? 0 : signatureList.size();
+	}
+
+	public boolean isHasMultipleSignatures() {
+		return signatureList != null && signatureList.size() > 1;
+	}
+
+	public boolean isHasPreviousSignature() {
+		return signatureList != null && currentSignatureIndex > 0;
+	}
+
+	public boolean isHasNextSignature() {
+		return signatureList != null && currentSignatureIndex < signatureList.size() - 1;
+	}
+
+	public boolean isShowSignaturePad() {
+		return showSignaturePad;
+	}
+
+	public void setShowSignaturePad(boolean showSignaturePad) {
+		this.showSignaturePad = showSignaturePad;
+	}
+
 	public void resetMaintainSignature() {
 		signatureContent = null;
 		signatureContentStream = null;
+	}
+
+	public void resetBatchSignatures() {
+		batchSignatureList = new ArrayList<>();
+		batchCurrentSignatureIndex = 0;
+		showBatchSignaturePad = true;
+		signatureContent = null;
+	}
+
+	public void saveBatchSignature() {
+		if (StringUtils.isNotEmpty(signatureContent)) {
+			if (batchSignatureList == null) {
+				batchSignatureList = new ArrayList<>();
+			}
+			batchSignatureList.add(signatureContent);
+			signatureContent = null;
+			batchCurrentSignatureIndex = batchSignatureList.size() - 1;
+			showBatchSignaturePad = false;
+		}
+	}
+
+	public int getBatchSignatureCount() {
+		return batchSignatureList == null ? 0 : batchSignatureList.size();
+	}
+
+	public String getBatchSignatureCountText() {
+		if (batchSignatureList == null || batchSignatureList.isEmpty()) return "";
+		return "签名 " + (batchCurrentSignatureIndex + 1) + "/" + batchSignatureList.size();
+	}
+
+	public boolean isHasBatchMultipleSignatures() {
+		return batchSignatureList != null && batchSignatureList.size() > 1;
+	}
+
+	public boolean isHasBatchPreviousSignature() {
+		return batchSignatureList != null && batchCurrentSignatureIndex > 0;
+	}
+
+	public boolean isHasBatchNextSignature() {
+		return batchSignatureList != null && batchCurrentSignatureIndex < batchSignatureList.size() - 1;
+	}
+
+	public void batchNextSignature() {
+		if (batchSignatureList != null && batchCurrentSignatureIndex < batchSignatureList.size() - 1) {
+			batchCurrentSignatureIndex++;
+		}
+	}
+
+	public void batchPreviousSignature() {
+		if (batchSignatureList != null && batchCurrentSignatureIndex > 0) {
+			batchCurrentSignatureIndex--;
+		}
+	}
+
+	public void batchSelectSignature(int index) {
+		if (batchSignatureList != null && index >= 0 && index < batchSignatureList.size()) {
+			batchCurrentSignatureIndex = index;
+		}
+	}
+
+	public void addBatchNewSignature() {
+		signatureContent = null;
+		showBatchSignaturePad = true;
+	}
+
+	public StreamedContent getBatchCurrentSignatureImage() {
+		if (batchSignatureList == null || batchSignatureList.isEmpty()
+				|| batchCurrentSignatureIndex < 0 || batchCurrentSignatureIndex >= batchSignatureList.size()) {
+			return null;
+		}
+		try {
+			String base64 = batchSignatureList.get(batchCurrentSignatureIndex);
+			DefaultStreamedContent streamedContent = new DefaultStreamedContent();
+			streamedContent.setStream(new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(base64)));
+			return streamedContent;
+		} catch (Exception e) {
+			LOGGER.error("getBatchCurrentSignatureImage error: {}", e.getMessage());
+			return null;
+		}
+	}
+
+	public boolean isShowBatchSignaturePad() {
+		return showBatchSignaturePad;
+	}
+
+	public void setShowBatchSignaturePad(boolean showBatchSignaturePad) {
+		this.showBatchSignaturePad = showBatchSignaturePad;
 	}
 
 	public void onNurseSiteMaintainConfigChange() {
@@ -706,20 +913,39 @@ public class MaintainController implements ServerEventInterface{
 			}
 		}
 		if (!listNewNurseSiteMaintain.isEmpty()) {
-			String signatureId = null;
+			// 合并待签名的签名内容：已确认的批量签名 + 当前签名板上未确认的
+			List<String> allSignatures = new ArrayList<>();
+			if (batchSignatureList != null) {
+				allSignatures.addAll(batchSignatureList);
+			}
 			if (StringUtils.isNotEmpty(signatureContent)) {
-				signatureId = nurseSiteMaintainService.saveMaintainSignature(signatureContent, "");
+				allSignatures.add(signatureContent);
+			}
+			String signatureId = null;
+			for (String sig : allSignatures) {
+				signatureId = nurseSiteMaintainService.saveMaintainSignature(sig, "");
 			}
 			if (signatureId == null) {
 				signatureId = "";
 			}
 			nurseSiteMaintainService.completeMaintain(listNewNurseSiteMaintain, signatureId, currentDate, currentUser);
+			// 保存所有签名为附件（多签名支持）
+			if (!allSignatures.isEmpty()) {
+				for (NurseSiteMaintain wo : listNewNurseSiteMaintain) {
+					for (String sig : allSignatures) {
+						nurseSiteMaintainService.saveMaintainSignatureAttachment(sig, wo.getId());
+					}
+				}
+			}
 			Set<String> clinicalDeptSet = listNewNurseSiteMaintain.stream().map(NurseSiteMaintain::getClinicalDeptUID).collect(Collectors.toSet());
 			for (String clinicalDeptUid : clinicalDeptSet) {
 				nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),
 						signatureId + "," + clinicalDeptUid);
 			}
 			addMessage("工单后台完成中，请稍候刷新页面查看。");
+			// 清空批量签名状态
+			batchSignatureList = null;
+			signatureContent = null;
 		} else {
 			addMessage("未找到符合条件的工单");
 		}
@@ -980,5 +1206,37 @@ public class MaintainController implements ServerEventInterface{
 
 	public Date getCurrentDate() {
 		return new Date();
+	}
+
+	public StreamedContent getCurrentSignatureContent() {
+		return currentSignatureContent;
+	}
+
+	public void setCurrentSignatureContent(StreamedContent currentSignatureContent) {
+		this.currentSignatureContent = currentSignatureContent;
+	}
+
+	public List<V2_BlobObject> getSignatureList() {
+		return signatureList;
+	}
+
+	public void setSignatureList(List<V2_BlobObject> signatureList) {
+		this.signatureList = signatureList;
+	}
+
+	public int getCurrentSignatureIndex() {
+		return currentSignatureIndex;
+	}
+
+	public void setCurrentSignatureIndex(int currentSignatureIndex) {
+		this.currentSignatureIndex = currentSignatureIndex;
+	}
+
+	public List<String> getBatchSignatureList() {
+		return batchSignatureList;
+	}
+
+	public int getBatchCurrentSignatureIndex() {
+		return batchCurrentSignatureIndex;
 	}
 }
