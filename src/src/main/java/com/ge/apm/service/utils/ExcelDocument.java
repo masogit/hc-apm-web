@@ -65,7 +65,15 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public ExcelDocument(String path) throws IOException {
-        this(new FileInputStream(path), ExcelDocument.parseTypeByFileName(path));
+        this(createValidatedInputStream(path), ExcelDocument.parseTypeByFileName(path));
+    }
+
+    private static FileInputStream createValidatedInputStream(String path) throws IOException {
+        ExcelType type = parseTypeByFileName(path);
+        if (type == null) {
+            throw new IOException("Unsupported Excel file type: " + path);
+        }
+        return new FileInputStream(path);
     }
 
     public ExcelDocument(InputStream input, ExcelType type) throws IOException {
@@ -835,12 +843,9 @@ public class ExcelDocument implements AutoCloseable{
     }
 
     public void writeToFile(File file) throws IOException {
-        FileOutputStream fos = new FileOutputStream(file);
-
-        this.workBook.write(fos);
-
-        fos.close();
-
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            this.workBook.write(fos);
+        }
     }
 
     public InputStream getStream() throws IOException {

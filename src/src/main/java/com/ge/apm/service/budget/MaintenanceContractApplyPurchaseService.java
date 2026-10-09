@@ -414,9 +414,9 @@ public class MaintenanceContractApplyPurchaseService {
         List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(id);
         StreamedContent streamedContent = null;
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream zout = new ZipOutputStream(bout);
-        generateSingleApply(zout, applyPurchase, applyPurchaseAssetList, blobObjects);
-        zout.close();
+        try (ZipOutputStream zout = new ZipOutputStream(bout)) {
+            generateSingleApply(zout, applyPurchase, applyPurchaseAssetList, blobObjects);
+        }
         String name = this.buildFileName();
         streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", name+".zip");
         return streamedContent;

@@ -87,13 +87,13 @@ public class BudgetApplicationExportService {
      */
     public StreamedContent exportZip(List<BudgetApplicationAsset> budgetApplicationAssetList) throws IOException, ParseException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream zout = new ZipOutputStream(bout);
-        for(BudgetApplicationAsset budgetApplicationAsset : budgetApplicationAssetList){
-            BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
-            List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
-            generateSingleBudget(budgetApplicationAsset, budgetApplication,blobObjects, zout, FILE_NAME_ROOT_YEAR, ATTACHMENT);
+        try (ZipOutputStream zout = new ZipOutputStream(bout)) {
+            for(BudgetApplicationAsset budgetApplicationAsset : budgetApplicationAssetList){
+                BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
+                List<V2_BlobObject> blobObjects = blobObjectRepository.findByBoUuid(budgetApplicationAsset.getId());
+                generateSingleBudget(budgetApplicationAsset, budgetApplication,blobObjects, zout, FILE_NAME_ROOT_YEAR, ATTACHMENT);
+            }
         }
-        zout.close();
         StreamedContent streamedContent = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()), "application/zip", "Export_Purchase.zip");
         return streamedContent;
     }
@@ -103,9 +103,9 @@ public class BudgetApplicationExportService {
         BudgetApplication budgetApplication = budgetApplicationRepository.findById(budgetApplicationAsset.getApplicationId());
         String base = rootFileName + "-" + budgetApplicationAsset.getApplicationNum();
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream zout = new ZipOutputStream(bout);
-        generateSingleBudget(budgetApplicationAsset,budgetApplication, blobObjects,zout, rootFileName, ATTACHMENT);
-        zout.close();
+        try (ZipOutputStream zout = new ZipOutputStream(bout)) {
+            generateSingleBudget(budgetApplicationAsset,budgetApplication, blobObjects,zout, rootFileName, ATTACHMENT);
+        }
         StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
         return streamedContent;
     }

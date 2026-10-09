@@ -727,10 +727,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     public void writeToFile(File file) throws IOException {
 
-        FileOutputStream fos = new FileOutputStream(file);
-        workBook.write(fos);
-        workBook.close();
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            workBook.write(fos);
+            workBook.close();
+        }
     }
 
     private void writeSummaryFormula(ExcelDocumentStreamingWriter writer, List<String> exportFields, int maxRows) {
