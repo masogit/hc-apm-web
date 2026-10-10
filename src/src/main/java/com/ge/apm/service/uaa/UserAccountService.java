@@ -467,20 +467,23 @@ public class UserAccountService {
 		logger.info("该用户为设备类型负责人,config:{},user:{}", JSONObject.toJSONString(item),selected);
 		Integer userID = selected.getId();
 		String userUID = selected.getUid();
-		Integer dispatchUserId = item.getDispatchUserId();
-		Integer dispatchUserId2 = item.getDispatchUserId2();
 		Integer measureDispatchUserId = item.getMeasureDispatchUserId();
 		Integer measureDispatchUserId2 = item.getMeasureDispatchUserId2();
 		Integer pmDispatchUserId = item.getPmDispatchUserId();
 		Integer pmDispatchUserId2 = item.getPmDispatchUserId2();
 		String assetApprover = item.getAssetApprover();
-		if(userID.equals(dispatchUserId)) result.add("该用户为维修派工人，不能操作！");
-		if(userID.equals(dispatchUserId2)) result.add("该用户为维修派工人2，不能操作！");
 		if(userID.equals(measureDispatchUserId))  result.add("该用户为计量派工人，不能操作！");
 		if(userID.equals(measureDispatchUserId2)) result.add("该用户为计量派工人2，不能操作！");
 		if(userID.equals(pmDispatchUserId))  result.add("该用户为保养派工人，不能操作！");
 		if(userID.equals(pmDispatchUserId2)) result.add("该用户为保养派工人2，不能操作！");
 		if(userUID.equals(assetApprover)) result.add("该用户为资产审核人，不能操作！");
+		// 检查用户是否属于维修派工角色
+		if (item.getDispatchRoleId() != null) {
+			List<UserRole> userCustomRoles = userRoleRepository.findByUserIdAndRoleType(userID, 1);
+			boolean isInDispatchRole = userCustomRoles.stream()
+					.anyMatch(ur -> item.getDispatchRoleId().equals(ur.getRoleId()));
+			if (isInDispatchRole) result.add("该用户为维修派工角色成员，不能操作！");
+		}
 		logger.info("流程配置项中负责人校验,config:{},user:{},result:{}", JSONObject.toJSONString(item), JSONObject.toJSONString(selected),JSONObject.toJSONString(result));
 
 	}
