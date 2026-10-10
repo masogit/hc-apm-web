@@ -34,7 +34,14 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
     Iterator<Row> iterator;
 
     public ExcelDocumentStreamingReader(String path, int sheetIndex, int keyRowNum, Integer versionRowNum, Integer versionColNum) throws IOException {
-        this(new FileInputStream(path), sheetIndex, keyRowNum, versionRowNum, versionColNum);
+        this(createInputStream(path), sheetIndex, keyRowNum, versionRowNum, versionColNum);
+    }
+
+    private static FileInputStream createInputStream(String path) throws IOException {
+        if (path == null || (!path.endsWith(".xlsx") && !path.endsWith(".xls"))) {
+            throw new IOException("Unsupported Excel file type: " + path);
+        }
+        return new FileInputStream(path);
     }
 
     public ExcelDocumentStreamingReader(InputStream input, int sheetIndex, int keyRowNum) {

@@ -422,8 +422,7 @@ public class TrianInSiteEditController extends GenericCRUDUUIDController<TrainIn
     public String qrCodeView() throws Exception {
         if (selectedTrainDetail != null && StrUtil.isNotEmpty(selectedTrainDetail.getQrCodeStr())) {
             String url = trainManageService.getBaseURL().replace("gateway", "") + "wx/training/signin";
-//            url = url + "?" + selectedTrainDetail.getQrCodeStr();
-            url = url + "?tenantUid=" + selectSite.getTenantUID() + "&" + selectedTrainDetail.getQrCodeStr();
+            url = url + "?" + selectedTrainDetail.getQrCodeStr();
             return qrCodeDrawService.getImageBase64(QrCodeSupportUtil.createQrCodeWithoutLogo(selectedTrainDetail.getQrCodeStr(), url, Color.WHITE));
         } else {
             return "";
