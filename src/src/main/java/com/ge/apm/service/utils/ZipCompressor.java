@@ -16,16 +16,13 @@ static final int BUFFER = 8192;
         zipFile = new File(pathName);     
     }     
     public void compress(String ...pathName) { 
-        ZipOutputStream out = null;     
-        try {    
-            FileOutputStream fileOutputStream = new FileOutputStream(zipFile);     
-            CheckedOutputStream cos = new CheckedOutputStream(fileOutputStream,new CRC32());     
-            out = new ZipOutputStream(cos);     
+        try (FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
+             CheckedOutputStream cos = new CheckedOutputStream(fileOutputStream, new CRC32());
+             ZipOutputStream out = new ZipOutputStream(cos)) {
             String basedir = "";   
             for (int i=0;i<pathName.length;i++){  
                 compress(new File(pathName[i]), out, basedir);     
             }  
-            out.close();    
         } catch (Exception e) {     
             throw new RuntimeException(e);     
         }   
@@ -34,14 +31,11 @@ static final int BUFFER = 8192;
         File file = new File(srcPathName);     
         if (!file.exists())     
             throw new RuntimeException(srcPathName + "不存在！");     
-        try {     
-            FileOutputStream fileOutputStream = new FileOutputStream(zipFile);     
-            CheckedOutputStream cos = new CheckedOutputStream(fileOutputStream,     
-                    new CRC32());     
-            ZipOutputStream out = new ZipOutputStream(cos);     
+        try (FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
+             CheckedOutputStream cos = new CheckedOutputStream(fileOutputStream, new CRC32());
+             ZipOutputStream out = new ZipOutputStream(cos)) {
             String basedir = "";     
             compress(file, out, basedir);     
-            out.close();     
         } catch (Exception e) {     
             throw new RuntimeException(e);     
         }     
@@ -73,8 +67,7 @@ static final int BUFFER = 8192;
         if (!file.exists()) {     
             return;     
         }     
-        try {     
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));     
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             ZipEntry entry = new ZipEntry(basedir + file.getName());     
             out.putNextEntry(entry);     
             int count;     
@@ -82,7 +75,6 @@ static final int BUFFER = 8192;
             while ((count = bis.read(data, 0, BUFFER)) != -1) {     
                 out.write(data, 0, count);     
             }     
-            bis.close();     
         } catch (Exception e) {     
             throw new RuntimeException(e);     
         }     

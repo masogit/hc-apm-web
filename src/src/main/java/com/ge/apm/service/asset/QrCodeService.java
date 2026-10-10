@@ -466,22 +466,22 @@ public class QrCodeService {
 
     public StreamedContent exportQrCodeListByAssets(List<AssetInfo> assetList, String templateId) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream out = new ZipOutputStream(bout);
-        QrCodeTemplate template = Strings.isNullOrEmpty(templateId) ? null : templateDao.findById(templateId);
-        assetList.forEach(item -> {
-            if (!Strings.isNullOrEmpty(item.getQrCode())) {
-                try {
-                    BufferedImage image = getQrCodeImage(template == null ? getTemplateBySiteUid(item.getSiteUID()) : template, item, null, null);
-                    String fileName = Optional.ofNullable(item.getClinicalDeptName()).orElse("").concat("_").concat(item.getName()).concat("_").concat(item.getQrCode()).concat(".jpg");
-                    out.putNextEntry(new ZipEntry(fileName));
-                    ImageIO.write(image, "JPG", out);
-                    out.closeEntry();
-                } catch (Exception e) {
-                    WebUtil.addErrorMessage(item + "export fail;");
+        try (ZipOutputStream out = new ZipOutputStream(bout)) {
+            QrCodeTemplate template = Strings.isNullOrEmpty(templateId) ? null : templateDao.findById(templateId);
+            assetList.forEach(item -> {
+                if (!Strings.isNullOrEmpty(item.getQrCode())) {
+                    try {
+                        BufferedImage image = getQrCodeImage(template == null ? getTemplateBySiteUid(item.getSiteUID()) : template, item, null, null);
+                        String fileName = Optional.ofNullable(item.getClinicalDeptName()).orElse("").concat("_").concat(item.getName()).concat("_").concat(item.getQrCode()).concat(".jpg");
+                        out.putNextEntry(new ZipEntry(fileName));
+                        ImageIO.write(image, "JPG", out);
+                        out.closeEntry();
+                    } catch (Exception e) {
+                        WebUtil.addErrorMessage(item + "export fail;");
+                    }
                 }
-            }
-        });
-        out.close();
+            });
+        }
 
         DefaultStreamedContent zipFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()));
         zipFile.setName("qrCodes.zip");

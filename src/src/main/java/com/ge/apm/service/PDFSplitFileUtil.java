@@ -30,14 +30,16 @@ public class PDFSplitFileUtil {
 
                 // 创建新文档
                 Document document = new Document();
-                PdfCopy copy = new PdfCopy(document, new FileOutputStream(newFile));
-                document.open();
+                try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                    PdfCopy copy = new PdfCopy(document, fos);
+                    document.open();
 
-                // 导入并添加第 i 页
-                PdfImportedPage page = copy.getImportedPage(reader, i);
-                copy.addPage(page);
+                    // 导入并添加第 i 页
+                    PdfImportedPage page = copy.getImportedPage(reader, i);
+                    copy.addPage(page);
 
-                document.close(); // 自动 flush 并关闭流
+                    document.close(); // 自动 flush 并关闭流
+                }
                 resultFiles.add(newFile);
             }
         } catch (Throwable e) {

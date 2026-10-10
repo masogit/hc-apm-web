@@ -337,6 +337,9 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "lifecycle")
     private Integer lifecycle;//使用年限
 
+    @Column(name = "depreciation_lifecycle")
+    private Integer depreciationLifecycle; // 折旧年限(月)
+
     @Column(name = "depreciation_method")
     private Integer depreciationMethod;//折旧算法
 
@@ -2430,6 +2433,34 @@ public class AssetInfo implements ChineseName, Serializable {
             this.lifecycle = new Double(lifecycle * 12).intValue();
         }
 
+    }
+
+    public Integer getDepreciationLifecycle() {
+        return depreciationLifecycle;
+    }
+
+    public void setDepreciationLifecycle(Integer depreciationLifecycle) {
+        this.depreciationLifecycle = depreciationLifecycle;
+    }
+
+    public Double getDepreciationLifecycleInYear() {
+        if (depreciationLifecycle == null) {
+            return null;
+        }
+        return new Double(depreciationLifecycle) / 12.0;
+    }
+
+    public void setDepreciationLifecycleInYear(Double lifecycle) {
+        if (lifecycle == null) {
+            this.depreciationLifecycle = null;
+        } else {
+            this.depreciationLifecycle = new Double(lifecycle * 12).intValue();
+        }
+    }
+
+    /** 获取用于折旧计算的有效年限(月)，优先取depreciationLifecycle，回退取lifecycle */
+    public Integer getEffectiveDepreciationLifecycle() {
+        return depreciationLifecycle != null ? depreciationLifecycle : lifecycle;
     }
 
     public String getRegistrationNo() {

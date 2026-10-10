@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
  * @package com.ge.apm.service.spareParts
  */
 @Service
-@Transactional
 public class SimplePartsRequestService {
     private static final Logger log = LoggerFactory.getLogger(SimplePartsRequestService.class);
 
@@ -89,6 +88,7 @@ public class SimplePartsRequestService {
      * @createTime 2020/6/8 15:56
      * @description 保存数据
      */
+    @Transactional
     public void save(SimplePartsRequest partsRequest) {
         partsRequestRepository.save(partsRequest);
     }
@@ -100,6 +100,7 @@ public class SimplePartsRequestService {
      * @createTime 2020/6/12 10:39
      * @description 批量保存数据
      */
+    @Transactional
     public void save(List<SimplePartsRequest> partsRequest) {
         partsRequestRepository.save(partsRequest);
     }
@@ -113,6 +114,7 @@ public class SimplePartsRequestService {
      * @createTime 2020/6/15 14:51
      * @description 申购中的备件
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsRequest> findByTypeAndStatus(Integer type, Integer status) {
         return partsRequestRepository.findByTypeAndStatus(type, status);
     }
@@ -124,6 +126,7 @@ public class SimplePartsRequestService {
      * @createTime 2020/6/17 17:49
      * @description 根据订单编号查询到未审批的订单
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsRequest> findByRequestCode(String requestCode) {
         return partsRequestRepository.findByRequestCode(requestCode);
     }
@@ -133,6 +136,7 @@ public class SimplePartsRequestService {
      * @param partsItemId
      * @return
      */
+    @Transactional(readOnly = true)
     public Optional<SimplePartsItemValue> getInventoryNumAndAvgPriceByPartsItem(String partsItemId, String partsWarehouseId) {
 
         List<String> warehouseIds = Lists.newArrayList();
@@ -158,6 +162,7 @@ public class SimplePartsRequestService {
      * @param partsRequestLineItem
      * @param partsRequest
      */
+    @Transactional
     public void stockInParts(SimplePartsRequestLineItem partsRequestLineItem, SimplePartsRequest partsRequest) {
 
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
@@ -330,6 +335,7 @@ public class SimplePartsRequestService {
         partsRequestRepository.save(partsRequest);
     }
 
+    @Transactional
     public void saveNewPartsRequest(SimplePartsRequest partsRequest, List<SimplePartsRequestLineItem> partsRequestLineItemList, boolean isApproval) {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
 
@@ -365,6 +371,7 @@ public class SimplePartsRequestService {
 
     }
 
+    @Transactional
     public void savePartsRequestWithProvidedData(SimplePartsRequest partsRequest, List<SimplePartsRequestLineItem> partsRequestLineItemList) {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
 
@@ -426,6 +433,7 @@ public class SimplePartsRequestService {
      * @param simplePartsTransactions
      * @return
      */
+    @Transactional(readOnly = true)
     public Map<String, Object> createReportData(SimplePartsRequest simplePartsRequest, List<SimplePartsTransaction> simplePartsTransactions){
         Map<String, Object> reportData = new HashedMap();
         reportData.put("request_code",simplePartsRequest.getRequestCode());//申领单编号
@@ -579,6 +587,7 @@ public class SimplePartsRequestService {
         partsRequestRepository.delete(id);
     }
 
+    @Transactional(readOnly = true)
     public int getTenantTotalStockNum(String partsItemId){
         List<SimplePartsInventory> partsInventoryList = partsInventoryRepository.findByPartsItemId(partsItemId);
 

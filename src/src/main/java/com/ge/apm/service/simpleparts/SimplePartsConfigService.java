@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class SimplePartsConfigService {
 
     @Autowired
     private SimplePartsConfigRepository partsConfigRepository;
 
+    @Transactional(readOnly = true)
     public boolean isEnableWarehouseLocator() {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Optional<SimplePartsConfig> partsConfigOptional = partsConfigRepository.findByTenantUid(currentUserAccount.getTenantUID());
@@ -28,6 +28,7 @@ public class SimplePartsConfigService {
         return partsConfigOptional.get().isEnableWarehouseLocator();
     }
 
+    @Transactional(readOnly = true)
     public boolean isEnableWarehouseSelectionInRequest() {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Optional<SimplePartsConfig> partsConfigOptional = partsConfigRepository.findByTenantUid(currentUserAccount.getTenantUID());
@@ -39,6 +40,7 @@ public class SimplePartsConfigService {
         return partsConfigOptional.get().isEnableWarehouseSelectionInRequest() != null ? partsConfigOptional.get().isEnableWarehouseSelectionInRequest() : false;
     }
 
+    @Transactional(readOnly = true)
     public boolean isEnableIntegrationWithWorkOrder() {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Optional<SimplePartsConfig> partsConfigOptional = partsConfigRepository.findByTenantUid(currentUserAccount.getTenantUID());
@@ -50,6 +52,7 @@ public class SimplePartsConfigService {
         return partsConfigOptional.get().isEnableIntegrationWithWorkOrder();
     }
 
+    @Transactional(readOnly = true)
     public boolean isEnableTenantLocal() {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         Optional<SimplePartsConfig> partsConfigOptional = partsConfigRepository.findByTenantUid(currentUserAccount.getTenantUID());

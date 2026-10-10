@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-@Transactional
 public class ZkbTrainAttendanceRecordService {
 
     private static final Logger logger = LoggerFactory.getLogger(ZkbTrainAttendanceRecordService.class);
@@ -47,6 +46,7 @@ public class ZkbTrainAttendanceRecordService {
 
     private final List<String> statusList = Arrays.asList("Attended", "Unattended");
 
+    @Transactional
     public List<ZkbTrainAttendanceRecord> handleExcel(UploadedFile file, UserAccount currentUser) {
         List<ZkbTrainAttendanceRecord> importFailedDataList = new ArrayList<>();
         Workbook workbook = null;
@@ -304,11 +304,13 @@ public class ZkbTrainAttendanceRecordService {
         return importFailedDataList;
     }
 
+    @Transactional(readOnly = true)
     public List<HashMap<String, String>> queryNormalRecords() {
         // 实现查询逻辑
         return null;
     }
 
+    @Transactional
     public void saveRecord(ZkbTrainAttendanceRecord selected, UserAccount currentUser) {
         if (selected.getId() == null) {
             selected.setCreatedDate(new Date());

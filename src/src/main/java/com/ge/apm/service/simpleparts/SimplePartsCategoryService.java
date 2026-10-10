@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 public class SimplePartsCategoryService {
 
     @Autowired
     private SimplePartsCategoryRepository partsDao;
 
+    @Transactional(readOnly = true)
     public TreeNode buildPartsCategoryInTree(String tenantUid) {
         List<SimplePartsCategory> resultList = partsDao.listPartsCategoryInHierarchy(tenantUid);
         Map<String, TreeNode> treeNodeMap = new HashMap<>(8);

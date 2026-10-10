@@ -31,7 +31,6 @@ import com.ibm.icu.util.Calendar;
 
 
 @Service
-@Transactional
 public class AssetOptRecordService {
 	private final Logger log = LoggerFactory.getLogger(AssetOptRecordService.class);
 	@Autowired
@@ -72,6 +71,7 @@ public class AssetOptRecordService {
 		}
 		return sb.toString();
 	}
+	@Transactional(readOnly = true)
 	public OrgInfo fetchOrgInfoByUid(String uid){
 		return orgInfoRepository.findByUid(uid);
 	}
@@ -88,6 +88,7 @@ public class AssetOptRecordService {
 			}
 		}
 	}
+	@Transactional(readOnly = true)
 	public void supplementOrgInfo(List<AssetOptRecord> listRecord){
 		if(listRecord!=null && listRecord.size()>0){
 			Set<String> setSiteOrgUids=new HashSet<String>();
@@ -119,6 +120,7 @@ public class AssetOptRecordService {
 			}
 		}
 	}
+	@Transactional(readOnly = true)
 	public void supplementRecord(List<AssetOptRecord> listRecord){
 		if(listRecord!=null && listRecord.size()>0){
 			Set<String> setAssetUid=new HashSet<String>();
@@ -173,6 +175,7 @@ public class AssetOptRecordService {
 			}
 		}
 	}
+	@Transactional(readOnly = true)
 	public List<AssetOptRecord> getAssetOptRecordList(String assetUid){
 		if(StringUtils.isEmpty(assetUid)) return null;
 		List<AssetOptRecord> assetOptRecordListLimit5 = assetOptRecordRepository.getAssetOptRecordListLimit5(assetUid);
@@ -205,6 +208,7 @@ public class AssetOptRecordService {
 		return assetOptRecordListLimit5;
 	}
 	public static String[] basicInfo={"院区","科室","设备名称","设备编号","序列号","型号"};
+	@Transactional(readOnly = true)
 	public StreamedContent exportAllWoByAssetInfoId(AssetInfo assetInfo, Date startDate, Date endDate){
 		InputStream inputStream =null;
 		try {

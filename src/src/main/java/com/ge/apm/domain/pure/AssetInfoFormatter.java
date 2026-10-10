@@ -603,6 +603,14 @@ public class AssetInfoFormatter {
         return assetInfo.getLifecycleInYear();
     }
 
+    public Integer getDepreciationLifecycle() {
+        return assetInfo.getDepreciationLifecycle();
+    }
+
+    public Double getDepreciationLifecycleInYear() {
+        return assetInfo.getDepreciationLifecycleInYear();
+    }
+
     public String getRegistrationNo() {
         return assetInfo.getRegistrationNo();
     }
@@ -976,6 +984,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("purchasePrice"), this.getPurchasePrice());
         map.put(getMessage("salvageValue"), this.getSalvageValue());
         map.put(getMessage("lifecycle"), this.getLifecycleInYear());
+        map.put(getMessage("depreciationLifecycle"), this.getDepreciationLifecycleInYear());
         map.put(getMessage("depreciationMethod"), this.getDepreciationMethodAsString());
 
         map.put(getMessage("manufactDate"),this.getManufactDate());
@@ -1048,6 +1057,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
+        map.put(getMessage("assetClassification32"), assetInfo.getAssetClassification32());
         map.put(getMessage("usageCount"), assetInfo.getUsageCount());
         map.put(getMessage("ratingUsageCount"), assetInfo.getRatingUsageCount());
         map.put(getMessage("epc"), assetInfo.getEpc());
@@ -1120,6 +1130,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("purchasePrice"), this.getPurchasePrice());
         map.put(getMessage("salvageValue"), this.getSalvageValue());
         map.put(getMessage("lifecycle"), this.getLifecycleInYear());
+        map.put(getMessage("depreciationLifecycle"), this.getDepreciationLifecycleInYear());
         map.put(getMessage("depreciationMethod"), this.getDepreciationMethodAsString());
 
         map.put(getMessage("manufactDate"),this.getManufactDate());
@@ -1192,6 +1203,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("assetQuantity"), assetInfo.getAssetQuantity());
         map.put(getMessage("assetTypeGroup"), encodedToAssetTypeGroupPath.get(assetInfo.getAssetType()));
         map.put(getMessage("assetTypeGroupEncoded"), assetInfo.getAssetType());
+        map.put(getMessage("assetClassification32"), assetInfo.getAssetClassification32());
 
         map.put(getMessage("spare01"), this.getSpare01AsString());
         map.put(getMessage("spare02"), this.getSpare02AsString());

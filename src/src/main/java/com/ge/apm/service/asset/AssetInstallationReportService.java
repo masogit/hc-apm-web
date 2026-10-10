@@ -350,17 +350,16 @@ public class AssetInstallationReportService {
     private byte[] renderZip(List<Map<String, Object>> dataList, byte[] templateBytes, String reportType) throws IOException {
 
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream zout = new ZipOutputStream(bout);
-        for (Map<String, Object> data : dataList) {
-            String fileName = buildFileName(data, reportType, false);
-            zout.putNextEntry(new ZipEntry(fileName));
-            //logger.info("Adding zip entry for: " + fileName);
-            byte[] bytes = this.renderDocx(data, templateBytes);
-            IOUtils.write(bytes, zout);
-            zout.closeEntry();
+        try (ZipOutputStream zout = new ZipOutputStream(bout)) {
+            for (Map<String, Object> data : dataList) {
+                String fileName = buildFileName(data, reportType, false);
+                zout.putNextEntry(new ZipEntry(fileName));
+                //logger.info("Adding zip entry for: " + fileName);
+                byte[] bytes = this.renderDocx(data, templateBytes);
+                IOUtils.write(bytes, zout);
+                zout.closeEntry();
+            }
         }
-
-        zout.close();
         return bout.toByteArray();
     }
 

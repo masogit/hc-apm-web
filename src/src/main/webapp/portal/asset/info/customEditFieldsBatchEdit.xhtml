@@ -884,6 +884,14 @@
                            readonly="#{!assetInfoBulkEditController.needEdit('lifecycle')}" />
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'depreciationLifecycle')}">
+        <h:panelGroup>
+            <label class="label">#{msg.depreciationLifecycle}</label>
+            <p:inputNumber minValue="0" decimalPlaces="1" id="depreciationLifecycle" 
+                           value="#{assetInfoBulkEditController.selected.depreciationLifecycleInYear}"
+                           readonly="#{!assetInfoBulkEditController.needEdit('depreciationLifecycle')}" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'depreciationMethod')}" >
         <h:panelGroup>
             <label class="label">#{msg.depreciationMethod}</label>

@@ -24,7 +24,6 @@ import java.util.Set;
  * @version: 1.0
  */
 @Service
-@Transactional
 public class SimplePartsWarehouseOrgService {
 
     @Autowired
@@ -33,15 +32,18 @@ public class SimplePartsWarehouseOrgService {
     @Autowired
     private OrgInfoRepository orgInfoRepository;
 
+    @Transactional(readOnly = true)
     public List<SimplePartsWareHouseOrg> findAllByPartsWarehouseId(String id) {
         return partsWarehouseOrgRepository.findAllByPartsWarehouseId(id);
     }
 
+    @Transactional
     public void deleteByPartsWarehouseId(String id) {
         partsWarehouseOrgRepository.deleteByPartsWarehouseId(id);
     }
 
 
+    @Transactional(readOnly = true)
     public TreeNode preparePartsWarehouseOrgAdd() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         String siteUID = userAccount.getSiteUID();

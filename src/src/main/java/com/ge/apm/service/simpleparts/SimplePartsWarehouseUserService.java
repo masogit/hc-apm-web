@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  * @version: 1.0
  */
 @Service
-@Transactional
 public class SimplePartsWarehouseUserService {
 
     private static final Logger logger = Logger.getLogger(SimplePartsWarehouseUserService.class);
@@ -35,10 +34,12 @@ public class SimplePartsWarehouseUserService {
     @Autowired
     private SimplePartsWarehouseRepository partsWarehouseRepository;
 
+    @Transactional(readOnly = true)
     public List<String> findAllByPartsWarehouseByUserUid(String userUid) {
         return partsWarehouseUserRepository.findAllByPartsWarehouseByUserUid(userUid);
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsWarehouse> queryByUserUid() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         if (userAccount == null) {

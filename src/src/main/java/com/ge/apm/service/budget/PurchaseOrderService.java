@@ -224,13 +224,12 @@ public class PurchaseOrderService {
     public StreamedContent exportPurchaseZip(PurchaseOrderInfo purchaseOrderInfo) throws IOException, ParseException {
         String base = "采购单" + purchaseOrderInfo.getPurchaseNum();
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream zout = new ZipOutputStream(bout);
+        try (ZipOutputStream zout = new ZipOutputStream(bout)) {
 
-        //budgetApplicationExportService.generatePurchaseFile(zout, purchaseOrderInfo);
-        budgetApplicationExportService.generateBudgetFiles(zout, purchaseOrderInfo);
-        budgetApplicationExportService.generateSupplierFiles(zout, purchaseOrderInfo);
-
-        zout.close();
+            //budgetApplicationExportService.generatePurchaseFile(zout, purchaseOrderInfo);
+            budgetApplicationExportService.generateBudgetFiles(zout, purchaseOrderInfo);
+            budgetApplicationExportService.generateSupplierFiles(zout, purchaseOrderInfo);
+        }
         StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(bout.toByteArray())), "application/zip", base+".zip");
         return streamedContent;
     }

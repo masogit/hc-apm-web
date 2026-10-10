@@ -153,7 +153,10 @@ public class SurgeryAnesthesiaEquipmentInfoController extends GenericCRUDUUIDCon
                         orderBy.append("\"").append(property).append("\"").append(dir).append(",");
                         break;
                     case "uid":
-                        orderBy.append("e.uid").append(dir).append(",");
+                        // uid 排序会导致 PG 使用 PK 索引做 Index Scan，强制走 Nested Loop Join，禁用
+                        break;
+                    case "createdDate":
+                        orderBy.append("e.created_date").append(dir).append(",");
                         break;
                     default:
                         break;

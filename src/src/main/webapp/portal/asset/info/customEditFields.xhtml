@@ -1208,6 +1208,18 @@
             </p:inputNumber>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'depreciationLifecycle')}">
+        <h:panelGroup>
+            <label class="label">#{msg.depreciationLifecycle}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['depreciationLifecycle'].required? '*':''}</span></label>
+            <p:inputNumber minValue="0" maxValue="99" decimalPlaces="1" id="depreciationLifecycle" 
+                           value="#{assetInfoEditController.selected.depreciationLifecycleInYear}" 
+                           required="#{assetInfoEditController.customConfig.assetFields['depreciationLifecycle'].required}"
+                           requiredMessage="#{msg.depreciationLifecycle} #{msg.ValidationRequire}" 
+                           readonly="#{!assetInfoEditController.needEdit('depreciationLifecycle')}">
+                <p:ajax />
+            </p:inputNumber>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'depreciationMethod')}" >
         <h:panelGroup>
             <label class="label">#{msg.depreciationMethod}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['depreciationMethod'].required? '*':''}</span></label>

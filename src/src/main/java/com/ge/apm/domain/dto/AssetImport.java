@@ -242,6 +242,10 @@ public class AssetImport implements Serializable {
     @ExcelProperty(value = "LifeCycle")
     private Double lifecycleInYear;//使用年限(年)
 
+    private Integer depreciationLifecycle;//折旧年限(月)
+    @ExcelProperty(value = "DepreciationLifecycle")
+    private Double depreciationLifecycleInYear;//折旧年限(年)
+
     private Integer depreciationMethod;//折旧算法
 
     @ExcelProperty(value = "DepreciationMethod")
@@ -1529,6 +1533,14 @@ public class AssetImport implements Serializable {
     public void setLifecycle(Integer lifecycle) {
         this.lifecycle = lifecycle;
 
+    }
+
+    public Integer getDepreciationLifecycle() {
+        return depreciationLifecycle;
+    }
+
+    public void setDepreciationLifecycle(Integer depreciationLifecycle) {
+        this.depreciationLifecycle = depreciationLifecycle;
     }
 
     public Integer getDepreciationMethod() {
@@ -3245,6 +3257,21 @@ public class AssetImport implements Serializable {
             this.lifecycle = null;
         } else {
             this.lifecycle = new Double(lifecycleInYear * 12).intValue();
+        }
+    }
+
+    public Double getDepreciationLifecycleInYear() {
+        if (depreciationLifecycle == null) {
+            return null;
+        }
+        return new Double(depreciationLifecycle) / 12.0;
+    }
+
+    public void setDepreciationLifecycleInYear(Double depreciationLifecycleInYear) {
+        if (depreciationLifecycleInYear == null) {
+            this.depreciationLifecycle = null;
+        } else {
+            this.depreciationLifecycle = new Double(depreciationLifecycleInYear * 12).intValue();
         }
     }
 

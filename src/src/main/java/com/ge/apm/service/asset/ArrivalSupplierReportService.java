@@ -105,7 +105,11 @@ public class ArrivalSupplierReportService {
 
         InputStream  inputStream=fileDownloadService.getTemplateFileInputStream(SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getCode(), SystemTemplateEnum.ARRIVAL_SUPPLIER_REPORT.getFileType());
         if(inputStream != null){
-            templateBytes = IOUtils.toByteArray(inputStream);
+            try {
+                templateBytes = IOUtils.toByteArray(inputStream);
+            } finally {
+                inputStream.close();
+            }
         }
         return templateBytes;
     }
@@ -113,17 +117,16 @@ public class ArrivalSupplierReportService {
     private byte[] renderZip(List<Map<String, Object>> dataList, byte[] templateBytes) throws IOException {
 
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ZipOutputStream zout = new ZipOutputStream(bout);
-        for (Map<String, Object> data : dataList) {
-            String fileName = buildFileName(data, false);
-            zout.putNextEntry(new ZipEntry(fileName));
-            //logger.info("Adding zip entry for: " + fileName);
-            byte[] bytes = this.renderDocx(data, templateBytes);
-            IOUtils.write(bytes, zout);
-            zout.closeEntry();
+        try (ZipOutputStream zout = new ZipOutputStream(bout)) {
+            for (Map<String, Object> data : dataList) {
+                String fileName = buildFileName(data, false);
+                zout.putNextEntry(new ZipEntry(fileName));
+                //logger.info("Adding zip entry for: " + fileName);
+                byte[] bytes = this.renderDocx(data, templateBytes);
+                IOUtils.write(bytes, zout);
+                zout.closeEntry();
+            }
         }
-
-        zout.close();
         return bout.toByteArray();
     }
 

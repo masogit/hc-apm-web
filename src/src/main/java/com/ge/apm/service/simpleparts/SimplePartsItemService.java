@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class SimplePartsItemService {
 
     @Autowired
@@ -36,6 +35,7 @@ public class SimplePartsItemService {
     @Autowired
     private SimplePartsCategoryService partsCategoryService;
 
+    @Transactional
     public void save(SimplePartsItem parts) {
         partsItemRepository.save(parts);
         List<SimplePartsInventory> list = partsInventoryService.findByPartsItemId(parts.getId());
@@ -45,20 +45,24 @@ public class SimplePartsItemService {
         }
     }
 
+    @Transactional(readOnly = true)
     public TreeNode buildPartsCategoryTree(String tenantUid) {
         return partsCategoryService.buildPartsCategoryInTree(tenantUid);
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsItem> findAll() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         List<SimplePartsItem> partsItems = partsItemRepository.findByTenantUid(userAccount.getTenantUID());
         return partsItems;
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsItem> findByIds(Set<String> ids) {
         return partsItemRepository.findAll(ids);
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsItem> getPartsItemListInInventoryByPartsHouseId(String partsWarehouseId, String name) {
         List<SimplePartsInventory> partsInventoryList = partsInventoryService.findByWarehouseId(partsWarehouseId);
         List<SimplePartsItem> list = Lists.newArrayList();
@@ -73,15 +77,18 @@ public class SimplePartsItemService {
 
         return list;
     }
+    @Transactional(readOnly = true)
     public List<SimplePartsItem> getPartsItemList(String tenantUID) {
         List<SimplePartsItem> list = partsItemRepository.findByTenantUid(tenantUID);
         return list != null && list.size() > 0 ? list : Lists.newArrayList();
     }
 
+    @Transactional
     public void saveSelectedPartsEdit(Set<String> partsItemIds,SimplePartsCategory partsCategory) {
         partsItemRepository.updatePartsItemPartsCategoryByIds(partsItemIds,partsCategory.getName(),partsCategory.getEncoded());
     }
 
+    @Transactional(readOnly = true)
     public SimplePartsItem getPartsItem(String partsItemId,String parts) {
         if(partsItemId != null){
             return partsItemRepository.findById(partsItemId);
@@ -94,6 +101,7 @@ public class SimplePartsItemService {
         return null;
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsItem> findAllByName(String name) {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         List<SimplePartsItem> partsItems = partsItemRepository.findByTenantUidAndName(userAccount.getTenantUID(), name);

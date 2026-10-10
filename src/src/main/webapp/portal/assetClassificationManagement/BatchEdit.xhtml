@@ -7,6 +7,14 @@
 
     <ui:define name="content">
         <style>
+            #batchEditAssetClassificationForm .form-group .ui-inputtext:not(#batchEditAssetClassificationForm\:selectedOrgName),
+            #batchEditAssetClassificationForm .form-group .ui-selectonemenu,
+            #batchEditAssetClassificationForm .form-group .ui-selectcheckboxmenu {
+                width: 100% !important;
+            }
+            #batchEditAssetClassificationForm\:selectedOrgName {
+                width: calc(100% - 32px) !important;
+            }
 
         </style>
         <div class="ui-g">
@@ -280,6 +288,26 @@
                     }
                 }
             }
+        </script>
+        <script type="text/javascript">
+        //<![CDATA[
+            $(function() {
+                var form = $('#batchEditAssetClassificationForm');
+                form.find('.ui-selectonemenu-trigger .ui-icon, .ui-selectcheckboxmenu-trigger .ui-icon').each(function() {
+                    var el = $(this);
+                    el.removeClass('ui-icon ui-icon-triangle-1-s');
+                    el.css({
+                        'background': 'none',
+                        'backgroundImage': 'none',
+                        'textIndent': '0',
+                        'overflow': 'visible',
+                        'font-size': '13px',
+                        'line-height': '1'
+                    });
+                    el.html('\u25BC');
+                });
+            });
+        //]]>
         </script>
         <p:dialog id="batchAssetClassification32Dialog"
                   widgetVar="batchAssetClassification32Dialog"

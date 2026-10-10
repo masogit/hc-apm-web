@@ -16,7 +16,6 @@ import java.util.List;
  * @version: 1.0
  */
 @Service
-@Transactional
 public class SimplePartsWarehouseLocatorService {
 
     @Autowired
@@ -25,6 +24,7 @@ public class SimplePartsWarehouseLocatorService {
     @Autowired
     private SimplePartsInventoryRepository partsInventoryRepository;
 
+    @Transactional(readOnly = true)
     public List<SimplePartsWareHouseLocator> findAllByPartsWarehouseId(String id) {
         return partsWarehouseLocatorRepository.findAllByPartsWarehouseId(id);
     }
@@ -35,10 +35,12 @@ public class SimplePartsWarehouseLocatorService {
      * @date 2020/7/27 17:06
      * 根据仓库id查询该仓库的仓位
      */
+    @Transactional(readOnly = true)
     public List<SimplePartsWareHouseLocator> findByPartsWarehouseId(String partsWarehouseId) {
         return partsWarehouseLocatorRepository.findByPartsWarehouseId(partsWarehouseId);
     }
 
+    @Transactional(readOnly = true)
     public List<SimplePartsWareHouseLocator> findByPartsWarehouseIdAndPartsItemId(String partsWarehouseId, String partsItemId) {
         List<SimplePartsWareHouseLocator> partsWareHouseLocators = findByPartsWarehouseId(partsWarehouseId);
         List<SimplePartsWareHouseLocator> result = Lists.newArrayList();

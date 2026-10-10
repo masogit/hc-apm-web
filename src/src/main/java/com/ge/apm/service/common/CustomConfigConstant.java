@@ -74,14 +74,14 @@ public class CustomConfigConstant {
                 "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
                 "usageCount", "ratingUsageCount", "epc",
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
-                "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
+                "salvageValue", "lifecycle", "depreciationLifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
                 "installDate", "factoryWarrantyDate", "warrantyDate", "terminateDate", "lastPmDate", "lastQaDate",
                 "lastMeteringDate", "lastInventoryDate", "acceptDate", "warrantyMonth","maitanance", "maitananceTel", "qrCode",
                 "locationCode", "locationName", "comments", "locationNotes","assetUsage", "capitalSource",
                 "capitalSource2", "measureGrade", "riskGrade", "estimatedRiskLevel", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "status","isPm", "isFixed","isChecked", "assetValueCategory", "deviceStatus",
                 "warranty", "subjectProject", "proprietaryClass", "tags", "UCMID", "createdDate",
-                "createdBy","mainDirectory","secondDirectory","geDeviceType","UUID"
+                "createdBy","mainDirectory","secondDirectory","geDeviceType","assetClassification32","UUID"
         );
     }
 
@@ -123,7 +123,7 @@ public class CustomConfigConstant {
                 "repairForm", "locationCode", "locationName", "status", "deviceStatus", "isPm","isFixed", "isChecked", "comments", "assetUsage",
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
-                "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
+                "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationLifecycle", "depreciationMethod", "lastPmDate",
                 "usageCount", "ratingUsageCount", "epc",
                 "lastQaDate", "lastMeteringDate", "lastInventoryDate", "warranty","createdBy","assetUsedLifecycle", "assetLifecycleDeadline", "warrantyStatus");
     }
@@ -153,7 +153,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsEditpageFinicialFields() {
-        return Arrays.asList("purchasePrice", "salvageValue", "lifecycle", "depreciationMethod","createdBy");
+        return Arrays.asList("purchasePrice", "salvageValue", "lifecycle", "depreciationLifecycle", "depreciationMethod","createdBy");
     }
 
     public static List<String> getAssetsEditpageDateFields() {
@@ -172,7 +172,7 @@ public class CustomConfigConstant {
                 "isPm","isFixed", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",
                 "usageCount", "ratingUsageCount", "epc",
-                "lastPmDate", "lastQaDate", "lastMeteringDate", "lastInventoryDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod","createdBy");
+                "lastPmDate", "lastQaDate", "lastMeteringDate", "lastInventoryDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationLifecycle", "depreciationMethod","createdBy");
     }
 
     public static List<String> getAssetsMobilepageHeaderFields() {

@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
  * @package com.ge.apm.service.spareParts
  */
 @Service
-@Transactional
 public class SimplePartsRequestWorkOrderService {
     private static final Logger log = LoggerFactory.getLogger(SimplePartsRequestWorkOrderService.class);
 
@@ -124,6 +123,7 @@ public class SimplePartsRequestWorkOrderService {
         this.sendWxMsg(partsRequest);
     }
 
+    @Transactional(readOnly = true)
     public void sendWxMsg(SimplePartsRequest partsRequest){
         try {
             log.info("工单申请备件发送微信通知,"+"工单号:"+partsRequest.getMaintenanceWorkOrderNumber()+",申请编号:"+partsRequest.getRequestCode());
@@ -336,6 +336,7 @@ public class SimplePartsRequestWorkOrderService {
         partsRequestLineItem.setSiteUID(currentUserAccount.getSiteUID());
     }
 
+    @Transactional(readOnly = true)
     public Optional<SimplePartsWarehouse> getPartsWarehouseByPmOrderId(String V2_PmOrderId){
 
         V2_PmOrder v2_pmOrder = v2PmOrderRepository.findById(V2_PmOrderId);
@@ -354,6 +355,7 @@ public class SimplePartsRequestWorkOrderService {
         }
         return Optional.empty();
     }
+    @Transactional(readOnly = true)
     public Optional<SimplePartsWarehouse> getPartsWarehouseByWorkOrderId(String workOrderId){
 
         V2_WorkOrder v2_workOrder = woDao.findById(workOrderId);

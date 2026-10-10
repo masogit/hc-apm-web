@@ -15,7 +15,6 @@ import java.util.*;
 
 
 @Service
-@Transactional
 public class AssetOperationRecordService {
 	private final Logger log = LoggerFactory.getLogger(AssetOperationRecordService.class);
 	@Autowired
@@ -59,6 +58,7 @@ public class AssetOperationRecordService {
 //		}
 //		return sb.toString();
 //	}
+	@Transactional(readOnly = true)
 	public OrgInfo fetchOrgInfoByUid(String uid){
 		return orgInfoRepository.findByUid(uid);
 	}

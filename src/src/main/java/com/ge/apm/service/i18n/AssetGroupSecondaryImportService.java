@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 public class AssetGroupSecondaryImportService  {
     private static final Logger logger = LoggerFactory.getLogger(AssetGroupSecondaryImportService.class);
 
@@ -38,6 +37,7 @@ public class AssetGroupSecondaryImportService  {
     @Autowired
     I18nMessageRepository i18nMessageDao;
 
+    @Transactional
     public void importAssetGroupSecondary(String tenantUid, ExcelDocumentStreamingReader excelDoc) {
         TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUid);
 
