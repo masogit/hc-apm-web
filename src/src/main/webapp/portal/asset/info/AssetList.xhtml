@@ -325,17 +325,13 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetTypeGroup'}">
-                                <p:column width="100" exportable="true">
-                                    <f:facet name="header">
-                                        <h:outputText value="#{msg.assetTypeGroup}"/><br/>
-                                        <p:selectOneMenu id="assetTypeGroupFilter"
-                                                         widgetVar="assetTypeGroupFilterWidget"
-                                                         value="#{assetInfoListController.selectedAssetTypeGroupUid}"
-                                                         autoWidth="false" style="max-width:150px;font-size:12px;">
-                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                            <f:selectItems value="#{assetInfoListController.assetTypeGroupSelectItems}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                            <p:ajax listener="#{assetInfoListController.onAssetTypeGroupFilterChange}" update=":AssetInfoListForm:datalist :AssetInfoListForm:datalist:assetTypeGroupFilter"/>
-                                        </p:selectOneMenu>
+                                <p:column width="100" exportable="true" headerText="#{msg.assetTypeGroup}" filterBy="#{item.assetType}" filterMatchMode="EQ">
+                                    <f:facet name="filter">
+                                        <h:panelGroup id="assetTypeGroupFilterDisplay" layout="block" style="max-width:150px;">
+                                            <h:outputText value="#{assetInfoListController.selectedAssetTypeGroupDisplayName}" rendered="#{not empty assetInfoListController.selectedAssetTypeGroupDisplayName}" style="font-size:12px;display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;"/>
+                                            <h:outputText value="#{msg.SelectOneMessage}" class="ui-selectonemenu-label ui-inputfield ui-corner-all" rendered="#{empty assetInfoListController.selectedAssetTypeGroupDisplayName}" />
+                                            <p:commandButton id="btnAssetTypeGroupFilter" type="button" icon="fa fa-angle-down" style="zoom:0.7;float:right;" onclick="PF('varPanelAssetTypeGroupFilter').show();return false;"/>
+                                        </h:panelGroup>
                                     </f:facet>
                                     <h:outputText value="#{assetInfoListController.convertAssetTypeGroupEncodedToName(item.assetType)}"/>
                                 </p:column>
@@ -1362,6 +1358,29 @@
                     </p:dataTable>
 
                     <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
+
+                    <p:overlayPanel appendTo="AssetInfoListForm" widgetVar="varPanelAssetTypeGroupFilter" for=":AssetInfoListForm:datalist:btnAssetTypeGroupFilter" hideEffect="fade" dynamic="false" dismissable="false"
+                                    style="width:280px" modal="false">
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:inputText id="assetTypeGroupFilterTextInput" value="#{assetInfoListController.assetTypeGroupFilterText}" style="width:75%;"/>
+                            <p:commandButton icon="ui-icon-search" process="assetTypeGroupFilterTextInput @this"
+                                             update="assetTypeGroupFilterTreeInList"
+                                             actionListener="#{assetInfoListController.filterAssetTypeGroupNodes}"/>
+                            <p:tree id="assetTypeGroupFilterTreeInList" class="tree" style="width:98%;border:0;"
+                                    value="#{assetInfoListController.assetTypeGroupFilterTree}" var="node" selectionMode="single">
+                                <p:ajax process="@this" event="select" listener="#{assetInfoListController.onAssetTypeGroupTreeNodeSelect}"
+                                        update=":AssetInfoListForm:datalist :AssetInfoListForm:datalist:assetTypeGroupFilterDisplay"
+                                        oncomplete="PF('varPanelAssetTypeGroupFilter').show();"/>
+                                <p:ajax process="@this" event="expand"/>
+                                <p:ajax process="@this" event="collapse"/>
+                                <p:treeNode type="sysAuthGroup">
+                                    <h:outputText value="#{node.displayName}"/>
+                                </p:treeNode>
+                                <p:treeNode type="hidden" rendered="false"/>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
+
                     <p:overlayPanel appendTo="AssetInfoListForm" id="idPanelFilterWarrantyDate" widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('warrantyDate')}">
                         <h:panelGrid columns="2">
                             <p:outputLabel value="#{msg.From}"/>
