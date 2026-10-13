@@ -75,7 +75,6 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax event="rowSelect" listener="#{equipmentExpiryManagementController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                         <p:ajax event="filter" listener="#{equipmentExpiryManagementController.onFilter}"
                                 oncomplete="updateSelectAllCheckBox();" update="searchForm"/>
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
@@ -102,7 +101,12 @@
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}"
                                   sortBy="#{item.namePyCode}" filterBy="#{item.name}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.name}"/>
+                            <p:commandLink value="#{item.name}" onclick="prepareAssetViewWindow();"
+                                           oncomplete="openAssetViewWindow(xhr, status, args)"
+                                           process="@this"
+                                           actionListener="#{equipmentExpiryManagementController.onSelectAsset}">
+                                <f:param name="assetUid" value="#{item.uid}"/>
+                            </p:commandLink>
                         </p:column>
                         <p:column headerText="#{msg.clinicalDeptName}">
                             <f:facet name="header">

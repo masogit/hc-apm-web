@@ -37,6 +37,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.Serializable;
@@ -312,13 +313,18 @@ public class EquipmentExpiryManagementController extends JpaCRUDController<Asset
     }
 
     public void onSelectAsset() throws IOException {
-        if (null == selected) {
+        String assetUid = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("assetUid");
+        if (assetUid == null || assetUid.isEmpty()) {
+            return;
+        }
+        AssetInfo asset = dao.findByUid(assetUid);
+        if (null == asset) {
             return;
         }
 
         String url = "actionName=View&selectedid="
-                + selected.getUid()
-                + "&asset_name=" + selected.getName();
+                + asset.getUid()
+                + "&asset_name=" + asset.getName();
         url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
