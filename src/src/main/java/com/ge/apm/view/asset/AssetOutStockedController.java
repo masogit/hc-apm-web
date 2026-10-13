@@ -275,13 +275,13 @@ public class AssetOutStockedController extends GenericCRUDUUIDController<AssetOu
             return;
         }
         AssetInfoEditController assetInfoEditController = WebUtil.getBean(AssetInfoEditController.class);
-        if (assetInfoEditController.checkAssetOrderIsComplete(selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList()))) {
+        if (assetInfoEditController.checkAssetOrderIsComplete(selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList()), false)) {
             return;
         }
-        boolean checked = assetOutStockService.checkAssetInfo(selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList()));
-        if (!checked) {
+        String checked = assetOutStockService.checkAssetInfo(selectedItems.stream().map(AssetOutStockRecord::getAssetUid).collect(Collectors.toList()));
+        if (StringUtils.hasText(checked)) {
             RequestContext.getCurrentInstance().addCallbackParam("generatedReturnedStockDoc", false);
-            WebUtil.addErrorMessage("设备有未处理的工单，无法生成退库单！");
+            WebUtil.addErrorMessage(checked);
             return;
         }
         notInstalled = 0L;

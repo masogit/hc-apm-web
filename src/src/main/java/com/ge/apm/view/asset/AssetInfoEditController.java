@@ -26,14 +26,13 @@ import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.component.AssetTypeGroupTreeComponentController;
 import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
-import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
-import com.ge.healthcare.cn.common.mq.MqContext;
 import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
-import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
 import com.ge.healthcare.cn.common.onnx.RiskLevel;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.map.MapUtil;
@@ -416,6 +415,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
+        configItemService = WebUtil.getBean(ConfigItemService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         approval = Boolean.parseBoolean((String) UrlEncryptController.getValueFromMap(encodeStr, "approval"));
@@ -594,7 +594,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getAssetUploadFileFormats() {
-        ConfigItemService configItemService = WebUtil.getBean(ConfigItemService.class);
         return  configItemService.getConfigItemByKeyToString("assetUploadFileFormats",loginUser);
     }
     private void assetInfoCopySelected(AssetInfo assetInfo, AssetInfo selected) {
@@ -1590,7 +1589,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         if ("scrap".equals(action)) {
             List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals("Scrap")).collect(Collectors.toList());
-            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod,signatureId,collect);
+            boolean checkOrderWhenScrap = BooleanUtils.isTrue(configItemService.getConfigItemByKey("checkOrderWhenScrap", loginUser));
+            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod,signatureId,collect,checkOrderWhenScrap);
         } else if ("departmentCovert".equals(action)) {
             Map<String, Object> param = MapUtil.newHashMap();
             param.put("assetUids", bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
@@ -1618,7 +1618,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter @Setter
     private List<AssetInfo> bathSelectedList = new ArrayList<>();
 
-    public boolean checkAssetOrderIsComplete(List<String> uidList) {
+    public boolean checkAssetOrderIsComplete(List<String> uidList, boolean isScrap) {
         List<String> uids;
         if (uidList.size() == 1) {
             selected = dao.findByUid(uidList.get(0));
@@ -1628,17 +1628,34 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             bathSelectedList = dao.findByUidIn(uidList);
             uids = bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList());
         }
-        List<V2_WorkOrder> workOrders = v2WorkOrderRepository.getByAssetUidInAndStatusOrderByCloseTimeDesc(uids, 1);
-        List<V2_PmOrder> pmOrders   =   v2PmOrderRepository.findByAssetUidInAndIsFinished(uids,false);
-        List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidIn(uids);
-        if(CollectionUtils.isNotEmpty(workOrders)  ||  CollectionUtils.isNotEmpty(pmOrders)  ||   CollectionUtils.isNotEmpty(nurseSiteMaintainItemList) ){
-            logger.error("Assets have outstanding work orders");
-            nurseSiteMaintainIsComplete=CollectionUtils.isNotEmpty(nurseSiteMaintainItemList) ?true:false;
-            workOrderList=workOrders.stream().map(V2_WorkOrder::getBusinessNumber).collect(Collectors.toList());
-            pmOrderList=pmOrders.stream().map(V2_PmOrder::getBusinessNumber).collect(Collectors.toList());
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("asetOrderIsComplete", true);
-            return true;
+
+        boolean checkOrderWhenScrap = BooleanUtils.isTrue(configItemService.getConfigItemByKey("checkOrderWhenScrap", loginUser));
+        // checkOrderWhenScrap为false时申请报废，只检查mvs工单
+        if (isScrap && !checkOrderWhenScrap) {
+            List<V2_WorkOrder> workOrders = v2WorkOrderRepository.findUnFinishedMvsOrderByAsset(uids);
+            List<V2_PmOrder> pmOrders = v2PmOrderRepository.findUnFinishedMvsOrderByAsset(uids);
+            if (CollectionUtils.isNotEmpty(workOrders) || CollectionUtils.isNotEmpty(pmOrders)) {
+                logger.error("Assets have outstanding work orders");
+                nurseSiteMaintainIsComplete = true;
+                workOrderList = workOrders.stream().map(V2_WorkOrder::getBusinessNumber).collect(Collectors.toList());
+                pmOrderList = pmOrders.stream().map(V2_PmOrder::getBusinessNumber).collect(Collectors.toList());
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("asetOrderIsComplete", true);
+                return true;
+            }
+        } else {
+            List<V2_WorkOrder> workOrders = v2WorkOrderRepository.getByAssetUidInAndStatusOrderByCloseTimeDesc(uids, 1);
+            List<V2_PmOrder> pmOrders = v2PmOrderRepository.findByAssetUidInAndIsFinished(uids, false);
+            List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findNoCheckedByAssetUidIn(uids);
+            if (CollectionUtils.isNotEmpty(workOrders) || CollectionUtils.isNotEmpty(pmOrders) || CollectionUtils.isNotEmpty(nurseSiteMaintainItemList)) {
+                logger.error("Assets have outstanding work orders");
+                nurseSiteMaintainIsComplete = CollectionUtils.isNotEmpty(nurseSiteMaintainItemList);
+                workOrderList = workOrders.stream().map(V2_WorkOrder::getBusinessNumber).collect(Collectors.toList());
+                pmOrderList = pmOrders.stream().map(V2_PmOrder::getBusinessNumber).collect(Collectors.toList());
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("asetOrderIsComplete", true);
+                return true;
+            }
         }
         return false;
     }

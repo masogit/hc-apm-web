@@ -125,4 +125,7 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     @Transactional
     @Query(value = "UPDATE v2_work_order SET man_hours=?1 WHERE id=?2", nativeQuery = true)
     public void updateManHours(Double manHours, String id);
+
+    @Query(value = "select * from v2_work_order t where t.asset_uid in (?1) and t.status = 1 AND EXISTS (SELECT 1 FROM mvs_ib_mapping m1 WHERE t.asset_uid = m1.mvs_ib_uid OR t.asset_uid = m1.e_home_ib_uid)", nativeQuery = true)
+    List<V2_WorkOrder> findUnFinishedMvsOrderByAsset(List<String> assetUidList);
 }
