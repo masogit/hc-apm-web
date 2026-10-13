@@ -5,19 +5,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTypeGroupMapper;
-import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.budget.*;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.mq.MqUtils;
-import com.ge.apm.service.asset.AssetInfoBulkEditService;
-import com.ge.apm.service.asset.AssetInfoToBeTerminatedService;
-import com.ge.apm.service.asset.AssetLifecyleService;
-import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.budget.PurchaseBudgetConfigService;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.common.GatewayURL;
-import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
@@ -25,19 +20,17 @@ import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.simpleparts.SimplePartsConfigService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.wo.V2_WorkOrderService;
-import com.ge.apm.service.wo.WorkOrderService;
 import com.ge.apm.view.budget.BudgetConstant;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmSystemRole;
+import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.mq.MqContext;
-import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -137,6 +130,8 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     @Autowired
     private SysRoleRepository sysRoleRepository;
+    @Autowired
+    private AssetScrapService assetScrapService;
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget, boolean approvalFlag) {
         // 需要调用服务端提供的接口
         logger.info("approvableTarget" + approvableTarget);
@@ -1690,7 +1685,10 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         AssetInfo assetInfo = assetInfoDao.getById(assetScrap.getAssetId());
 
         if (ApprovalConstant.SCRAP_STATUS_SUCCESS.equals(status)   ) {
-
+            if (assetScrap.getResolveOrder() != null && assetScrap.getResolveOrder()) {
+                // 处理维修，保养，盘点，日常检查，科室借调，调剂
+                assetScrapService.autoResolve(assetScrap.getAssetId());
+            }
 
             UserAccount applyUser = userAccountRepository.getByUid(assetScrap.getRequestUserUid());
             //报废

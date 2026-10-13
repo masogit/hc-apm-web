@@ -164,6 +164,10 @@ public class EfficiencyEquipmentInfo  implements  Serializable {
         this.purchaseDate = purchaseDate;
     }
 
+    public String getPurchaseDateStr() {
+        return purchaseDate != null ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(purchaseDate) : "";
+    }
+
     public String getUid() {
         return uid;
     }

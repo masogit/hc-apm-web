@@ -24,7 +24,8 @@ public class AssetScrapService  extends MicroServiceInvoker {
 
     protected static final   Logger logger = LoggerFactory.getLogger(MicroServiceInvoker.class);
 
-    public void apply(Integer assetId, String applyReason, String approvalReason, String equipmentDisposalMethod, String customDisposalMethod, String signatureId, List<V2_BlobObject> attachments) {
+    public void apply(Integer assetId, String applyReason, String approvalReason, String equipmentDisposalMethod, String customDisposalMethod,
+                      String signatureId, List<V2_BlobObject> attachments,boolean checkOrderWhenScrap) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("assetId",String.valueOf(assetId));
         map.put("applyReason",applyReason);
@@ -33,6 +34,7 @@ public class AssetScrapService  extends MicroServiceInvoker {
         map.put("customDisposalMethod",customDisposalMethod);
         map.put("auditSignature",signatureId);
         map.put("attachments",attachments);
+        map.put("checkOrderWhenScrap",checkOrderWhenScrap);
         String token = UserContextService.getAccessToken();
         HttpEntity<HashMap> requestEntity = new HttpEntity<HashMap>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ASSET_SCRAP_APPLY);
@@ -44,6 +46,22 @@ public class AssetScrapService  extends MicroServiceInvoker {
         }else {
             WebUtil.addErrorMessage((String)responseMap.get("message"));
             logger.error("AssetScrapService apply error  assetId:{},result:{}", assetId , responseMap.get("data"));
+        }
+    }
+
+    public void autoResolve(Integer assetId) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("assetId", String.valueOf(assetId));
+        String token = UserContextService.getAccessToken();
+        HttpEntity<HashMap> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.ASSET_SCRAP_AUTO_RESOLVE);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+        if (isOkay(response)) {
+            logger.info("AssetScrapService auto resolve assetId:{},result:{}", assetId, responseMap.get("data"));
+        } else {
+            WebUtil.addErrorMessage((String) responseMap.get("message"));
+            logger.error("AssetScrapService auto resolve error  assetId:{},result:{}", assetId, responseMap.get("data"));
         }
     }
 

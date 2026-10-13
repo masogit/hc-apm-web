@@ -214,6 +214,7 @@ public enum GatewayURL {
     JI_MU_REPORT("/apmReport/jmreport/view"),
 
     ASSET_SCRAP_APPLY("/hcapmassetservice/api/apm/assetScrap/apply"),
+    ASSET_SCRAP_AUTO_RESOLVE("/hcapmassetservice/api/apm/assetScrap/autoResolve"),
     ASSET_CHECK_ORDER_CONDITION("/hcapmassetservice/api/apm/asset/assetinfos/checkOrderCondition"),
     ASSET_DEPARTMENT_COVERT_APPLY("/hcapmassetservice/api/apm/departmentConvert/assetDepartmentConvert"),
 

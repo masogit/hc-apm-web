@@ -135,6 +135,10 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     @JsonProperty
     private List<V2_BlobObject> attachments;
 
+    // 报废申请审批通过时是否处理工单（维修，保养，日常检查，盘点）
+    @Column(name = "resolve_order")
+    private Boolean resolveOrder = false;
+
     public AssetScrap() {
     }
 
@@ -432,5 +436,13 @@ public class AssetScrap implements Serializable , ApprovableTarget {
 
     public void setAttachments(List<V2_BlobObject> attachments) {
         this.attachments = attachments;
+    }
+
+    public Boolean getResolveOrder() {
+        return resolveOrder;
+    }
+
+    public void setResolveOrder(Boolean resolveOrder) {
+        this.resolveOrder = resolveOrder;
     }
 }

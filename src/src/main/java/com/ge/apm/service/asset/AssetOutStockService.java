@@ -243,7 +243,7 @@ public class AssetOutStockService extends MicroServiceInvoker {
 
     }
 
-    public boolean checkAssetInfo(List<String> assetUids) {
+    public String checkAssetInfo(List<String> assetUids) {
         Map<String, Object> map = MapUtil.newHashMap();
         map.put("assetUids", assetUids);
         String token = UserContextService.getAccessToken();
@@ -252,11 +252,11 @@ public class AssetOutStockService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
         if (isOkay(response)) {
-            return (boolean) responseMap.get("data");
+            return String.valueOf(responseMap.get("data"));
         } else {
             logger.error("AssetOutStockService check asset error assetUids:{},result:{}", assetUids , responseMap.get("data"));
         }
-        return false;
+        return "";
     }
 
     public String queryInStockNo(String preStr){

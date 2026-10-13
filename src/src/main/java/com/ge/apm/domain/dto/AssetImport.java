@@ -3264,14 +3264,14 @@ public class AssetImport implements Serializable {
         if (depreciationLifecycle == null) {
             return null;
         }
-        return new Double(depreciationLifecycle) / 12.0;
+        return Math.round(new Double(depreciationLifecycle) / 12.0 * 100) / 100.0;
     }
 
     public void setDepreciationLifecycleInYear(Double depreciationLifecycleInYear) {
         if (depreciationLifecycleInYear == null) {
             this.depreciationLifecycle = null;
         } else {
-            this.depreciationLifecycle = new Double(depreciationLifecycleInYear * 12).intValue();
+            this.depreciationLifecycle = (int) Math.round(depreciationLifecycleInYear * 12);
         }
     }
 

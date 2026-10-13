@@ -141,7 +141,7 @@
                         <h:panelGroup>
                             <label class="label">#{systemConfigItemController.configItemMap.get('assetScrap').name.concat('(').concat(systemConfigItemController.configItemMap.get('assetScrap').key).concat(')')}</label>
                             <p:selectOneRadio id="assetScrap" value="#{systemConfigItemController.configItemMap.get('assetScrap').showValue}" style="width: 15%;">
-                                <p:ajax event="change" listener="#{systemConfigItemController.onAssetScrapChange}" update="showAssetScrapNoGroup" />
+                                <p:ajax event="change" listener="#{systemConfigItemController.onAssetScrapChange}" update="showAssetScrapNoGroup checkOrderWhenScrapGroup" />
                                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                             </p:selectOneRadio>
@@ -149,6 +149,13 @@
                         <h:panelGroup id="showAssetScrapNoGroup">
                             <label class="label">#{systemConfigItemController.configItemMap.get('showAssetScrapNo').name.concat('(').concat(systemConfigItemController.configItemMap.get('showAssetScrapNo').key).concat(')')}</label>
                             <p:selectOneRadio id="showAssetScrapNo" value="#{systemConfigItemController.configItemMap.get('showAssetScrapNo').showValue}"  style="width: 15%;" disabled="#{!systemConfigItemController.configItemMap.get('assetScrap').showValue}">
+                                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+                        <h:panelGroup id="checkOrderWhenScrapGroup">
+                            <label class="label">#{systemConfigItemController.configItemMap.get('checkOrderWhenScrap').name.concat('(').concat(systemConfigItemController.configItemMap.get('checkOrderWhenScrap').key).concat(')')}</label>
+                            <p:selectOneRadio id="checkOrderWhenScrap" value="#{systemConfigItemController.configItemMap.get('checkOrderWhenScrap').showValue}"  style="width: 15%;" disabled="#{!systemConfigItemController.configItemMap.get('assetScrap').showValue}">
                                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                             </p:selectOneRadio>
@@ -162,8 +169,8 @@
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">#{msg.Operation}</label>
-                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfigScrap(systemConfigItemController.configItemMap.get('assetScrap'),systemConfigItemController.configItemMap.get('showAssetScrapNo'))}" update="configItemForm" />
-                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfigScrip(systemConfigItemController.configItemMap.get('assetScrap'),systemConfigItemController.configItemMap.get('showAssetScrapNo'))}" update="configItemForm" style="padding:10px"
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfigScrap(systemConfigItemController.configItemMap.get('assetScrap'),systemConfigItemController.configItemMap.get('showAssetScrapNo'),systemConfigItemController.configItemMap.get('checkOrderWhenScrap'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfigScrip(systemConfigItemController.configItemMap.get('assetScrap'),systemConfigItemController.configItemMap.get('showAssetScrapNo'),systemConfigItemController.configItemMap.get('checkOrderWhenScrap'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('assetScrap').configItemValue == null}"/>
             </h:panelGroup>
 

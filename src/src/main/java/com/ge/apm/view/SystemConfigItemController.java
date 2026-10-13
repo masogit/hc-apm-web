@@ -374,12 +374,17 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
              ConfigItem showAssetScrapNoItem = configItemMap.get("showAssetScrapNo");
             showAssetScrapNoItem.setShowValue("false"); // 同步值
          }
+        if (!isAssetScrapEnabled) {
+            ConfigItem checkOrderWhenScrapItem = configItemMap.get("checkOrderWhenScrap");
+            checkOrderWhenScrapItem.setShowValue("true"); // 同步值
+        }
     }
 
 
-    public void deleteConfigScrip(ConfigItem configItemF,ConfigItem configItemS) {
+    public void deleteConfigScrip(ConfigItem configItemF,ConfigItem configItemS,ConfigItem configItemC) {
         deleteConfig(configItemF);
         deleteConfig(configItemS);
+        deleteConfig(configItemC);
     }
 
     public void deleteConfig(ConfigItem configItem) {
@@ -432,9 +437,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         saveConfig(this.selected);
     }
 
-    public void saveConfigScrap(ConfigItem configItemF,ConfigItem configItemS){
+    public void saveConfigScrap(ConfigItem configItemF,ConfigItem configItemS,ConfigItem configItemC){
         saveScrap(configItemF);
         saveScrap(configItemS);
+        saveScrap(configItemC);
         WebUtil.addErrorMessage("保存成功！");
     }
 

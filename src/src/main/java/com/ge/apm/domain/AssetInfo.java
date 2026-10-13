@@ -2447,14 +2447,14 @@ public class AssetInfo implements ChineseName, Serializable {
         if (depreciationLifecycle == null) {
             return null;
         }
-        return new Double(depreciationLifecycle) / 12.0;
+        return Math.round(new Double(depreciationLifecycle) / 12.0 * 100) / 100.0;
     }
 
     public void setDepreciationLifecycleInYear(Double lifecycle) {
         if (lifecycle == null) {
             this.depreciationLifecycle = null;
         } else {
-            this.depreciationLifecycle = new Double(lifecycle * 12).intValue();
+            this.depreciationLifecycle = (int) Math.round(lifecycle * 12);
         }
     }
 
