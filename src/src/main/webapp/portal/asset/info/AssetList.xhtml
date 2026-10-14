@@ -1360,6 +1360,7 @@
                     <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
 
                     <p:overlayPanel appendTo="AssetInfoListForm" widgetVar="varPanelAssetTypeGroupFilter" for=":AssetInfoListForm:datalist:btnAssetTypeGroupFilter" hideEffect="fade" dynamic="false" dismissable="false"
+                                    rendered="#{assetInfoListController.isShowColumn('assetTypeGroup')}"
                                     style="width:280px" modal="false">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:inputText id="assetTypeGroupFilterTextInput" value="#{assetInfoListController.assetTypeGroupFilterText}" style="width:75%;"/>
@@ -1369,7 +1370,7 @@
                             <p:tree id="assetTypeGroupFilterTreeInList" class="tree" style="width:98%;border:0;"
                                     value="#{assetInfoListController.assetTypeGroupFilterTree}" var="node" selectionMode="single">
                                 <p:ajax process="@this" event="select" listener="#{assetInfoListController.onAssetTypeGroupTreeNodeSelect}"
-                                        update=":AssetInfoListForm:datalist :AssetInfoListForm:datalist:assetTypeGroupFilterDisplay"
+                                        update=":AssetInfoListForm:datalist"
                                         oncomplete="PF('varPanelAssetTypeGroupFilter').show();"/>
                                 <p:ajax process="@this" event="expand"/>
                                 <p:ajax process="@this" event="collapse"/>
