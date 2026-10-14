@@ -108,6 +108,13 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     private final List<String> contractUploadFileFormatsOptions = Arrays.asList(
             "jpg","jpeg","png","pdf","doc","docx","xls","xlsx");
 
+    @Getter @Setter
+    private String hospitalGrade;
+    @Getter @Setter
+    private String cityCode;
+    @Getter @Setter
+    private String provinceCode;
+
     @Getter@Setter
     private ConfigItem selectedConfigItem;
     @Getter@Setter
@@ -161,6 +168,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         categoryMap.put(21,"院区间调剂");
         categoryMap.put(22,"使用科室筛选");
         categoryMap.put(23,"手术室绩效管理");
+        categoryMap.put(24,"文件上传控制");
         uploadFileFormatsSelected = new ArrayList<>(uploadFileFormatOptions);
         contractUploadFileFormatsSelected = new ArrayList<>(contractUploadFileFormatsOptions);
     }
@@ -230,7 +238,7 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
         }
         configItemList = page.getContent();
         for (ConfigItem configItem : configItemList) {
-            if ("assetScrap".equals(configItem.getKey()) || "showAssetScrapNo".equals(configItem.getKey()) ) {
+            if ("assetScrap".equals(configItem.getKey()) || "showAssetScrapNo".equals(configItem.getKey()) || "checkOrderWhenScrap".equals(configItem.getKey()) ) {
                 configItemMap.put(configItem.getKey(),configItem);
             }
             if ("assetUploadFileFormats".equals(configItem.getKey())) {
@@ -283,6 +291,10 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
                 ConfigItem configItem = configItemMap.get("setAssetOutStockDept");
                 selectedObjectMap.put("assetOutStockDept", orgInfoRepository.getByUid(configItem.getShowValue()));
                 assetOutStockDept = orgInfoRepository.getByUid(configItem.getShowValue());
+            }
+
+            if (category.equals("13")) {
+                loadHospitalInfoConfig();
             }
 
             if (category.equals("4")) {
@@ -438,9 +450,9 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
     }
 
     public void saveConfigScrap(ConfigItem configItemF,ConfigItem configItemS,ConfigItem configItemC){
-        saveScrap(configItemF);
-        saveScrap(configItemS);
-        saveScrap(configItemC);
+        if (configItemF != null) saveScrap(configItemF);
+        if (configItemS != null) saveScrap(configItemS);
+        if (configItemC != null) saveScrap(configItemC);
         WebUtil.addErrorMessage("保存成功！");
     }
 
@@ -1078,5 +1090,51 @@ public class SystemConfigItemController extends GenericCRUDUUIDController<Config
 
     public List<String> getUploadFileFormatOptions() {
         return uploadFileFormatOptions;
+    }
+
+    private void loadHospitalInfoConfig() {
+        ConfigItem configItem = configItemMap.get("hospitalInfoConfig");
+        if (configItem != null && StringUtils.isNotEmpty(configItem.getShowValue())) {
+            try {
+                JSONObject json = JSON.parseObject(configItem.getShowValue());
+                this.hospitalGrade = json.getString("hospitalGrade");
+                this.cityCode = json.getString("cityCode");
+                this.provinceCode = json.getString("provinceCode");
+            } catch (Exception e) {
+                logger.error("解析医院信息配置JSON失败", e);
+                this.hospitalGrade = null;
+                this.cityCode = null;
+                this.provinceCode = null;
+            }
+        } else {
+            this.hospitalGrade = null;
+            this.cityCode = null;
+            this.provinceCode = null;
+        }
+    }
+
+    public void saveHospitalInfoConfig() {
+        ConfigItem configItem = configItemMap.get("hospitalInfoConfig");
+        if (configItem == null) {
+            WebUtil.addErrorMessage("配置项不存在，请联系管理员！");
+            return;
+        }
+        JSONObject json = new JSONObject();
+        json.put("hospitalGrade", this.hospitalGrade);
+        json.put("cityCode", this.cityCode);
+        json.put("provinceCode", this.provinceCode);
+        configItem.setShowValue(json.toJSONString());
+        saveConfig(configItem);
+    }
+
+    public void deleteHospitalInfoConfig() {
+        ConfigItem configItem = configItemMap.get("hospitalInfoConfig");
+        if (configItem == null) {
+            return;
+        }
+        deleteConfig(configItem);
+        this.hospitalGrade = null;
+        this.cityCode = null;
+        this.provinceCode = null;
     }
 }

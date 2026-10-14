@@ -1636,7 +1636,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             List<V2_PmOrder> pmOrders = v2PmOrderRepository.findUnFinishedMvsOrderByAsset(uids);
             if (CollectionUtils.isNotEmpty(workOrders) || CollectionUtils.isNotEmpty(pmOrders)) {
                 logger.error("Assets have outstanding work orders");
-                nurseSiteMaintainIsComplete = true;
+                nurseSiteMaintainIsComplete = false;
                 workOrderList = workOrders.stream().map(V2_WorkOrder::getBusinessNumber).collect(Collectors.toList());
                 pmOrderList = pmOrders.stream().map(V2_PmOrder::getBusinessNumber).collect(Collectors.toList());
                 RequestContext requestContext = RequestContext.getCurrentInstance();
