@@ -1386,6 +1386,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         newSignature = true;
         workHoursList = null;
         selectedApproverUid = null;
+        currentStatus = 1;
+        displayTime = false;
     }
 
     public void onSelectWorkOrder() {
@@ -1758,6 +1760,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void prepareCompleteOrder(String woid) {
         approveFlag =false;
+        // 重置状态，防止上一次操作的残留值污染当前工单
+        currentStatus = 1;
+        displayTime = false;
         selectedWorkOrder = dao.findById(woid);
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
         hasConfigMultiLevelApproval = false;

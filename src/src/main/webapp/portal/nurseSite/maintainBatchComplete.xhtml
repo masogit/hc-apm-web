@@ -53,7 +53,7 @@
                     </h:panelGroup>
                     <!-- 新增签名按钮 -->
                     <h:panelGroup layout="block" style="text-align:center;margin-top:10px;">
-                        <p:commandButton value="新增签名" actionListener="#{maintainController.addBatchNewSignature()}" update=":maintainBatchCompleteForm" />
+                        <p:commandButton value="新增签名" actionListener="#{maintainController.addBatchNewSignature()}" update=":maintainBatchCompleteForm" oncomplete="PF('globalSig').clear();"/>
                     </h:panelGroup>
                 </h:panelGroup>
 

@@ -1516,7 +1516,8 @@ public class NurseSiteMaintainService {
 	public String saveMaintainSignature(String content, String id) {
 		V2_BlobObject blobObject = null;
 		try {
-			blobObject = blobFileService.uploadFileString(content);
+			InputStream inputStream = base64ToFile(content);
+			blobObject = blobFileService.uploadFile(inputStream, "signature.png");
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error(e.getMessage());
@@ -1524,7 +1525,7 @@ public class NurseSiteMaintainService {
 		}
 		if (null != blobObject) {
 			blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-			blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+			blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_SIGNATURE);
 			blobObject.setBoUuid(id);
 			blobFileService.saveBlobObject(blobObject);
 			return blobObject.getObjectStorageId();
@@ -1532,11 +1533,21 @@ public class NurseSiteMaintainService {
 			return null;
 		}
 	}
+    public InputStream base64ToFile(String base64Str)  {
+		// 去掉Data URL前缀（如果有的话）
+		if (base64Str.contains(",")) {
+			base64Str = base64Str.substring(base64Str.indexOf(",") + 1);
+		}
 
+		// 解码并写入文件
+		byte[] imageBytes = Base64.getDecoder().decode(base64Str);
+		return  new ByteArrayInputStream(imageBytes);
+	}
 	public String saveMaintainSignatureAttachment(String content, String maintainId) {
 		V2_BlobObject blobObject = null;
 		try {
-			blobObject = blobFileService.uploadFileString(content);
+			InputStream inputStream = base64ToFile(content);
+			blobObject = blobFileService.uploadFile(inputStream, "signature.png");
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 			return null;
