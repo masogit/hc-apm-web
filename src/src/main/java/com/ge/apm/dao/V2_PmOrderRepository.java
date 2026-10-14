@@ -184,6 +184,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 	@Query(nativeQuery = true,value = "select * from v2_pm_order where site_uid =?1 and pm_type=?2  and is_finished =?3")
     List<V2_PmOrder> findBySiteUidAndPmTypeAndIsFinished(String siteUid, int pmType, boolean status);
 
-	@Query(nativeQuery = true,value = "select t.* from v2_pm_order t where t.asset_uid in (?1) and t.is_finished = false AND EXISTS (SELECT 1 FROM mvs_ib_mapping m1 WHERE t.asset_uid = m1.mvs_ib_uid OR t.asset_uid = m1.e_home_ib_uid)")
+	// MVS工单：v2_pm_order.asset_uid = mvs_ib_mapping.mvs_ib_uid/e_home_ib_uid，mvs_ib_mapping.ib_uid = asset_info.uid
+	@Query(nativeQuery = true,value = "select t.* from v2_pm_order t where t.is_finished = false and EXISTS (SELECT 1 FROM mvs_ib_mapping m1 WHERE m1.ib_uid in (?1) AND (t.asset_uid = m1.mvs_ib_uid OR t.asset_uid = m1.e_home_ib_uid))")
 	List<V2_PmOrder> findUnFinishedMvsOrderByAsset(List<String> assetUidList);
 }
