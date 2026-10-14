@@ -154,6 +154,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         configCacheService = WebUtil.getBean(ConfigCacheService.class);
+        systemEventAuditAopAspect = WebUtil.getBean(SystemEventAuditAopAspect.class);
         ruleMap = new HashMap<>();
         this.selectedMap = new HashMap<>();
         this.currentPageAssets = new ArrayList<>();
@@ -462,7 +463,21 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             }
             deleteAssetUids.add(entry.getKey());
         }
+        UserAccount currentUser = UserContextService.getCurrentUserAccount();
         dao.deleteByAssetUids(deleteAssetUids);
+        try {
+            JSONObject eventData = new JSONObject();
+            eventData.put("action", "batchDelete");
+            eventData.put("deleteCount", deleteAssetUids.size());
+            eventData.put("assetUids", deleteAssetUids);
+            SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(
+                    currentUser, SystemEventAuditEnum.REL_RULE_ASSET_BATCH_DELETE,
+                    null, Boolean.TRUE, "",
+                    AuditBoTypeEnum.REL_RULE_ASSET.getBoType(), eventData.toJSONString());
+            systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
+        } catch (Exception e) {
+            logger.error("批量删除绑定-写入审计表失败", e);
+        }
         this.selectedMap.clear();
     }
 
@@ -683,9 +698,9 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
             eventData.put("fullDeleteCount", deleteRelRuleAsset.size());
             eventData.put("updateFieldCount", saveRelRuleAsset.size());
             SystemEventAudit systemEventAudit = systemEventAuditAopAspect.buildEventAudit(
-                    currentUser, SystemEventAuditEnum.PM_ORDER_RULE_UPDATE,
+                    currentUser, SystemEventAuditEnum.REL_RULE_ASSET_UNBIND,
                     null, Boolean.TRUE, "",
-                    AuditBoTypeEnum.PM_ORDER_RULE.getBoType(), eventData.toJSONString());
+                    AuditBoTypeEnum.REL_RULE_ASSET.getBoType(), eventData.toJSONString());
             systemEventAuditAopAspect.sendSystemAuditMessage(systemEventAudit);
         } catch (Exception e) {
             logger.error("解除绑定-写入审计表失败", e);
