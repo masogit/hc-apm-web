@@ -1359,7 +1359,7 @@
 
                     <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
 
-                    <p:overlayPanel appendTo="AssetInfoListForm" widgetVar="varPanelAssetTypeGroupFilter" for=":AssetInfoListForm:datalist:btnAssetTypeGroupFilter" hideEffect="fade" dynamic="false" dismissable="false"
+                    <p:overlayPanel rendered="#{assetInfoListController.customedColumns.contains('assetTypeGroup')}" appendTo="AssetInfoListForm" widgetVar="varPanelAssetTypeGroupFilter" for=":AssetInfoListForm:datalist:btnAssetTypeGroupFilter" hideEffect="fade" dynamic="false" dismissable="false"
                                     style="width:280px" modal="false">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:inputText id="assetTypeGroupFilterTextInput" value="#{assetInfoListController.assetTypeGroupFilterText}" style="width:75%;"/>
