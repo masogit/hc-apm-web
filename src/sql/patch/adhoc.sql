@@ -25,6 +25,8 @@ AS SELECT oi.uid AS tenant_uid,
            FROM i18n_type_manage intm_1
              JOIN i18n_message inm ON intm_1.msg_type::text = inm.msg_type::text
           GROUP BY inm.site_id, inm.msg_type) vmsg ON vmsg.msg_type::text = intm.msg_type::text AND vmsg.site_id = COALESCE(intmt.tenant_id, '-1'::integer);
+--YHAAO-29714 增加配置项医院的信息
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 13,  null, '医院信息配置，包含医院等级、城市编码、省编码', 'hospitalInfoConfig', '医院信息配置', 'f', 't', 1 where not exists(select * from config_item where key = 'hospitalInfoConfig');
 
 -- Step 2:  YHAAO-29471  一脉阳光-维修派单人选择逻辑优化  历史数据迁移（支持重复执行）
 DO $$
