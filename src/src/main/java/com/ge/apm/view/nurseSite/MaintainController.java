@@ -676,6 +676,26 @@ public class MaintainController implements ServerEventInterface{
 		showBatchSignaturePad = true;
 	}
 
+	public boolean isCanAddBatchSignature() {
+		return batchSignatureList == null || batchSignatureList.size() < MAX_SIGNATURE_COUNT;
+	}
+
+	public void deleteBatchSignature() {
+		if (batchSignatureList == null || batchSignatureList.isEmpty()) {
+			return;
+		}
+		batchSignatureList.remove(batchCurrentSignatureIndex);
+		if (batchSignatureList.isEmpty()) {
+			batchCurrentSignatureIndex = 0;
+			showBatchSignaturePad = true;
+			signatureContent = null;
+		} else {
+			if (batchCurrentSignatureIndex >= batchSignatureList.size()) {
+				batchCurrentSignatureIndex = batchSignatureList.size() - 1;
+			}
+		}
+	}
+
 	public StreamedContent getBatchCurrentSignatureImage() {
 		if (batchSignatureList == null || batchSignatureList.isEmpty()
 				|| batchCurrentSignatureIndex < 0 || batchCurrentSignatureIndex >= batchSignatureList.size()) {
