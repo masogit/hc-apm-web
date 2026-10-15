@@ -1576,6 +1576,16 @@ public class NurseSiteMaintainService {
 		);
 	}
 
+	public boolean deleteMaintainSignature(String blobId) {
+		try {
+			blobFileService.deleteBlobFileById(blobId);
+			return true;
+		} catch (Exception e) {
+			LOGGER.error("deleteMaintainSignature error: {}", e.getMessage());
+			return false;
+		}
+	}
+
 	public String getMaintainSignatureWeb(String signatureId) {
 		StreamedContent streamedContent = blobFileService.getBlobObjectByStorageId(signatureId);
 		InputStream input = streamedContent.getStream();

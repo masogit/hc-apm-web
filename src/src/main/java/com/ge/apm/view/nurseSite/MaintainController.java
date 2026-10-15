@@ -449,8 +449,8 @@ public class MaintainController implements ServerEventInterface{
 
 	public void saveMaintainSignature() {
 		if (StringUtils.isNotEmpty(signatureContent)) {
-			String objectStorageId = nurseSiteMaintainService.saveMaintainSignature(signatureContent, nurseSiteMaintain.getId());
-			nurseSiteMaintain.setSignatureId(objectStorageId);
+//			String objectStorageId = nurseSiteMaintainService.saveMaintainSignature(signatureContent, nurseSiteMaintain.getId());
+//			nurseSiteMaintain.setSignatureId(objectStorageId);
 			// 同时保存为新附件形式（多签名支持）
 			nurseSiteMaintainService.saveMaintainSignatureAttachment(signatureContent, nurseSiteMaintain.getId());
 			// 刷新签名列表并定位到最新签名，保持签名板可继续输入
@@ -550,6 +550,33 @@ public class MaintainController implements ServerEventInterface{
 		showSignaturePad = true;
 	}
 
+	private static final int MAX_SIGNATURE_COUNT = 6;
+
+	public boolean isCanAddSignature() {
+		return signatureList == null || signatureList.size() < MAX_SIGNATURE_COUNT;
+	}
+
+	public void deleteSignature() {
+		if (signatureList == null || signatureList.isEmpty()) {
+			return;
+		}
+
+		V2_BlobObject currentBlob = signatureList.get(currentSignatureIndex);
+		boolean deleted = nurseSiteMaintainService.deleteMaintainSignature(currentBlob.getId());
+		if (deleted) {
+			signatureList.remove(currentSignatureIndex);
+			if (signatureList.isEmpty()) {
+				currentSignatureContent = null;
+				showSignaturePad = true;
+			} else {
+				if (currentSignatureIndex >= signatureList.size()) {
+					currentSignatureIndex = signatureList.size() - 1;
+				}
+				loadCurrentSignatureImage();
+			}
+		}
+	}
+
 	public String getSignatureCountText() {
 		if (signatureList == null || signatureList.isEmpty()) {
 			return "";
@@ -647,6 +674,26 @@ public class MaintainController implements ServerEventInterface{
 	public void addBatchNewSignature() {
 		signatureContent = null;
 		showBatchSignaturePad = true;
+	}
+
+	public boolean isCanAddBatchSignature() {
+		return batchSignatureList == null || batchSignatureList.size() < MAX_SIGNATURE_COUNT;
+	}
+
+	public void deleteBatchSignature() {
+		if (batchSignatureList == null || batchSignatureList.isEmpty()) {
+			return;
+		}
+		batchSignatureList.remove(batchCurrentSignatureIndex);
+		if (batchSignatureList.isEmpty()) {
+			batchCurrentSignatureIndex = 0;
+			showBatchSignaturePad = true;
+			signatureContent = null;
+		} else {
+			if (batchCurrentSignatureIndex >= batchSignatureList.size()) {
+				batchCurrentSignatureIndex = batchSignatureList.size() - 1;
+			}
+		}
 	}
 
 	public StreamedContent getBatchCurrentSignatureImage() {

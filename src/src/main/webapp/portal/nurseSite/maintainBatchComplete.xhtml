@@ -51,9 +51,15 @@
                             <h:outputText value="&amp;gt;" escape="false" />
                         </p:commandLink>
                     </h:panelGroup>
-                    <!-- 新增签名按钮 -->
+                    <!-- 操作按钮栏：删除 + 新增签名 同一排 -->
                     <h:panelGroup layout="block" style="text-align:center;margin-top:10px;">
-                        <p:commandButton value="新增签名" actionListener="#{maintainController.addBatchNewSignature()}" update=":maintainBatchCompleteForm" oncomplete="PF('globalSig').clear();"/>
+                        <p:commandButton value="删除" actionListener="#{maintainController.deleteBatchSignature()}"
+                            update=":maintainBatchCompleteForm" style="margin-right:10px;" oncomplete="#{maintainController.hasBatchMultipleSignatures?'':'PF(\'globalSig\').clear();'}">
+                            <p:confirm header="确认删除" message="确定要删除当前签名吗？" icon="ui-icon-alert" />
+                        </p:commandButton>
+                        <p:commandButton value="新增签名" actionListener="#{maintainController.addBatchNewSignature()}"
+                            update=":maintainBatchCompleteForm" oncomplete="PF('globalSig').clear();"
+                            rendered="#{maintainController.canAddBatchSignature}" />
                     </h:panelGroup>
                 </h:panelGroup>
 
@@ -73,6 +79,10 @@
                 <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":messages" icon="ui-icon-check" oncomplete="PF('maintainBatchCompleteDialog').hide()" timeout="180000"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchCompleteDialog').hide()"/>
             </h:form>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="确定" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="取消" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
         </p:dialog>
     </ui:composition>
 </html>
