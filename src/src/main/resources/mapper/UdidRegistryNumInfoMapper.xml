@@ -77,4 +77,23 @@
         where registry_num = #{registryNum}
         ORDER BY updated_at DESC LIMIT 1
     </select>
+
+    <select id="fuzzySearch" resultType="com.ge.apm.domain.UdidRegistryNumInfo">
+        SELECT registry_num, product_name, ggxh, registrant_name, flbm
+        FROM udid_registry_num_info
+        <where>
+            <if test="registryNum != null and registryNum != ''">
+                and registry_num ilike CONCAT('%', #{registryNum}, '%')
+            </if>
+            <if test="registrantName != null and registrantName != ''">
+                and registrant_name ilike CONCAT('%', #{registrantName}, '%')
+            </if>
+            <if test="deviceName != null and deviceName != ''">
+                and product_name ilike CONCAT('%', #{deviceName}, '%')
+            </if>
+            <if test="devicePattern != null and devicePattern != ''">
+                and ggxh::text ilike CONCAT('%', #{devicePattern}, '%')
+            </if>
+        </where>
+    </select>
 </mapper>

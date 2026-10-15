@@ -672,6 +672,9 @@
                          requiredMessage="#{msg.registrationNo} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('registrationNo')}" >
                 <p:ajax />
             </p:inputText>
+
+            <p:commandButton id="udidButton" actionListener="#{assetInfoEditController.showUdidInfo()}" title="知识库参考"
+                             process="@this" update=":UdidInfoForm:display" oncomplete="PF('UdidInfoDlg').show()" icon="ui-icon-repeat"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'modalityId')}" >

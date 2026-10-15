@@ -31,6 +31,7 @@ import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.DataSourceEnum;
 import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
 import com.ge.healthcare.cn.common.onnx.RiskLevel;
@@ -71,6 +72,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.util.*;
@@ -165,6 +167,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     @Getter @Setter
     private Map<String,Boolean> useValue = new HashMap<>();
+    @Getter @Setter
+    private UdidInfoForm udidInfo;
 
     private FileDownloadService fileDownloadService;
     public List<String> managementListString(String query) {
@@ -312,6 +316,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private StreamedContent signatureContentStream;
     @Getter
     private ConfigItemService configItemService;
+    private UdidSearchService udidSearchService;
     @Getter
     private String signatureId;
     @Getter
@@ -416,6 +421,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
         configItemService = WebUtil.getBean(ConfigItemService.class);
+        udidSearchService = WebUtil.getBean(UdidSearchService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         approval = Boolean.parseBoolean((String) UrlEncryptController.getValueFromMap(encodeStr, "approval"));
@@ -2906,5 +2912,145 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public RiskLevel[] getRiskLevels() {
         return RiskLevel.values();
+    }
+
+    public void showUdidInfo() {
+        if (isCreateAction()) {
+            udidInfo = new UdidInfoForm();
+            udidInfo.setRegistrationNo(selected.getRegistrationNo());
+        }
+        if (isEditAction()) {
+            udidInfo = new UdidInfoForm();
+            udidInfo.setRegistrationNo(selected.getRegistrationNo());
+            udidInfo.setName(selected.getName());
+            udidInfo.setFunctionType(selected.getFunctionType());
+            udidInfo.setManufacture(selected.getManufacture());
+            udidInfo.setMedicalApparatusClassification(selected.getMedicalApparatusClassification());
+        }
+    }
+
+    public void applyUidInfo() {
+        if (StringUtils.isBlank(udidInfo.getRegistrationNo())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("registrationNo") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        if (StringUtils.isBlank(udidInfo.getName())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("name") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        if (customConfig.getAssetFields().get("functionType").isRequired() && StringUtils.isBlank(udidInfo.getFunctionType())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("functionType") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        selected.setRegistrationNo(udidInfo.getRegistrationNo());
+        selected.setName(udidInfo.getName());
+        selected.setFunctionType(udidInfo.getFunctionType());
+        selected.setManufacture(udidInfo.getManufacture());
+        selected.setMedicalApparatusClassification(udidInfo.getMedicalApparatusClassification());
+    }
+
+    public void checkUdid() {
+        int count = 0;
+        StringBuilder warnColumn = new StringBuilder();
+
+        UdidRegistryNumInfo udidRegistryNumInfo = udidSearchService.selectByRegistryNum(udidInfo.getRegistrationNo());
+
+        if (Objects.isNull(udidRegistryNumInfo)) {
+            udidInfo.setMessage("该注册证号在知识库中不存在！");
+            udidInfo.setRegistrationNoFromUdid(false);
+            udidInfo.setNameFromUdid(null);
+            udidInfo.setFunctionTypeFromUdid(null);
+            udidInfo.setManufactureFromUdid(null);
+            udidInfo.setMedicalApparatusClassificationFromUdid(null);
+        } else {
+            udidInfo.setRegistrationNoFromUdid(true);
+            if (!Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getName())) {
+                count++;
+                warnColumn.append("名称");
+                udidInfo.setNameFromUdid(false);
+            } else {
+                udidInfo.setNameFromUdid(true);
+            }
+            if (!UdidSearchService.parseJsonArrayToStringList(udidRegistryNumInfo.getGgxh()).contains(udidInfo.getFunctionType())) {
+                if (count > 0) {
+                    warnColumn.append("、");
+                }
+                count++;
+                warnColumn.append("设备型号");
+                udidInfo.setFunctionTypeFromUdid(false);
+            } else {
+                udidInfo.setFunctionTypeFromUdid(true);
+            }
+            if (!Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture())) {
+                if (count > 0) {
+                    warnColumn.append("、");
+                }
+                count++;
+                warnColumn.append("制造商");
+                udidInfo.setManufactureFromUdid(false);
+            } else {
+                udidInfo.setManufactureFromUdid(true);
+            }
+            if (!UdidSearchService.parseJsonArrayAndStripHyphens(udidRegistryNumInfo.getFlbm()).contains(udidInfo.getMedicalApparatusClassification())) {
+                if (count > 0) {
+                    warnColumn.append("、");
+                }
+                count++;
+                warnColumn.append("医疗器械分类");
+                udidInfo.setMedicalApparatusClassificationFromUdid(false);
+            } else {
+                udidInfo.setMedicalApparatusClassificationFromUdid(true);
+            }
+            if (count > 0) {
+                udidInfo.setMessage("检测到" + count + "个字段与知识库不一致（" + warnColumn + "）");
+            } else {
+                udidInfo.setMessage("校验与知识库一致");
+            }
+        }
+    }
+
+    public void resetUdid() {
+        udidInfo.setRegistrationNo(selected.getRegistrationNo());
+        udidInfo.setName(selected.getName());
+        udidInfo.setFunctionType(selected.getFunctionType());
+        udidInfo.setManufacture(selected.getManufacture());
+        udidInfo.setMedicalApparatusClassification(selected.getMedicalApparatusClassification());
+
+        udidInfo.setNameFromUdid(null);
+        udidInfo.setFunctionTypeFromUdid(null);
+        udidInfo.setManufactureFromUdid(null);
+        udidInfo.setManufactureFromUdid(null);
+        udidInfo.setMedicalApparatusClassificationFromUdid(null);
+        udidInfo.setMessage("");
+    }
+
+    public String groupByUdid(String s) {
+        return DataSourceEnum.UDID.getSourceName();
+    }
+
+    public String groupByValue(SelectItemDto object) {
+        return object.getValue();
+    }
+
+    public String groupByType(Supplier supplier) {
+        return supplier.getId() < 0 ? DataSourceEnum.UDID.getSourceName() : DataSourceEnum.APM.getSourceName();
+    }
+
+    public List<String> completeUdidRegistrationNo(String prefix) {
+        return udidSearchService.fuzzySearchRegistryNum(prefix, "", "", "");
+    }
+
+    public List<String> completeUdidAssetName(String prefix) {
+        return udidSearchService.fuzzySearchDeviceName(udidInfo.getRegistrationNo(), udidInfo.getManufacture(), prefix, udidInfo.getFunctionType());
+    }
+
+    public List<String> completeUdidFunctionType(String prefix) {
+        return udidSearchService.fuzzySearchDevicePattern(udidInfo.getRegistrationNo(), udidInfo.getManufacture(), udidInfo.getName(), prefix);
     }
 }

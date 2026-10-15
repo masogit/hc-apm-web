@@ -1,8 +1,7 @@
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.mapper.UdidDeviceCubeMapper;
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.mapper.UdidRegistryNumInfoMapper;
-import com.ge.apm.domain.UdidDeviceCube;
 import com.ge.apm.domain.UdidRegistryNumInfo;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -20,19 +19,22 @@ import java.util.stream.Collectors;
 public class UdidSearchService {
 
     @Autowired
-    private UdidDeviceCubeMapper udidDeviceCubeMapper;
-    @Autowired
     private UdidRegistryNumInfoMapper udidRegistryNumInfoMapper;
 
     /**
      * 模糊查询注册证号
+     *
+     * @param registryNum    注册证号
+     * @param registrantName 制造商
+     * @param deviceName     设备名称
+     * @param devicePattern  设备型号
      */
     public List<String> fuzzySearchRegistryNum(String registryNum, String registrantName,
                                                String deviceName, String devicePattern) {
 
-        List<UdidDeviceCube> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
         return result.stream()
-                .map(UdidDeviceCube::getRegistryNum)
+                .map(UdidRegistryNumInfo::getRegistryNum)
                 .filter(StringUtils::isNotBlank)
                 .distinct()
                 .sorted(String::compareTo)
@@ -41,13 +43,18 @@ public class UdidSearchService {
 
     /**
      * 模糊查询制造商
+     *
+     * @param registryNum    注册证号
+     * @param registrantName 制造商
+     * @param deviceName     设备名称
+     * @param devicePattern  设备型号
      */
     public List<String> fuzzySearchRegistrantName(String registryNum, String registrantName,
                                                   String deviceName, String devicePattern) {
 
-        List<UdidDeviceCube> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
         return result.stream()
-                .map(UdidDeviceCube::getRegistrantName)
+                .map(UdidRegistryNumInfo::getRegistrantName)
                 .filter(StringUtils::isNotBlank)
                 .distinct()
                 .sorted(String::compareTo)
@@ -56,13 +63,18 @@ public class UdidSearchService {
 
     /**
      * 模糊查询设备名称
+     *
+     * @param registryNum    注册证号
+     * @param registrantName 制造商
+     * @param deviceName     设备名称
+     * @param devicePattern  设备型号
      */
     public List<String> fuzzySearchDeviceName(String registryNum, String registrantName,
                                               String deviceName, String devicePattern) {
 
-        List<UdidDeviceCube> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
         return result.stream()
-                .map(UdidDeviceCube::getDeviceName)
+                .map(UdidRegistryNumInfo::getProductName)
                 .filter(StringUtils::isNotBlank)
                 .distinct()
                 .sorted(String::compareTo)
@@ -71,13 +83,20 @@ public class UdidSearchService {
 
     /**
      * 模糊查询设备型号
+     *
+     * @param registryNum    注册证号
+     * @param registrantName 制造商
+     * @param deviceName     设备名称
+     * @param devicePattern  设备型号
      */
     public List<String> fuzzySearchDevicePattern(String registryNum, String registrantName,
                                                  String deviceName, String devicePattern) {
 
-        List<UdidDeviceCube> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
         return result.stream()
-                .map(UdidDeviceCube::getDevicePattern)
+                .map(UdidRegistryNumInfo::getGgxh)
+                .filter(StringUtils::isNotBlank)
+                .flatMap(s -> parseJsonArrayToStringList(s).stream())
                 .filter(StringUtils::isNotBlank)
                 .distinct()
                 .sorted(String::compareTo)
@@ -86,19 +105,26 @@ public class UdidSearchService {
 
     /**
      * 模糊查询
+     *
+     * @param registryNum    注册证号
+     * @param registrantName 制造商
+     * @param deviceName     设备名称
+     * @param devicePattern  设备型号
      */
-    private List<UdidDeviceCube> fuzzySearch(String registryNum, String registrantName,
-                                             String deviceName, String devicePattern) {
+    private List<UdidRegistryNumInfo> fuzzySearch(String registryNum, String registrantName,
+                                                  String deviceName, String devicePattern) {
 
         if (StringUtils.isBlank(registryNum) && StringUtils.isBlank(registrantName)
                 && StringUtils.isBlank(deviceName) && StringUtils.isBlank(devicePattern)) {
             return Lists.newArrayList();
         }
-        return udidDeviceCubeMapper.fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        return udidRegistryNumInfoMapper.fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
     }
 
     /**
      * 查询注册证详情
+     *
+     * @param registryNum 注册证号
      */
     public UdidRegistryNumInfo selectByRegistryNum(String registryNum) {
 
@@ -106,5 +132,38 @@ public class UdidSearchService {
             return null;
         }
         return udidRegistryNumInfoMapper.selectByRegistryNum(registryNum);
+    }
+
+    /**
+     * 解析JSON数组字符串为字符串List
+     * 例如: ["TDP-L1", "TDP-L2", "TDP-L3"] -> List<String>
+     *
+     * @param jsonArray JSON数组字符串
+     * @return 字符串列表，输入无效时返回空列表
+     */
+    public static List<String> parseJsonArrayToStringList(String jsonArray) {
+        if (StringUtils.isBlank(jsonArray)) {
+            return Lists.newArrayList();
+        }
+        try {
+            return JSON.parseArray(jsonArray, String.class);
+        } catch (Exception e) {
+            log.warn("Failed to parse JSON array: {}", jsonArray, e);
+            return Lists.newArrayList();
+        }
+    }
+
+    /**
+     * 解析JSON数组字符串并去除元素中的连字符
+     * 例如: ["22-01-04"] -> ["220104"]
+     *
+     * @param jsonArray JSON数组字符串
+     * @return 去除连字符后的字符串列表，输入无效时返回空列表
+     */
+    public static List<String> parseJsonArrayAndStripHyphens(String jsonArray) {
+        return parseJsonArrayToStringList(jsonArray).stream()
+                .filter(StringUtils::isNotBlank)
+                .map(s -> s.replace("-", ""))
+                .collect(Collectors.toList());
     }
 }
