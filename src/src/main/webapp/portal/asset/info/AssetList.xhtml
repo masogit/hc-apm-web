@@ -1367,7 +1367,7 @@
                                     value="#{assetInfoListController.assetTypeGroupFilterTree}" var="node" selectionMode="single">
                                 <p:ajax process="@this" event="select" listener="#{assetInfoListController.onAssetTypeGroupTreeNodeSelect}"
                                         update=":AssetInfoListForm:datalist :AssetInfoListForm:datalist:filterAssetTypeGroup"
-                                        oncomplete="PF('varPanelAssetTypeGroupFilter').show();"/>
+                                        oncomplete="PF('varPanelAssetTypeGroupFilter').hide();"/>
                                 <p:ajax process="@this" event="expand"/>
                                 <p:ajax process="@this" event="collapse"/>
                                 <p:treeNode type="sysAuthGroup">
