@@ -6456,3 +6456,5 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'depreciationLifecycle', '折旧年限', 'Depreciation Lifecycle', NULL, '-1');
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DepreciationLifecycle', '折旧年限', 'Depreciation Lifecycle', NULL, '-1');
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'DepreciationLifecycle', '折旧年限', 'Depreciation Lifecycle', NULL, '-1');
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'manufactureNotExists', '该制造商在系统中不存在，请先新增该制造商', 'This manufacturer doesn''t exist in the system, please add this manufacturer first.', NULL, '-1');

@@ -22,7 +22,7 @@ public class UdisSupplierConverter implements Converter {
             SupplierRepository supplierDao = WebUtil.getBean(SupplierRepository.class);
             Supplier supplier = supplierDao.getBySiteIdAndName(siteId, value);
             if (supplier == null) {
-                // 来自NMPA的虚拟制造商，id为负数，在listener中根据此特征展示提示
+                // 来自NMPA的虚拟制造商，id为负数
                 supplier = new Supplier();
                 supplier.setName(value);
                 supplier.setId(-1);

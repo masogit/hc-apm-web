@@ -24,7 +24,7 @@ public class UdidInfoForm {
     private Boolean functionTypeFromUdid;
 
     // 制造商
-    private String manufacture;
+    private Supplier manufacture;
 
     // 制造商来自udid
     private Boolean manufactureFromUdid;
@@ -37,4 +37,31 @@ public class UdidInfoForm {
 
     // 知识库校验信息
     private String message;
+
+    public void fillValue(String registrationNo, String name, String functionType, Supplier manufacture, String medicalApparatusClassification) {
+        this.registrationNo = registrationNo;
+        this.name = name;
+        this.functionType = functionType;
+        this.manufacture = manufacture;
+        this.medicalApparatusClassification = medicalApparatusClassification;
+    }
+
+    public void clearValue() {
+        this.name = null;
+        this.functionType = null;
+        this.manufacture = null;
+        this.medicalApparatusClassification = null;
+    }
+
+    public void clearFlag() {
+        this.registrationNoFromUdid = null;
+        this.nameFromUdid = null;
+        this.functionTypeFromUdid = null;
+        this.manufactureFromUdid = null;
+        this.medicalApparatusClassificationFromUdid = null;
+    }
+
+    public void clearMessage() {
+        this.message = null;
+    }
 }

@@ -167,8 +167,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     @Getter @Setter
     private Map<String,Boolean> useValue = new HashMap<>();
-    @Getter @Setter
-    private UdidInfoForm udidInfo;
 
     private FileDownloadService fileDownloadService;
     public List<String> managementListString(String query) {
@@ -316,7 +314,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private StreamedContent signatureContentStream;
     @Getter
     private ConfigItemService configItemService;
-    private UdidSearchService udidSearchService;
     @Getter
     private String signatureId;
     @Getter
@@ -351,6 +348,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
     private String type=null;
+    @Getter @Setter
+    private UdidInfoForm udidInfo;
+    private UdidSearchService udidSearchService;
+    private SupplierService supplierService;
+    @Getter @Setter
+    private Supplier newUdidSupplier;
 
     @Override
     protected void init() {
@@ -422,6 +425,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTypeGroupTreeComponentController.registerController(this);
         configItemService = WebUtil.getBean(ConfigItemService.class);
         udidSearchService = WebUtil.getBean(UdidSearchService.class);
+        supplierService = WebUtil.getBean(SupplierService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         approval = Boolean.parseBoolean((String) UrlEncryptController.getValueFromMap(encodeStr, "approval"));
@@ -2924,7 +2928,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             udidInfo.setRegistrationNo(selected.getRegistrationNo());
             udidInfo.setName(selected.getName());
             udidInfo.setFunctionType(selected.getFunctionType());
-            udidInfo.setManufacture(selected.getManufacture());
+            udidInfo.setManufacture(supplierService.findSupplierById(selected.getManufactureId()));
             udidInfo.setMedicalApparatusClassification(selected.getMedicalApparatusClassification());
         }
     }
@@ -2948,10 +2952,27 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
+        if (Objects.nonNull(udidInfo.getManufacture()) && Objects.equals(-1, udidInfo.getManufacture().getId())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("manufactureNotExists"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        if (customConfig.getAssetFields().get("manufacture").isRequired() && Objects.isNull(udidInfo.getManufacture())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("manufacture") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
         selected.setRegistrationNo(udidInfo.getRegistrationNo());
         selected.setName(udidInfo.getName());
         selected.setFunctionType(udidInfo.getFunctionType());
-        selected.setManufacture(udidInfo.getManufacture());
+        if (Objects.nonNull(udidInfo.getManufacture())) {
+            selected.setManufacture(udidInfo.getManufacture().getName());
+            selected.setManufactureId(udidInfo.getManufacture().getId().toString());
+            selected.setManufactureTel(udidInfo.getManufacture().getTel());
+            selectedObjectMap.put("manufacturer", udidInfo.getManufacture());
+        }
         selected.setMedicalApparatusClassification(udidInfo.getMedicalApparatusClassification());
     }
 
@@ -2962,12 +2983,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         UdidRegistryNumInfo udidRegistryNumInfo = udidSearchService.selectByRegistryNum(udidInfo.getRegistrationNo());
 
         if (Objects.isNull(udidRegistryNumInfo)) {
-            udidInfo.setMessage("该注册证号在知识库中不存在！");
+            udidInfo.clearFlag();
             udidInfo.setRegistrationNoFromUdid(false);
-            udidInfo.setNameFromUdid(null);
-            udidInfo.setFunctionTypeFromUdid(null);
-            udidInfo.setManufactureFromUdid(null);
-            udidInfo.setMedicalApparatusClassificationFromUdid(null);
+            udidInfo.setMessage("该注册证号在知识库中不存在！");
         } else {
             udidInfo.setRegistrationNoFromUdid(true);
             if (!Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getName())) {
@@ -2987,7 +3005,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             } else {
                 udidInfo.setFunctionTypeFromUdid(true);
             }
-            if (!Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture())) {
+            if (Objects.isNull(udidInfo.getManufacture()) || !Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture().getName())) {
                 if (count > 0) {
                     warnColumn.append("、");
                 }
@@ -3016,41 +3034,107 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void resetUdid() {
-        udidInfo.setRegistrationNo(selected.getRegistrationNo());
-        udidInfo.setName(selected.getName());
-        udidInfo.setFunctionType(selected.getFunctionType());
-        udidInfo.setManufacture(selected.getManufacture());
-        udidInfo.setMedicalApparatusClassification(selected.getMedicalApparatusClassification());
-
-        udidInfo.setNameFromUdid(null);
-        udidInfo.setFunctionTypeFromUdid(null);
-        udidInfo.setManufactureFromUdid(null);
-        udidInfo.setManufactureFromUdid(null);
-        udidInfo.setMedicalApparatusClassificationFromUdid(null);
-        udidInfo.setMessage("");
+        AssetInfo currentAsset = null;
+        if (isEditAction()) {
+            currentAsset = assetInfoService.getAssetInfo(selected.getId());
+        }
+        if (Objects.nonNull(currentAsset)) {
+            udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
+                    supplierService.findSupplierById(selected.getManufactureId()), selected.getMedicalApparatusClassification());
+        } else {
+            udidInfo.clearValue();
+        }
+        udidInfo.clearFlag();
+        udidInfo.clearMessage();
     }
 
     public String groupByUdid(String s) {
         return DataSourceEnum.UDID.getSourceName();
     }
 
-    public String groupByValue(SelectItemDto object) {
-        return object.getValue();
-    }
-
-    public String groupByType(Supplier supplier) {
-        return supplier.getId() < 0 ? DataSourceEnum.UDID.getSourceName() : DataSourceEnum.APM.getSourceName();
+    public String groupBySource(Supplier supplier) {
+        return supplier.isFromUdid() ? DataSourceEnum.UDID.getSourceName() : DataSourceEnum.APM.getSourceName();
     }
 
     public List<String> completeUdidRegistrationNo(String prefix) {
-        return udidSearchService.fuzzySearchRegistryNum(prefix, "", "", "");
+        return udidSearchService.fuzzySearchRegistryNum(prefix);
     }
 
     public List<String> completeUdidAssetName(String prefix) {
-        return udidSearchService.fuzzySearchDeviceName(udidInfo.getRegistrationNo(), udidInfo.getManufacture(), prefix, udidInfo.getFunctionType());
+        return udidSearchService.fuzzySearchDeviceName(udidInfo.getRegistrationNo(), prefix);
     }
 
     public List<String> completeUdidFunctionType(String prefix) {
-        return udidSearchService.fuzzySearchDevicePattern(udidInfo.getRegistrationNo(), udidInfo.getManufacture(), udidInfo.getName(), prefix);
+        return udidSearchService.fuzzySearchDevicePattern(udidInfo.getRegistrationNo(), prefix);
+    }
+
+    public List<Supplier> completeUdidManufacture(String query) {
+        // apm供应商
+        List<Supplier> apmSupplierList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID(), query, 1000);
+
+        // udid供应商
+        List<String> udidSupplierNameList = udidSearchService.fuzzySearchRegistrantName(udidInfo.getRegistrationNo(), query);
+
+        // 构造NMPA制造商列表
+        List<Supplier> udidSupplierList = udidSupplierNameList.stream()
+                .map(name -> {
+                    Supplier supplier = new Supplier();
+                    Supplier apmSupplier = supplierDao.findByManufacturerTAndTenantUIDAndName(loginUser.getTenantUID(), name);
+                    supplier.setId(Objects.isNull(apmSupplier) ? -1 : apmSupplier.getId());
+                    supplier.setFromUdid(true);
+                    supplier.setName(name);
+                    supplier.setName(name);
+                    return supplier;
+                }).collect(Collectors.toList());
+
+        // 合并两个列表
+        udidSupplierList.addAll(apmSupplierList);
+        return udidSupplierList;
+    }
+
+    public void onUdidRegistrationNoSelect(AjaxBehaviorEvent event) {
+        log.info("before: {}", selected.getRegistrationNo());
+        log.info("after: {}", udidInfo.getRegistrationNo());
+
+        if (event instanceof SelectEvent) {
+            log.info("selected: {}", ((SelectEvent) event).getObject());
+            udidInfo.setRegistrationNo((String) ((SelectEvent) event).getObject());
+        }
+
+        if (!Objects.equals(selected.getRegistrationNo(), udidInfo.getRegistrationNo())) {
+            udidInfo.clearValue();
+            udidInfo.clearFlag();
+            udidInfo.clearMessage();
+        }
+    }
+
+    public void prepareCreateUdidSupplier() {
+        String supplierName = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("supplierName");
+
+        newUdidSupplier = new Supplier();
+        newUdidSupplier.setName(supplierName);
+        newUdidSupplier.setManufacturerT(true);
+    }
+
+    public void saveNewUdidSupplier() {
+        if (null == newUdidSupplier.getId()) {
+            this.newUdidSupplier.setSiteId(loginUser.getSiteId());
+            this.newUdidSupplier.setHospitalId(loginUser.getHospitalId());
+            this.newUdidSupplier.setTenantUID(loginUser.getTenantUID());
+            this.newUdidSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+            this.newUdidSupplier.setHospitalUID(loginUser.getHospitalUID());
+            this.newUdidSupplier.setSiteUID(loginUser.getSiteUID());
+            this.newUdidSupplier.setCreatedDate(new Date());
+            this.newUdidSupplier.setCreatedBy(loginUser.getName());
+        }
+        supplierController.setSelected(newUdidSupplier);
+        supplierController.saveSubmit();
+
+        newUdidSupplier = supplierDao.findByManufacturerTAndTenantUIDAndName(loginUser.getTenantUID(), newUdidSupplier.getName());
+
+        udidInfo.setManufacture(newUdidSupplier);
     }
 }

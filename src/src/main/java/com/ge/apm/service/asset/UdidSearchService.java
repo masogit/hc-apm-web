@@ -24,15 +24,11 @@ public class UdidSearchService {
     /**
      * 模糊查询注册证号
      *
-     * @param registryNum    注册证号
-     * @param registrantName 制造商
-     * @param deviceName     设备名称
-     * @param devicePattern  设备型号
+     * @param registryNum 注册证号
      */
-    public List<String> fuzzySearchRegistryNum(String registryNum, String registrantName,
-                                               String deviceName, String devicePattern) {
+    public List<String> fuzzySearchRegistryNum(String registryNum) {
 
-        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", "", "");
         return result.stream()
                 .map(UdidRegistryNumInfo::getRegistryNum)
                 .filter(StringUtils::isNotBlank)
@@ -46,13 +42,10 @@ public class UdidSearchService {
      *
      * @param registryNum    注册证号
      * @param registrantName 制造商
-     * @param deviceName     设备名称
-     * @param devicePattern  设备型号
      */
-    public List<String> fuzzySearchRegistrantName(String registryNum, String registrantName,
-                                                  String deviceName, String devicePattern) {
+    public List<String> fuzzySearchRegistrantName(String registryNum, String registrantName) {
 
-        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, "", "");
         return result.stream()
                 .map(UdidRegistryNumInfo::getRegistrantName)
                 .filter(StringUtils::isNotBlank)
@@ -64,15 +57,12 @@ public class UdidSearchService {
     /**
      * 模糊查询设备名称
      *
-     * @param registryNum    注册证号
-     * @param registrantName 制造商
-     * @param deviceName     设备名称
-     * @param devicePattern  设备型号
+     * @param registryNum 注册证号
+     * @param deviceName  设备名称
      */
-    public List<String> fuzzySearchDeviceName(String registryNum, String registrantName,
-                                              String deviceName, String devicePattern) {
+    public List<String> fuzzySearchDeviceName(String registryNum, String deviceName) {
 
-        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", deviceName, "");
         return result.stream()
                 .map(UdidRegistryNumInfo::getProductName)
                 .filter(StringUtils::isNotBlank)
@@ -84,20 +74,19 @@ public class UdidSearchService {
     /**
      * 模糊查询设备型号
      *
-     * @param registryNum    注册证号
-     * @param registrantName 制造商
-     * @param deviceName     设备名称
-     * @param devicePattern  设备型号
+     * @param registryNum   注册证号
+     * @param devicePattern 设备型号
      */
-    public List<String> fuzzySearchDevicePattern(String registryNum, String registrantName,
-                                                 String deviceName, String devicePattern) {
+    public List<String> fuzzySearchDevicePattern(String registryNum, String devicePattern) {
 
-        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", "", devicePattern);
         return result.stream()
                 .map(UdidRegistryNumInfo::getGgxh)
                 .filter(StringUtils::isNotBlank)
                 .flatMap(s -> parseJsonArrayToStringList(s).stream())
                 .filter(StringUtils::isNotBlank)
+                // 支持输入筛选
+                .filter(s -> StringUtils.isBlank(devicePattern) || s.toLowerCase().contains(devicePattern.toLowerCase()))
                 .distinct()
                 .sorted(String::compareTo)
                 .collect(Collectors.toList());
