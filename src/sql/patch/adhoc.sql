@@ -100,3 +100,7 @@ WHERE wc.tenant_uid = v_tenant_uid
 
 END LOOP;
 END $$;
+
+
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, '6', '生命时间轴分页数量设置', 'eventTimeLinePageSet', '生命时间轴分页数量设置', 'f', 't', 2 where not exists (select * from config_item where key = 'eventTimeLinePageSet');
