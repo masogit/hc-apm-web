@@ -1687,7 +1687,7 @@ public class MultiLevelApprovalService extends MicroServiceInvoker {
         if (ApprovalConstant.SCRAP_STATUS_SUCCESS.equals(status)   ) {
             if (assetScrap.getResolveOrder() != null && assetScrap.getResolveOrder()) {
                 // 处理维修，保养，盘点，日常检查，科室借调，调剂
-                assetScrapService.autoResolve(assetScrap.getAssetId());
+                assetScrapService.autoResolve(assetScrap.getAssetId(), assetScrap.getResolverId());
             }
 
             UserAccount applyUser = userAccountRepository.getByUid(assetScrap.getRequestUserUid());

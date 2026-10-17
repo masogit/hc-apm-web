@@ -684,6 +684,11 @@ public class AssetFileImportBaseService {
             isCreate = true;
         }
 
+        // 设备32分类 - 不允许通过导入修改，更新时保持原值
+        if (!isCreate && dbAsset != null) {
+            newAsset.setAssetClassification32(dbAsset.getAssetClassification32());
+        }
+
         // 如果租户开启资产分类，导入资产分类为空，则默认赋值第一个分类
         if (UserContextService.getCurrentUserAccount().isEnableAssetTypeGroup() && ObjectUtil.isEmpty(newAsset.getAssetType())) {
             if (assetTypeGroupList.isEmpty()) {
@@ -795,6 +800,9 @@ public class AssetFileImportBaseService {
             } else {
                 newAsset.setCreatedDate(new Date()); // 使用当前日期
             }
+
+            // 规则3: 设备32分类 - 不允许通过导入修改，保持原值
+            newAsset.setAssetClassification32(dbAsset.getAssetClassification32());
         } else {
             // 对于新资产，如果没有设置创建日期，则使用当前日期
             if (newAsset.getCreatedDate() == null) {

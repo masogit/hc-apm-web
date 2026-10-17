@@ -116,12 +116,16 @@
 									</p:commandLink>
 								</h:panelGroup>
 							</h:panelGroup>
-							<!-- 新增签名按钮 -->
-							<h:panelGroup rendered="#{maintainController.currentSignatureContent != null and !maintainController.showSignaturePad and userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}">
-								<h:panelGroup layout="block" style="text-align:center;margin-top:10px;">
-									<p:commandButton value="新增签名" actionListener="#{maintainController.addNewSignature()}"
-										update=":signatureForm signatureContent" oncomplete="PF('sig').clear();" />
-								</h:panelGroup>
+							<!-- 操作按钮栏：删除 + 新增签名 同一排 -->
+							<h:panelGroup layout="block" style="text-align:center;margin-top:10px;"
+								rendered="#{maintainController.currentSignatureContent != null and !maintainController.showSignaturePad and userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}">
+								<p:commandButton value="删除" actionListener="#{maintainController.deleteSignature()}"
+									update=":signatureForm signatureContent" style="margin-right:10px;" oncomplete="#{maintainController.hasMultipleSignatures?'':'PF(\'sig\').clear();'}">
+									<p:confirm header="确认删除" message="确定要删除当前签名吗？" icon="ui-icon-alert" />
+								</p:commandButton>
+								<p:commandButton value="新增签名" actionListener="#{maintainController.addNewSignature()}"
+									update=":signatureForm signatureContent" oncomplete="PF('sig').clear();"
+									rendered="#{maintainController.canAddSignature}" />
 							</h:panelGroup>
 							<!-- 签名板区域：新增签名时或无多签名时显示 -->
 							<h:panelGroup rendered="#{maintainController.signatureContentWeiXin==null and maintainController.currentSignatureContent==null or maintainController.showSignaturePad}">
@@ -138,7 +142,18 @@
 							rendered="#{(maintainController.blnWebSignatureEidt or maintainController.showSignaturePad) and userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}"/>
 						<p:commandButton value="重写" actionListener="#{maintainController.resetMaintainSignature()}" update=":signatureForm:signatureContent"
 							oncomplete="PF('sig').clear()" rendered="#{(maintainController.blnWebSignatureEidt or maintainController.showSignaturePad) and userContextService.accessContainsFunctionMenu('NURSESITE_CHECK')}" />
-						<p:commandButton value="关闭" oncomplete="PF('signatureDlg').hide();" />
+						<p:commandButton value="关闭"  onclick="close1()" update=":signatureForm"/>
+						<script>
+							function close1(){
+								PF('sig').clear();
+								PF('signatureDlg').hide();
+							}
+
+						</script>
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+							<p:commandButton value="确定" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+							<p:commandButton value="取消" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+						</p:confirmDialog>
 					</h:form>
 				</p:dialog>
 				

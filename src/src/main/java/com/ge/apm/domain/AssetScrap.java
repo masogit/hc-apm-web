@@ -139,6 +139,10 @@ public class AssetScrap implements Serializable , ApprovableTarget {
     @Column(name = "resolve_order")
     private Boolean resolveOrder = false;
 
+    // 报废申请提交人的ID（维修，保养，日常检查，盘点）
+    @Column(name = "resolver_id")
+    private Integer resolverId;
+
     public AssetScrap() {
     }
 
@@ -444,5 +448,13 @@ public class AssetScrap implements Serializable , ApprovableTarget {
 
     public void setResolveOrder(Boolean resolveOrder) {
         this.resolveOrder = resolveOrder;
+    }
+
+    public Integer getResolverId() {
+        return resolverId;
+    }
+
+    public void setResolverId(Integer resolverId) {
+        this.resolverId = resolverId;
     }
 }
