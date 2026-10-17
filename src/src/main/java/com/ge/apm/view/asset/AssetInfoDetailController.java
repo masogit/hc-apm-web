@@ -618,7 +618,7 @@ public class AssetInfoDetailController {
                 ;
                 url = contextPath + "/portal/woMgr/mvs/woMvsMgrViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
             }
-        }else if("maintenance".equals(type)){
+        }else if("inspection".equals(type) || "secondMaintenance".equals(type) || "thirdMaintenance".equals(type) || "qualityControl".equals(type)){
             V2_PmOrder pmOrder = pmOrderRepository.findById(uid);
             if(checkMvsData(pmOrder.getAssetUid()).equals("0")){
                 String encodeUrlQueryString = "actionName=View&selectedid="
