@@ -359,6 +359,26 @@
                 <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('eventTimeLinePageSet'))}" update="configItemForm" style="padding:10px"
                                disabled="#{systemConfigItemController.configItemMap.get('eventTimeLinePageSet').configItemValue == null}"/>
             </h:panelGroup>
+
+
+            <h:panelGroup>
+                <label class="label">#{systemConfigItemController.configItemMap.get('timeLineShowCards').name.concat('(').concat(systemConfigItemController.configItemMap.get('timeLineShowCards').key).concat(')')}</label>
+
+                <p:selectManyMenu value="#{systemConfigItemController.multiSelectedMap.timeLineShowCards}" showCheckbox="true" collectionType="java.util.ArrayList" style="width: 95%;">
+                    <f:selectItems value="#{systemConfigItemController.configItemMap.get('timeLineShowCards').enumList}" var="item" itemLabel="#{item.get('key')}" itemValue="#{item.get('value')}" />
+                </p:selectManyMenu>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.ConfigItemDesc}</label>
+                <p:inputTextarea value="#{systemConfigItemController.configItemMap.get('timeLineShowCards').description}" rows="1" cols="50" style="width: 50%;max-height:300px;overflow:scroll;" readonly="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">#{msg.Operation}</label>
+                <p:commandLink value="#{msg.Update}" actionListener="#{systemConfigItemController.saveConfig(systemConfigItemController.configItemMap.get('timeLineShowCards'))}" update="configItemForm" />
+                <p:commandLink value="#{msg.Delete}" actionListener="#{systemConfigItemController.deleteConfig(systemConfigItemController.configItemMap.get('timeLineShowCards'))}" update="configItemForm" style="padding:10px"
+                               disabled="#{systemConfigItemController.configItemMap.get('timeLineShowCards').configItemValue == null}"/>
+            </h:panelGroup>
+
         </p:panelGrid>
     </ui:composition>
 
