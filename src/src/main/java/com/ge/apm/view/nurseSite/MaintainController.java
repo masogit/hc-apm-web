@@ -22,6 +22,7 @@ import org.primefaces.model.ScheduleModel;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -73,6 +74,7 @@ public class MaintainController implements ServerEventInterface{
 	private List<OrgInfo> checkListParentOrgInfo;
 	// inner
 	private String signatureContent;
+	private String signatureContentNew;
 	private StreamedContent signatureContentStream;
 	private StreamedContent signatureContentWeiXin;
 	private boolean blnWebSignatureEidt;
@@ -103,6 +105,14 @@ public class MaintainController implements ServerEventInterface{
 
 	private String selectedStatus;
 
+	private List<String> signatureListNew = new ArrayList<>();
+
+	private int currentSignatureIndexNew;
+	private StreamedContent currentSignatureContentNew;
+
+	private boolean showSignaturePadNew;
+
+	private int signatureCount;
 	@PostConstruct
 	protected void init() {
 		uaaService = WebUtil.getBean(UaaService.class);
@@ -355,10 +365,34 @@ public class MaintainController implements ServerEventInterface{
 	public void saveMaintain() {
 		if(!checkRequired())return;
 		Date currentDate = new Date();
-		if (nurseSiteMaintainService.saveMaintain(nurseSiteMaintain, currentDate, currentUser)) {
+		// 将签名窗口中收集的base64签名转换为V2_BlobObject传递给service
+		List<V2_BlobObject> sigsToSave = null;
+		if (signatureListNew != null && !signatureListNew.isEmpty()) {
+			sigsToSave = new ArrayList<>();
+			for (String base64 : signatureListNew) {
+				if (StringUtils.isNotEmpty(base64)) {
+					V2_BlobObject blob = nurseSiteMaintainService.saveMaintainSignature(base64);
+					if (blob != null) {
+						sigsToSave.add(blob);
+					}
+				}
+			}
+		}
+		if (nurseSiteMaintainService.saveMaintain(nurseSiteMaintain, currentDate, currentUser, sigsToSave)) {
 			lazyEventModel.updateEvent(event);
 			addMessage("工单已保存");
 		}
+	}
+
+	/**
+	 * 重置签名弹窗状态，在显示签名窗口前调用
+	 */
+	public void resetSignatureDialog() {
+		signatureListNew = new ArrayList<>();
+		signatureContentNew = null;
+		showSignaturePadNew = false;
+		currentSignatureIndexNew = 0;
+		currentSignatureContentNew = null;
 	}
 	private boolean checkRequired(){
 		checkRequired = Boolean.TRUE;
@@ -451,12 +485,14 @@ public class MaintainController implements ServerEventInterface{
 		if (StringUtils.isNotEmpty(signatureContent)) {
 //			String objectStorageId = nurseSiteMaintainService.saveMaintainSignature(signatureContent, nurseSiteMaintain.getId());
 //			nurseSiteMaintain.setSignatureId(objectStorageId);
-			// 同时保存为新附件形式（多签名支持）
-			nurseSiteMaintainService.saveMaintainSignatureAttachment(signatureContent, nurseSiteMaintain.getId());
+//			// 同时保存为新附件形式（多签名支持）
+//			nurseSiteMaintainService.saveMaintainSignatureAttachment(signatureContent, nurseSiteMaintain.getId());
+			V2_BlobObject v2BlobObject = nurseSiteMaintainService.saveMaintainSignature(signatureContent);
 			// 刷新签名列表并定位到最新签名，保持签名板可继续输入
 			signatureContent = null;
 			signatureContentStream = null;
-			loadSignatureList();
+//			loadSignatureList();
+			signatureList.add(v2BlobObject);
 			if (signatureList != null && !signatureList.isEmpty()) {
 				currentSignatureIndex = signatureList.size() - 1;
 				loadCurrentSignatureImage();
@@ -464,6 +500,12 @@ public class MaintainController implements ServerEventInterface{
 			showSignaturePad = false;
 		}
 	}
+	 public void saveMaintainSignatureNew(){
+		 if (StringUtils.isNotEmpty(signatureContentNew)) {
+			 signatureListNew.add(signatureContentNew);
+			 showSignaturePadNew = true;
+		}
+	 }
 
 	public void getMaintainSignature(String signatureId, Integer signatureSourceType) {
 		signatureContent = null;
@@ -530,10 +572,21 @@ public class MaintainController implements ServerEventInterface{
 		}
 	}
 
+	public void nextSignatureNew() {
+		if (signatureListNew != null && currentSignatureIndexNew < signatureListNew.size() - 1) {
+			currentSignatureIndexNew++;
+		}
+	}
+
 	public void previousSignature() {
 		if (signatureList != null && currentSignatureIndex > 0) {
 			currentSignatureIndex--;
 			loadCurrentSignatureImage();
+		}
+	}
+	public void previousSignatureNew() {
+		if (signatureListNew != null && currentSignatureIndexNew > 0) {
+			currentSignatureIndexNew--;
 		}
 	}
 
@@ -543,6 +596,12 @@ public class MaintainController implements ServerEventInterface{
 			loadCurrentSignatureImage();
 		}
 	}
+	public void selectSignatureNew(int index) {
+		if (signatureListNew != null && index >= 0 && index < signatureListNew.size()) {
+			currentSignatureIndexNew = index;
+		}
+	}
+
 
 	public void addNewSignature() {
 		signatureContent = null;
@@ -550,11 +609,21 @@ public class MaintainController implements ServerEventInterface{
 		showSignaturePad = true;
 	}
 
+	public void addNewSignatureNew() {
+		signatureContentNew = null;
+		showSignaturePadNew = false;
+	}
+
 	private static final int MAX_SIGNATURE_COUNT = 6;
 
 	public boolean isCanAddSignature() {
 		return signatureList == null || signatureList.size() < MAX_SIGNATURE_COUNT;
 	}
+
+	public boolean isCanAddSignatureNew() {
+		return signatureListNew == null || signatureListNew.size() < MAX_SIGNATURE_COUNT;
+	}
+
 
 	public void deleteSignature() {
 		if (signatureList == null || signatureList.isEmpty()) {
@@ -576,6 +645,24 @@ public class MaintainController implements ServerEventInterface{
 			}
 		}
 	}
+	public void deleteSignatureNew() {
+		if (signatureListNew == null || signatureListNew.isEmpty()) {
+			return;
+		}
+
+		String context = signatureListNew.get(currentSignatureIndexNew);
+		signatureListNew.remove(currentSignatureIndexNew);
+		if (signatureListNew.isEmpty()) {
+			currentSignatureContentNew = null;
+			showSignaturePadNew = false;
+			signatureContentNew = null;
+		} else {
+			if (currentSignatureIndexNew >= signatureListNew.size()) {
+				currentSignatureIndexNew = signatureListNew.size() - 1;
+			}
+		}
+	}
+
 
 	public String getSignatureCountText() {
 		if (signatureList == null || signatureList.isEmpty()) {
@@ -583,21 +670,38 @@ public class MaintainController implements ServerEventInterface{
 		}
 		return "签名 " + (currentSignatureIndex + 1) + "/" + signatureList.size();
 	}
-
-	public int getSignatureCount() {
-		return signatureList == null ? 0 : signatureList.size();
+	public String getSignatureCountTextNew() {
+		if (signatureListNew == null || signatureListNew.isEmpty()) {
+			return "";
+		}
+		return "签名 " + (currentSignatureIndexNew + 1) + "/" + signatureListNew.size();
 	}
+
+
 
 	public boolean isHasMultipleSignatures() {
 		return signatureList != null && signatureList.size() > 1;
 	}
 
+	public boolean isHasMultipleSignaturesNew() {
+		return signatureListNew != null && signatureListNew.size() > 1;
+	}
+
+
 	public boolean isHasPreviousSignature() {
 		return signatureList != null && currentSignatureIndex > 0;
 	}
 
+	public boolean isHasPreviousSignatureNew() {
+		return signatureListNew != null && currentSignatureIndexNew > 0;
+	}
+
 	public boolean isHasNextSignature() {
 		return signatureList != null && currentSignatureIndex < signatureList.size() - 1;
+	}
+
+	public boolean isHasNextSignatureNew() {
+		return signatureListNew != null && currentSignatureIndexNew < signatureListNew.size() - 1;
 	}
 
 	public boolean isShowSignaturePad() {
@@ -611,6 +715,10 @@ public class MaintainController implements ServerEventInterface{
 	public void resetMaintainSignature() {
 		signatureContent = null;
 		signatureContentStream = null;
+	}
+
+	public void resetMaintainSignatureNew() {
+		signatureContentNew = null;
 	}
 
 	public void resetBatchSignatures() {
@@ -711,6 +819,22 @@ public class MaintainController implements ServerEventInterface{
 			return null;
 		}
 	}
+	public StreamedContent getBatchCurrentSignatureImageNew() {
+		if (signatureListNew == null || signatureListNew.isEmpty()
+				|| currentSignatureIndexNew < 0 || currentSignatureIndexNew >= signatureListNew.size()) {
+			return null;
+		}
+		try {
+			String base64 = signatureListNew.get(currentSignatureIndexNew);
+			DefaultStreamedContent streamedContent = new DefaultStreamedContent();
+			streamedContent.setStream(new ByteArrayInputStream(ImageUtils.convertPrimefacesBase64ToByte(base64)));
+			return streamedContent;
+		} catch (Exception e) {
+			LOGGER.error("getBatchCurrentSignatureImage error: {}", e.getMessage());
+			return null;
+		}
+	}
+
 
 	public boolean isShowBatchSignaturePad() {
 		return showBatchSignaturePad;
@@ -749,6 +873,9 @@ public class MaintainController implements ServerEventInterface{
 		nurseSiteMaintain = nurseSiteMaintainService.findByIds(Collections.singleton(((NurseSiteMaintain) event.getData()).getId())).get(0);
 		// generateNurseSiteMaintainData();
 		maintainItemController.reset(nurseSiteMaintain, this);
+		List<V2_BlobObject> attachmentSignatures = nurseSiteMaintainService.findMaintainSignatures(nurseSiteMaintain.getId());
+		signatureCount = attachmentSignatures.size();
+		signatureContentNew = null;
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
@@ -979,11 +1106,26 @@ public class MaintainController implements ServerEventInterface{
 			// 保存所有签名为附件（多签名支持）
 			if (!allSignatures.isEmpty()) {
 				for (NurseSiteMaintain wo : listNewNurseSiteMaintain) {
+					List<NurseSiteMaintainItem> maintainItemByParentId = nurseSiteMaintainService.findMaintainItemByParentId(wo.getId());
 					for (String sig : allSignatures) {
-						nurseSiteMaintainService.saveMaintainSignatureAttachment(sig, wo.getId());
+							nurseSiteMaintainService.saveMaintainSignatureAttachment(sig, wo.getId());
+					}
+					List<V2_BlobObject> maintainSignatures = nurseSiteMaintainService.findMaintainSignatures(wo.getId());
+					if(!CollectionUtils.isEmpty(maintainItemByParentId)){
+						for (NurseSiteMaintainItem nurseSiteMaintainItem : maintainItemByParentId) {
+							List<V2_BlobObject> collect = maintainSignatures.stream().map(item -> {
+								V2_BlobObject v2BlobObject = new V2_BlobObject();
+								BeanUtils.copyProperties(item, v2BlobObject);
+								v2BlobObject.setId(null);
+								v2BlobObject.setBoUuid(nurseSiteMaintainItem.getId());
+								return v2BlobObject;
+							}).collect(Collectors.toList());
+							nurseSiteMaintainService.saveBlobObjects(collect);
+						}
 					}
 				}
 			}
+
 			Set<String> clinicalDeptSet = listNewNurseSiteMaintain.stream().map(NurseSiteMaintain::getClinicalDeptUID).collect(Collectors.toSet());
 			for (String clinicalDeptUid : clinicalDeptSet) {
 				nurseSiteMaintainService.addBatchJob("complete", null, startBatchDate, endBatchDate, currentUser.getUid(),
@@ -1286,4 +1428,52 @@ public class MaintainController implements ServerEventInterface{
 	public int getBatchCurrentSignatureIndex() {
 		return batchCurrentSignatureIndex;
 	}
+
+	public String getSignatureContentNew() {
+		return signatureContentNew;
+	}
+
+	public void setSignatureContentNew(String signatureContentNew) {
+		this.signatureContentNew = signatureContentNew;
+	}
+
+	public List<String> getSignatureListNew() {
+		return signatureListNew;
+	}
+
+	public void setSignatureListNew(List<String> signatureListNew) {
+		this.signatureListNew = signatureListNew;
+	}
+
+	public int getCurrentSignatureIndexNew() {
+		return currentSignatureIndexNew;
+	}
+
+	public void setCurrentSignatureIndexNew(int currentSignatureIndexNew) {
+		this.currentSignatureIndexNew = currentSignatureIndexNew;
+	}
+
+	public StreamedContent getCurrentSignatureContentNew() {
+		return currentSignatureContentNew;
+	}
+
+	public void setCurrentSignatureContentNew(StreamedContent currentSignatureContentNew) {
+		this.currentSignatureContentNew = currentSignatureContentNew;
+	}
+
+	public boolean isShowSignaturePadNew() {
+		return showSignaturePadNew;
+	}
+
+	public void setShowSignaturePadNew(boolean showSignaturePadNew) {
+		this.showSignaturePadNew = showSignaturePadNew;
+	}
+
+	public void setSignatureCount(int signatureCount) {
+		this.signatureCount = signatureCount;
+	}
+	public int getSignatureCount() {
+		return signatureCount;
+	}
+
 }
