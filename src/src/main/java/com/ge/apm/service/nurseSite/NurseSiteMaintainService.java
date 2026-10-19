@@ -46,6 +46,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -412,6 +413,7 @@ public class NurseSiteMaintainService {
 
 	public void saveMaintainItem(NurseSiteMaintain obj) {
 		List<NurseSiteMaintainItem> listItem=obj.getListNurseSiteMaintainItem();
+		List<V2_BlobObject> signatureList=new ArrayList<>();
 		if(listItem!=null && listItem.size()>0){
 			for(NurseSiteMaintainItem item : listItem) {
 				boolean isFinish = true;
@@ -422,8 +424,18 @@ public class NurseSiteMaintainService {
 					if(data.getCheckValue()==null) isFinish = false;
 				}
 				item.setIsFinish(isFinish);
+				List<V2_BlobObject> signatureList1 = item.getSignatureList();
+				if(CollectionUtils.isNotEmpty(signatureList1)){
+					signatureList.addAll(signatureList1);
+					blobObjectRepository.deleteByBoUuid(item.getId());
+				}
+
+
 			}
 			nurseSiteMaintainItemRepository.save(listItem);
+			if(CollectionUtils.isNotEmpty(signatureList)){
+				blobFileService.saveBlobObject(signatureList);
+			}
 		}
 	}
 
@@ -1012,7 +1024,7 @@ public class NurseSiteMaintainService {
 			}
 		}
 	}
-	private boolean updateMaintainItem(NurseSiteMaintain obj, Date date, UserAccount user) {
+	private boolean updateMaintainItem(NurseSiteMaintain obj, Date date, UserAccount user,List<V2_BlobObject> signatureList) {
 		List<NurseSiteMaintainItem> listItem = obj.getListNurseSiteMaintainItem();
 		if(listItem==null || listItem.size()==0){
 			return false;
@@ -1048,6 +1060,7 @@ public class NurseSiteMaintainService {
 					}
 				}
 			}
+			boolean flagChange = false;
 //			boolean delay=tempItem.getCheckDate().after(sheculeDate)?true:false;
 			boolean hasComment=StringUtils.isNotEmpty(tempItem.getComment())?true:false;
 			//0：未检查,1:已检查，4进行中,2:通过没commnet没有delay，5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，3有问题，延期了,8，有问题，没有延期
@@ -1068,16 +1081,29 @@ public class NurseSiteMaintainService {
 								|| isSkipChanged){
                             tempItem.setUpdateByUid(user.getUid());
 							tempItem.setUpdateDate(date);
+							flagChange = true;
                         }
 						if((checkValueOld != null && !checkValueOld.equals(checkValueNew))
 							   || (StringUtils.isNotBlank(variableTextOld) && !variableTextOld.equals(variableTextNew))
 							   || isSkipChanged){
 							tempItem.setUpdateByUid(user.getUid());
 							tempItem.setUpdateDate(date);
+							flagChange = true;
 						}
                     }
                 }
+
             }
+			if(flagChange && CollectionUtils.isNotEmpty(signatureList)){
+				List<V2_BlobObject> collect = signatureList.stream().map(item -> {
+					V2_BlobObject v2BlobObject = new V2_BlobObject();
+					BeanUtils.copyProperties(item, v2BlobObject);
+					v2BlobObject.setId(null);
+					v2BlobObject.setBoUuid(tempItem.getId());
+					return v2BlobObject;
+				}).collect(Collectors.toList());
+				tempItem.setSignatureList(collect);
+			}
             if(tempItem.getUpdateDate()!=null){
 				boolean delay=tempItem.getUpdateDate().after(sheculeDate)?true:false;
 				int nullNum=0;
@@ -1424,11 +1450,19 @@ public class NurseSiteMaintainService {
 		return tempNurseSiteMaintain;
 	}
 
-	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user) {
-		if(!updateMaintainItem(tempNurseSiteMaintain,date,user)) return false;
+	public boolean saveMaintain(NurseSiteMaintain tempNurseSiteMaintain,Date date,UserAccount user,List<V2_BlobObject> signatureList) {
+		if(!updateMaintainItem(tempNurseSiteMaintain,date,user,signatureList)) return false;
 		saveMaintainItem(tempNurseSiteMaintain);
 		updateMaintain(tempNurseSiteMaintain,date,user);
 		save(tempNurseSiteMaintain);
+		if(CollectionUtils.isNotEmpty(signatureList)){
+			blobObjectRepository.deleteByBoUuid(tempNurseSiteMaintain.getId());
+			List<V2_BlobObject> collect = signatureList.stream().map(item -> {
+				item.setBoUuid(tempNurseSiteMaintain.getId());
+				return item;
+			}).collect(Collectors.toList());
+			blobFileService.saveBlobObject(collect);
+		}
 		return true;
 	}
 
@@ -1490,7 +1524,7 @@ public class NurseSiteMaintainService {
 			}
 		}
 		supplementMaintain(tempNurseSiteMaintain, 0, 0, true);
-		updateMaintainItem(tempNurseSiteMaintain,date,user);
+		updateMaintainItem(tempNurseSiteMaintain,date,user,null);
 		updateTimeAndUser(tempNurseSiteMaintain,date,user);
 		saveMaintainItem(tempNurseSiteMaintain);
 		updateMaintain(tempNurseSiteMaintain,date,user);
@@ -1513,6 +1547,25 @@ public class NurseSiteMaintainService {
 		return true;
 	}
 
+	public V2_BlobObject saveMaintainSignature(String content) {
+		V2_BlobObject blobObject = null;
+		try {
+			InputStream inputStream = base64ToFile(content);
+			blobObject = blobFileService.uploadFile(inputStream, "signature.png");
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+			return null;
+		}
+		if (null != blobObject) {
+			blobObject.setBoType(V2_BlobObject.BO_TYPE_NurseSiteMaintain);
+			blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_SIGNATURE);
+			blobFileService.saveBlobObject(blobObject);
+			return blobObject;
+		} else {
+			return null;
+		}
+	}
 	public String saveMaintainSignature(String content, String id) {
 		V2_BlobObject blobObject = null;
 		try {
@@ -2768,7 +2821,7 @@ public class NurseSiteMaintainService {
 							siteMaintainItem.setListData(historyDataMap.get(siteMaintainItem.getId()));
 						}
 						nurseSiteMaintain.setListNurseSiteMaintainItem(nurseSiteMaintainItems1);
-						saveMaintain(nurseSiteMaintain,new Date(),loginUser);
+						saveMaintain(nurseSiteMaintain,new Date(),loginUser,null);
 					}
 				}
 			}
@@ -2792,4 +2845,8 @@ public class NurseSiteMaintainService {
 	// }
 	// existMaintainDate=tempList;
 	// }
+
+	public  void  saveBlobObjects(List<V2_BlobObject> blobObjects){
+		blobObjectRepository.save(blobObjects);
+	}
 }
