@@ -669,8 +669,10 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:tab>
-                    <p:tab title="生命时间轴" id="timeline">
-                        <ui:include src="EventTimeline.xhtml"></ui:include>
+                    <p:tab title="生命时间轴" id="timeline" >
+                        <div style="height: 82vh; overflow: auto;">
+                            <ui:include src="EventTimeline.xhtml" />
+                        </div>
                     </p:tab>
 
                     <p:tab title="#{msg.specialAsset}" rendered="#{userContextService.accessContainsApmFeature('SPECIAL_ASSET')  and assetInfoDetailController.selected.specialAsset }">
