@@ -18,6 +18,7 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,7 +57,8 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 
 	private static final String ORG_NAME = "orgName";
 	private String orderId;
-	private Boolean isFinished = true;
+    private String assetUid;
+    private Boolean isFinished = true;
 	private List<String> listClinicalDeptName;
     private List<String> listAccessClinical;
 	private OrgInfoTreeService orgInfoTreeService;
@@ -92,7 +94,8 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		inventoryDisplayAssetDept = Optional.ofNullable(inventoryOrderService.getConfigValue(currentUser, "InventoryDisplayAssetDept")).map(Boolean::parseBoolean).orElse(Boolean.FALSE);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
-		isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));
+        assetUid = request.getParameter("assetUid");
+        isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));
 		if (null == orderId){
             listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         }else {
@@ -153,6 +156,10 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 			}
         }else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
+        }
+        if(StrUtil.isNotEmpty(assetUid)){
+            searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, assetUid, "1*"));
+
         }
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));

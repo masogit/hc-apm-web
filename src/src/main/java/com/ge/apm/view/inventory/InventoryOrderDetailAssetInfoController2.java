@@ -17,6 +17,7 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,6 +52,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
     private AssetInfoRepository assetInfoRepository;
     private ConfigCacheService cacheService;
 	private String orderId;
+    private String assetUid;
     private Boolean isFinished = true;
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 1;
@@ -90,6 +92,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
+		assetUid = request.getParameter("assetUid");
         isFinished = Boolean.parseBoolean(request.getParameter("isFinished"));
         if (null == orderId){
             listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
@@ -144,6 +147,9 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
             }
         }else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
+        }
+        if(StrUtil.isNotEmpty(assetUid)){
+            searchFilterList.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, assetUid,"1*"));
         }
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));

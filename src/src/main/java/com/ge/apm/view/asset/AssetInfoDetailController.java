@@ -104,7 +104,9 @@ public class AssetInfoDetailController {
     private SpecialAssetInfoService specialAssetInfoService;
     private V2_WorkOrderRepository workOrderRepository;
     private V2_PmOrderRepository pmOrderRepository;
-
+    private InventoryOrderDetailAssetInfoRepository inventoryOrderDetailAssetInfoRepository;
+    private InventoryOrderRepository inventoryOrderRepository;
+    private InventoryIssueRepository inventoryIssueRepository;
 
     private SpecialAssetInfo specialAssetInfo;
 
@@ -133,6 +135,9 @@ public class AssetInfoDetailController {
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        inventoryOrderDetailAssetInfoRepository = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
+        inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
+        inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
@@ -638,6 +643,13 @@ public class AssetInfoDetailController {
                     + selected.getUid()
                     +"&matchType=1"+"&boUuid="+uid;
             url = contextPath + "/portal/measuring/measuringResultList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        }else if("inventory".equals(type)){
+            InventoryOrderDetail inventoryOrderDetail = inventoryOrderDetailAssetInfoRepository.findById(uid);
+            InventoryOrder inventoryOrder = inventoryOrderRepository.findById(inventoryOrderDetail.getInventoryOrderId());
+            InventoryIssue inventoryIssue = inventoryIssueRepository.findProjectionByAssetIdAndInventoryOrderId(assetId, inventoryOrder.getId());
+            int queryIndex = inventoryIssue == null ? 1 : 3;
+            url = "orderId="+uid+"queryTabisFinished=false&queryTab="+queryIndex+"&assetUid=" +selected.getUid();
+            url = contextPath + "/portal/inventory/inventoryOrderDetailAssetInfoMain.xhtml?" + url;
         }
         log.info("timeline_url:"+url);
         RequestContext.getCurrentInstance().addCallbackParam("url", url);
