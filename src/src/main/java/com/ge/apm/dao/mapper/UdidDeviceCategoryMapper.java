@@ -2,6 +2,7 @@ package com.ge.apm.dao.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ge.apm.domain.UdidDeviceCategory;
+import com.ge.healthcare.cn.common.utils.tuple.ApmTriple;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -14,6 +15,6 @@ import java.util.List;
  */
 public interface UdidDeviceCategoryMapper extends BaseMapper<UdidDeviceCategory> {
 
-    List<UdidDeviceCategory> fuzzySearch(@Param("registryNum") String registryNum,
+    List<UdidDeviceCategory> fuzzySearch(@Param("categoryTriple") List<ApmTriple<Integer, Integer, Integer>> categoryTriple,
                                          @Param("category") String category);
 }

@@ -2925,11 +2925,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         if (isEditAction()) {
             udidInfo = new UdidInfoForm();
-            SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
             udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
-                    supplierService.findSupplierById(selected.getManufactureId()),
-                    selected.getMedicalApparatusClassification() + "  " + (Objects.isNull(sysAuthGroup) ? "" : sysAuthGroup.getName()));
-
+                    supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClassDisplay(selected.getMedicalApparatusClassification()));
         }
     }
 
@@ -3066,15 +3063,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             currentAsset = assetInfoService.getAssetInfo(selected.getId());
         }
         if (Objects.nonNull(currentAsset)) {
-            SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
             udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
-                    supplierService.findSupplierById(selected.getManufactureId()),
-                    selected.getMedicalApparatusClassification() + "  " + (Objects.isNull(sysAuthGroup) ? "" : sysAuthGroup.getName()));
+                    supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClassDisplay(selected.getMedicalApparatusClassification()));
         } else {
             udidInfo.clearValue();
         }
         udidInfo.clearFlag();
         udidInfo.clearMessage();
+    }
+
+    private String getApmMedicalClassDisplay(String medicalClassCode) {
+        if (StringUtils.isBlank(medicalClassCode)) {
+            return "";
+        }
+        SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
+        return selected.getMedicalApparatusClassification() + "  " + (Objects.isNull(sysAuthGroup) ? "" : sysAuthGroup.getName());
     }
 
     public String groupByUdid(String s) {
@@ -3122,7 +3125,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<String> completeUdidCategory(String prefix) {
-        return udidSearchService.fuzzySearchCategory(udidInfo.getRegistryNum(), prefix);//.stream()
+        return udidSearchService.fuzzySearchCategory(udidInfo.getRegistryNum(), prefix);
     }
 
     public void onUdidRegistryNumSelect(AjaxBehaviorEvent event) {
@@ -3146,6 +3149,24 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         newUdidSupplier = new Supplier();
         newUdidSupplier.setName(supplierName);
         newUdidSupplier.setManufacturerT(true);
+    }
+
+    public void onUdidSupplierChange() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newUdidSupplier.getName());
+        if (!ObjectUtils.isEmpty(supplier)) {
+            this.newUdidSupplier = supplier;
+        } else {
+            String name = newUdidSupplier.getName();
+            boolean ManufacturerT = newUdidSupplier.getManufacturerT();
+            boolean SupplierT = newUdidSupplier.getSupplierT();
+            boolean MaintainerT = newUdidSupplier.getMaintainerT();
+            prepareCreateUdidSupplier();
+            newUdidSupplier.setName(name);
+            newUdidSupplier.setSupplierT(SupplierT);
+            newUdidSupplier.setMaintainerT(MaintainerT);
+            newUdidSupplier.setManufacturerT(ManufacturerT);
+        }
     }
 
     public void saveNewUdidSupplier() {

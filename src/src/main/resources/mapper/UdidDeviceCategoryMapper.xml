@@ -18,19 +18,70 @@
         <result property="intendedUse" column="intended_use" jdbcType="VARCHAR"/>
         <result property="productExamples" column="product_examples" jdbcType="VARCHAR"/>
         <result property="managementClass" column="management_class" jdbcType="VARCHAR"/>
+        <result property="displayCategoryCode" column="display_category_code" jdbcType="VARCHAR"/>
+        <result property="displayCategoryName" column="display_category_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <select id="fuzzySearch" resultMap="BaseResultMap">
-        SELECT *
-        FROM udid_device_category
-        <where>
-            <if test="registryNum != null and registryNum != ''">
-                and exists (select 1 from udid_registry_num_info where registry_num = #{registryNum} and flbm::text ilike CONCAT('%', category_code, '%'))
-            </if>
-            <if test="category != null and category != ''">
-                and (category_code ilike CONCAT('%', #{category}, '%') or secondary_category ilike CONCAT('%', #{category}, '%'))
-            </if>
-        </where>
+        <choose>
+            <when test="categoryTriple != null and categoryTriple.size() > 0">
+                SELECT * FROM (
+                <foreach collection="categoryTriple" item="triple" separator=" UNION ALL ">
+                    SELECT t.*,
+                    <choose>
+                        <when test="triple.third != null and triple.third != 0">
+                            LPAD(#{triple.first}::text, 2, '0') || LPAD(#{triple.second}::text, 2, '0') || LPAD(#{triple.third}::text, 2, '0') AS display_category_code,
+                            SUBSTRING(t.secondary_category FROM '[ \u00A0](.+)$') AS display_category_name
+                        </when>
+                        <when test="triple.second != null and triple.second != 0">
+                            LPAD(#{triple.first}::text, 2, '0') || LPAD(#{triple.second}::text, 2, '0') AS display_category_code,
+                            SUBSTRING(t.primary_category FROM '[ \u00A0](.+)$') AS display_category_name
+                        </when>
+                        <when test="triple.first != null and triple.first != 0">
+                            LPAD(#{triple.first}::text, 2, '0') AS display_category_code,
+                            SUBSTRING(t.catalog_name FROM '[ \u00A0](.+)$') AS display_category_name
+                        </when>
+                        <otherwise>
+                            '' AS display_category_code,
+                            '' AS display_category_name
+                        </otherwise>
+                    </choose>
+                    FROM udid_device_category t
+                    WHERE 1=1
+                    <if test="triple.first != null and triple.first != 0">
+                        AND t.cat1_code = #{triple.first}
+                    </if>
+                    <if test="triple.second != null and triple.second != 0">
+                        AND t.cat2_code = #{triple.second}
+                    </if>
+                    <if test="triple.third != null and triple.third != 0">
+                        AND t.cat3_code = #{triple.third}
+                    </if>
+                    <if test="category != null and category != ''">
+                        <choose>
+                            <when test="triple.third != null and triple.third != 0">
+                                AND ((LPAD(#{triple.first}::text, 2, '0') || LPAD(#{triple.second}::text, 2, '0') || LPAD(#{triple.third}::text, 2, '0')) ilike CONCAT('%', #{category}, '%')
+                                OR SUBSTRING(t.secondary_category FROM '[ \u00A0](.+)$') ilike CONCAT('%', #{category}, '%'))
+                            </when>
+                            <when test="triple.second != null and triple.second != 0">
+                                AND ((LPAD(#{triple.first}::text, 2, '0') || LPAD(#{triple.second}::text, 2, '0')) ilike CONCAT('%', #{category}, '%')
+                                OR SUBSTRING(t.primary_category FROM '[ \u00A0](.+)$') ilike CONCAT('%', #{category}, '%'))
+                            </when>
+                            <when test="triple.first != null and triple.first != 0">
+                                AND ((LPAD(#{triple.first}::text, 2, '0')) ilike CONCAT('%', #{category}, '%')
+                                OR SUBSTRING(t.catalog_name FROM '[ \u00A0](.+)$') ilike CONCAT('%', #{category}, '%'))
+                            </when>
+                        </choose>
+                    </if>
+                </foreach>
+                ) sub
+            </when>
+            <otherwise>
+                SELECT *, '' AS display_category_code, '' AS display_category_name
+                FROM udid_device_category
+                WHERE 1=0
+            </otherwise>
+        </choose>
         ORDER BY category_code
     </select>
 </mapper>

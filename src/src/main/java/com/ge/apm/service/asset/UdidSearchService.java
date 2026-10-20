@@ -5,9 +5,11 @@ import com.ge.apm.dao.mapper.UdidDeviceCategoryMapper;
 import com.ge.apm.dao.mapper.UdidRegistryNumInfoMapper;
 import com.ge.apm.domain.UdidDeviceCategory;
 import com.ge.apm.domain.UdidRegistryNumInfo;
+import com.ge.healthcare.cn.common.utils.tuple.ApmTriple;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -129,11 +131,9 @@ public class UdidSearchService {
         List<UdidDeviceCategory> result = fuzzySearch(registryNum, category);
 
         return result.stream()
-                .map(UdidDeviceCategory::getDisplayCategory)
+                .map(e -> e.getDisplayCategoryCode() + "  " + e.getDisplayCategoryName())
                 .filter(StringUtils::isNotBlank)
                 .distinct()
-                // 支持输入筛选
-                .filter(s -> StringUtils.isBlank(category) || s.toLowerCase().contains(category.toLowerCase()))
                 .sorted(String::compareTo)
                 .collect(Collectors.toList());
     }
@@ -148,7 +148,23 @@ public class UdidSearchService {
         if (StringUtils.isBlank(registryNum) && StringUtils.isBlank(category)) {
             return Lists.newArrayList();
         }
-        return udidDeviceCategoryMapper.fuzzySearch(registryNum, category);
+
+        UdidRegistryNumInfo udidRegistryNumInfo = selectByRegistryNum(registryNum);
+
+        if (Objects.isNull(udidRegistryNumInfo)) {
+            return Lists.newArrayList();
+        }
+
+        List<ApmTriple<Integer, Integer, Integer>> categoryTriple = parseJsonArrayToStringList(udidRegistryNumInfo.getFlbm()).stream()
+                .map(UdidSearchService::parseToTriple)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(categoryTriple)) {
+            return Lists.newArrayList();
+        }
+
+        return udidDeviceCategoryMapper.fuzzySearch(categoryTriple, category);
     }
 
     /**
@@ -187,16 +203,55 @@ public class UdidSearchService {
     }
 
     /**
-     * 解析JSON数组字符串并去除元素中的连字符
-     * 例如: ["22-01-04"] -> ["220104"]
+     * 解析JSON数组字符串并去除尾部的"-00"及剩余连字符
+     * <pre>
+     *   ["22-01-04"] -> ["220104"]
+     *   ["22-00-00"] -> ["22"]
+     *   ["22-01-00"] -> ["2201"]
+     * </pre>
      *
      * @param jsonArray JSON数组字符串
-     * @return 去除连字符后的字符串列表，输入无效时返回空列表
+     * @return 处理后的字符串列表，输入无效时返回空列表
      */
     public static List<String> parseJsonArrayAndStripHyphens(String jsonArray) {
         return parseJsonArrayToStringList(jsonArray).stream()
                 .filter(StringUtils::isNotBlank)
-                .map(s -> s.replace("-", ""))
+                .map(s -> s.replace("-00", "").replace("-", ""))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 将连字符分隔的字符串解析为三元组
+     * <pre>
+     *   "22-01-04" -> ApmTriple(22, 1, 4)
+     *   "6825"     -> ApmTriple(6825, null, null)
+     *   null / ""  -> null
+     * </pre>
+     *
+     * @param value 连字符分隔的字符串
+     * @return 三元组，输入为blank时返回null
+     */
+    public static ApmTriple<Integer, Integer, Integer> parseToTriple(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        String[] parts = value.split("-", 3);
+        return ApmTriple.of(
+                parseIntegerSafe(parts, 0),
+                parseIntegerSafe(parts, 1),
+                parseIntegerSafe(parts, 2)
+        );
+    }
+
+    private static Integer parseIntegerSafe(String[] parts, int index) {
+        if (parts.length <= index || StringUtils.isBlank(parts[index])) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(parts[index].trim());
+        } catch (NumberFormatException e) {
+            log.warn("Failed to parse integer: '{}'", parts[index]);
+            return null;
+        }
     }
 }

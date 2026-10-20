@@ -253,7 +253,9 @@
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.name}*</label>
-                        <p:inputText id="name" value="#{assetInfoEditController.newUdidSupplier.name}" readonly="true"/>
+                        <p:inputText id="name" value="#{assetInfoEditController.newUdidSupplier.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
+                            <p:ajax event="valueChange" listener="#{assetInfoEditController.onUdidSupplierChange}" update=":UdidSupplierForm"/>
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.city}</label>
@@ -305,7 +307,7 @@
                 <br/>
                 <p:commandButton validateClient="true" icon="ui-icon-check" value="#{msg.Save}"
                                  actionListener="#{assetInfoEditController.saveNewUdidSupplier}"
-                                 update=":growl"
+                                 update=":growl UdidInfoForm"
                                  oncomplete="handleSubmit(args, 'UdidSupplierDlg');"/>
                 <p:commandButton immediate="true" icon="ui-icon-cancel" value="#{msg.Cancel}"
                                  onclick="PF('UdidSupplierDlg').hide()"/>
