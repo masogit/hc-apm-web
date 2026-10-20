@@ -1,21 +1,22 @@
 package com.ge.apm.domain;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 public class UdidInfoForm {
 
     // 注册证号
-    private String registrationNo;
+    private String registryNum;
 
     // 注册证号来自udid
-    private Boolean registrationNoFromUdid;
+    private Boolean registryNumFromUdid;
 
     // 资产名称
-    private String name;
+    private String assetName;
 
     // 资产名称来自udid
-    private Boolean nameFromUdid;
+    private Boolean assetNameFromUdid;
 
     // 设备型号
     private String functionType;
@@ -30,38 +31,58 @@ public class UdidInfoForm {
     private Boolean manufactureFromUdid;
 
     // 医疗器械分类
-    private String medicalApparatusClassification;
+    private String medicalClass;
 
     // 医疗器械分类来自udid
-    private Boolean medicalApparatusClassificationFromUdid;
+    private Boolean medicalClassFromUdid;
 
     // 知识库校验信息
     private String message;
 
-    public void fillValue(String registrationNo, String name, String functionType, Supplier manufacture, String medicalApparatusClassification) {
-        this.registrationNo = registrationNo;
-        this.name = name;
+    public void fillValue(String registryNum, String assetName, String functionType, Supplier manufacture, String medicalClass) {
+        this.registryNum = registryNum;
+        this.assetName = assetName;
         this.functionType = functionType;
         this.manufacture = manufacture;
-        this.medicalApparatusClassification = medicalApparatusClassification;
+        this.medicalClass = medicalClass;
     }
 
     public void clearValue() {
-        this.name = null;
+        this.assetName = null;
         this.functionType = null;
         this.manufacture = null;
-        this.medicalApparatusClassification = null;
+        this.medicalClass = null;
     }
 
     public void clearFlag() {
-        this.registrationNoFromUdid = null;
-        this.nameFromUdid = null;
+        this.registryNumFromUdid = null;
+        this.assetNameFromUdid = null;
         this.functionTypeFromUdid = null;
         this.manufactureFromUdid = null;
-        this.medicalApparatusClassificationFromUdid = null;
+        this.medicalClassFromUdid = null;
     }
 
     public void clearMessage() {
         this.message = null;
+    }
+
+    /**
+     * 提取器械分类代码（首个空白字符前的部分）
+     * <p>按空白字符（空格、NBSP等）分割 medicalClass，返回第一段。</p>
+     * <pre>
+     *   "01 X 射线高压发生器" -> "01"
+     *   "01.1\u00A0伽玛射束"   -> "01.1"
+     *   "6825"               -> "6825"
+     *   null / ""            -> 原值
+     * </pre>
+     *
+     * @return 首个空白字符前的内容；输入为blank时返回原值
+     */
+    public String getMedicalClassCode() {
+        if (StringUtils.isBlank(medicalClass)) {
+            return medicalClass;
+        }
+        String[] parts = medicalClass.split("[\\s\\u00A0]+", 2);
+        return parts[0];
     }
 }

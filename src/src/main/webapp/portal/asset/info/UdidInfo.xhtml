@@ -3,8 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
->
+      xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
     <h:outputStylesheet>
@@ -12,12 +11,12 @@
             border: none !important;
         }
 
-        #UdidInfoForm\:udidMedicalApparatusClassification_panel > table > tbody > tr > td {
+        #UdidInfoForm\:udidMedicalClass_panel > table > tbody > tr > td {
             border: none !important;
         }
     </h:outputStylesheet>
 
-    <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" height="400" width="960">
+    <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" height="460" width="960">
         <h:form id="UdidInfoForm">
             <h:panelGroup id="display">
                 <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%"
@@ -34,68 +33,67 @@
                 </p:panelGrid>
 
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetInfoEditController.udidInfo != null}">
-                    <h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.registrationNoFromUdid eq true}">
+                    <h:panelGroup rendered="#{assetInfoEditController.needEdit('registrationNo')}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.registryNumFromUdid eq true}">
                             <label class="label">
                                 <i class="fa fa-check-circle" style="color: green"/>
                                 #{msg.registrationNo}
                                 <span style="color:red">*</span>
                             </label>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.registrationNoFromUdid eq false}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.registryNumFromUdid eq false}">
                             <label class="label">
                                 <i class="fa fa-info-circle" style="color: red"/>
                                 #{msg.registrationNo}
                                 <span style="color:red">*</span>
                             </label>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.registrationNoFromUdid eq null}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.registryNumFromUdid eq null}">
                             <label class="label">
                                 #{msg.registrationNo}
                                 <span style="color:red">*</span>
                             </label>
                         </h:panelGroup>
-                        <p:autoComplete id="udidRegistrationNo" value="#{assetInfoEditController.udidInfo.registrationNo}"
-                                        completeMethod="#{assetInfoEditController.completeUdidRegistrationNo}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" dropdownMode="current" minQueryLength="3"
-                                        groupBy="#{assetInfoEditController.groupByUdid(t)}" var="t" itemLabel="#{t}" itemValue="#{t}">
-                            <p:ajax event="valueChange" process="@this" listener="#{assetInfoEditController.onUdidRegistrationNoSelect}" update="UdidInfoForm"/>
-                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidRegistrationNoSelect}" update="UdidInfoForm"/>
+                        <p:autoComplete id="udidRegistyNum" value="#{assetInfoEditController.udidInfo.registryNum}"
+                                        completeMethod="#{assetInfoEditController.completeUdidRegistryNum}"
+                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" minQueryLength="3"
+                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
+                            <p:ajax event="valueChange" process="@this" listener="#{assetInfoEditController.onUdidRegistryNumSelect}" update="UdidInfoForm"/>
+                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidRegistryNumSelect}" update="UdidInfoForm"/>
                         </p:autoComplete>
                     </h:panelGroup>
 
-                    <h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.nameFromUdid eq true}">
+                    <h:panelGroup rendered="#{assetInfoEditController.needEdit('name')}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.assetNameFromUdid eq true}">
                             <label class="label">
                                 <i class="fa fa-check-circle" style="color: green"/>
                                 #{msg.name}
                                 <span style="color:red">*</span>
                             </label>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.nameFromUdid eq false}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.assetNameFromUdid eq false}">
                             <label class="label">
                                 <i class="fa fa-info-circle" style="color: red"/>
                                 #{msg.name}
                                 <span style="color:red">*</span>
                             </label>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.nameFromUdid eq null}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.assetNameFromUdid eq null}">
                             <label class="label">
                                 #{msg.name}
                                 <span style="color:red">*</span>
                             </label>
                         </h:panelGroup>
-                        <p:autoComplete id="name" value="#{assetInfoEditController.udidInfo.name}"
+                        <p:autoComplete id="udidAsstName" value="#{assetInfoEditController.udidInfo.assetName}"
                                         completeMethod="#{assetInfoEditController.completeUdidAssetName}"
-                                        readonly="#{!assetInfoEditController.needEdit('name')}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" dropdownMode="current" minQueryLength="2"
-                                        groupBy="#{assetInfoEditController.groupByUdid(t)}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
+                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
                             <p:ajax process="@this"/>
                             <p:ajax event="itemSelect" process="@this"/>
                         </p:autoComplete>
                     </h:panelGroup>
 
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{assetInfoEditController.needEdit('functionType')}">
                         <h:panelGroup rendered="#{assetInfoEditController.udidInfo.functionTypeFromUdid eq true}">
                             <label class="label">
                                 <i class="fa fa-check-circle" style="color: green"/>
@@ -124,15 +122,14 @@
                         </h:panelGroup>
                         <p:autoComplete id="udidFunctionType" value="#{assetInfoEditController.udidInfo.functionType}"
                                         completeMethod="#{assetInfoEditController.completeUdidFunctionType}"
-                                        readonly="#{!assetInfoEditController.needEdit('functionType')}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" dropdownMode="current" minQueryLength="2"
-                                        groupBy="#{assetInfoEditController.groupByUdid(t)}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
+                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
                             <p:ajax process="@this"/>
                             <p:ajax event="itemSelect" process="@this"/>
                         </p:autoComplete>
                     </h:panelGroup>
 
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{assetInfoEditController.needEdit('manufacture')}">
                         <h:panelGroup rendered="#{assetInfoEditController.udidInfo.manufactureFromUdid eq true}">
                             <label class="label">
                                 <i class="fa fa-check-circle" style="color: green"/>
@@ -161,9 +158,8 @@
                         </h:panelGroup>
                         <p:autoComplete id="udidManufacture" value="#{assetInfoEditController.udidInfo.manufacture}"
                                         completeMethod="#{assetInfoEditController.completeUdidManufacture}"
-                                        readonly="#{!assetInfoEditController.needEdit('manufacture')}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" dropdownMode="current" minQueryLength="2"
-                                        groupBy="#{assetInfoEditController.groupBySource(t)}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="udidSupplierConverter">
+                                        scrollHeight="210" panelStyleClass="max-width-200" dropdown="true" converter="udidSupplierConverter"
+                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupBySource(t)}">
                             <p:column style="border: none">
                                 <div style="position: relative; text-align: center;">
                                     <h:outputText value="#{t.name}"/>
@@ -176,36 +172,38 @@
                             <p:ajax event="itemSelect" process="@this"/>
                         </p:autoComplete>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.medicalApparatusClassificationFromUdid eq true}">
+
+                    <h:panelGroup rendered="#{assetInfoEditController.needEdit('medicalApparatusClassification')}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.medicalClassFromUdid eq true}">
                             <label class="label">
                                 <i class="fa fa-check-circle" style="color: green"/>
                                 #{msg.medicalApparatusClassification}
+                                <span style="color:red">
+                                    #{assetInfoEditController.customConfig.assetFields['medicalApparatusClassification'].required? '*':''}
+                                </span>
                             </label>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.medicalApparatusClassificationFromUdid eq false}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.medicalClassFromUdid eq false}">
                             <label class="label">
                                 <i class="fa fa-info-circle" style="color: red"/>
                                 #{msg.medicalApparatusClassification}
+                                <span style="color:red">
+                                    #{assetInfoEditController.customConfig.assetFields['medicalApparatusClassification'].required? '*':''}
+                                </span>
                             </label>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.medicalApparatusClassificationFromUdid eq null}">
+                        <h:panelGroup rendered="#{assetInfoEditController.udidInfo.medicalClassFromUdid eq null}">
                             <label class="label">
                                 #{msg.medicalApparatusClassification}
+                                <span style="color:red">
+                                    #{assetInfoEditController.customConfig.assetFields['medicalApparatusClassification'].required? '*':''}
+                                </span>
                             </label>
                         </h:panelGroup>
-                        <p:autoComplete id="udidMedicalApparatusClassification" value="#{assetInfoEditController.udidInfo.manufacture}"
-                                        completeMethod="#{assetInfoEditController.completeUdidManufacture}"
-                                        readonly="#{!assetInfoEditController.needEdit('medicalApparatusClassification')}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" dropdownMode="current" minQueryLength="2"
-                                        groupBy="#{assetInfoEditController.groupBySource(t)}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="udidSupplierConverter">
-                            <p:column style="border: none">
-                                <div style="position: relative; text-align: center;">
-                                    <h:outputText value="#{t.name}"/>
-                                    <p:commandButton rendered="#{t.fromUdid and t.id lt 0}" style="zoom: 0.6; position: absolute; right: 0; top: 50%; transform: translateY(-50%);"
-                                                     icon="ui-icon-plus" title="#{msg.Create}" process="@this" type="button"/>
-                                </div>
-                            </p:column>
+                        <p:autoComplete id="udidMedicalClass" value="#{assetInfoEditController.udidInfo.medicalClass}"
+                                        completeMethod="#{assetInfoEditController.completeUdidCategory}"
+                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
+                                        groupBy="#{assetInfoEditController.groupByUdid(t)}" var="t" itemLabel="#{t}" itemValue="#{t}">
                             <p:ajax process="@this"/>
                             <p:ajax event="itemSelect" process="@this"/>
                         </p:autoComplete>
@@ -227,11 +225,20 @@
                     <h:panelGroup/>
                     <h:panelGroup/>
                     <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
+                    <h:panelGroup/>
                 </p:panelGrid>
                 <br/>
-                <p:commandButton validateClient="true" actionListener="#{assetInfoEditController.applyUidInfo()}" value="应用"
-                                 update="tab:AssetInfoEditForm:registrationNo tab:AssetInfoEditForm:name tab:AssetInfoEditForm:functionType tab:AssetInfoEditForm:manufacture"
-                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'UdidInfoDlg');"/>
+                <p:commandButton validateClient="true" value="应用" actionListener="#{assetInfoEditController.applyUidInfo()}"
+                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'UdidInfoDlg');" update="tab:AssetInfoEditForm"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('UdidInfoDlg').hide()"/>
             </h:panelGroup>
 

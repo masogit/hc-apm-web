@@ -2921,81 +2921,107 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void showUdidInfo() {
         if (isCreateAction()) {
             udidInfo = new UdidInfoForm();
-            udidInfo.setRegistrationNo(selected.getRegistrationNo());
+            udidInfo.setRegistryNum(selected.getRegistrationNo());
         }
         if (isEditAction()) {
             udidInfo = new UdidInfoForm();
-            udidInfo.setRegistrationNo(selected.getRegistrationNo());
-            udidInfo.setName(selected.getName());
-            udidInfo.setFunctionType(selected.getFunctionType());
-            udidInfo.setManufacture(supplierService.findSupplierById(selected.getManufactureId()));
-            udidInfo.setMedicalApparatusClassification(selected.getMedicalApparatusClassification());
+            SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
+            udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
+                    supplierService.findSupplierById(selected.getManufactureId()),
+                    selected.getMedicalApparatusClassification() + "  " + (Objects.isNull(sysAuthGroup) ? "" : sysAuthGroup.getName()));
+
         }
     }
 
     public void applyUidInfo() {
-        if (StringUtils.isBlank(udidInfo.getRegistrationNo())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("registrationNo") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
-            return;
+        if (needEdit("registrationNo")) {
+            if (StringUtils.isBlank(udidInfo.getRegistryNum())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("registrationNo") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            selected.setRegistrationNo(udidInfo.getRegistryNum());
         }
-        if (StringUtils.isBlank(udidInfo.getName())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("name") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
-            return;
+        if (needEdit("name")) {
+            if (StringUtils.isBlank(udidInfo.getAssetName())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("name") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            selected.setName(udidInfo.getAssetName());
         }
-        if (customConfig.getAssetFields().get("functionType").isRequired() && StringUtils.isBlank(udidInfo.getFunctionType())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("functionType") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
-            return;
+        if (needEdit("functionType")) {
+            if (customConfig.getAssetFields().get("functionType").isRequired() && StringUtils.isBlank(udidInfo.getFunctionType())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("functionType") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            selected.setFunctionType(udidInfo.getFunctionType());
         }
-        if (Objects.nonNull(udidInfo.getManufacture()) && Objects.equals(-1, udidInfo.getManufacture().getId())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("manufactureNotExists"));
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
-            return;
+        if (needEdit("manufacture")) {
+            if (customConfig.getAssetFields().get("manufacture").isRequired() && Objects.isNull(udidInfo.getManufacture())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("manufacture") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            if (Objects.nonNull(udidInfo.getManufacture())) {
+                if (Objects.equals(-1, udidInfo.getManufacture().getId())) {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("manufactureNotExists"));
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("validationFailed", true);
+                    return;
+                }
+                selected.setManufacture(udidInfo.getManufacture().getName());
+                selected.setManufactureId(udidInfo.getManufacture().getId().toString());
+                selected.setManufactureTel(udidInfo.getManufacture().getTel());
+                selectedObjectMap.put("manufacturer", udidInfo.getManufacture());
+            }
         }
-        if (customConfig.getAssetFields().get("manufacture").isRequired() && Objects.isNull(udidInfo.getManufacture())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("manufacture") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
-            return;
+        if (needEdit("medicalApparatusClassification")) {
+            if (customConfig.getAssetFields().get("medicalApparatusClassification").isRequired() && Objects.isNull(udidInfo.getMedicalClass())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("medicalApparatusClassification") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            if (StringUtils.isNotBlank(udidInfo.getMedicalClass())) {
+                SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(udidInfo.getMedicalClassCode());
+                if (Objects.isNull(sysAuthGroup)) {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("medicalApparatusClassificationNotExists"));
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("validationFailed", true);
+                    return;
+                }
+                selected.setMedicalApparatusClassification(udidInfo.getMedicalClassCode());
+                medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, selected.getMedicalApparatusClassification());
+            }
         }
-        selected.setRegistrationNo(udidInfo.getRegistrationNo());
-        selected.setName(udidInfo.getName());
-        selected.setFunctionType(udidInfo.getFunctionType());
-        if (Objects.nonNull(udidInfo.getManufacture())) {
-            selected.setManufacture(udidInfo.getManufacture().getName());
-            selected.setManufactureId(udidInfo.getManufacture().getId().toString());
-            selected.setManufactureTel(udidInfo.getManufacture().getTel());
-            selectedObjectMap.put("manufacturer", udidInfo.getManufacture());
-        }
-        selected.setMedicalApparatusClassification(udidInfo.getMedicalApparatusClassification());
     }
 
     public void checkUdid() {
         int count = 0;
         StringBuilder warnColumn = new StringBuilder();
 
-        UdidRegistryNumInfo udidRegistryNumInfo = udidSearchService.selectByRegistryNum(udidInfo.getRegistrationNo());
+        UdidRegistryNumInfo udidRegistryNumInfo = udidSearchService.selectByRegistryNum(udidInfo.getRegistryNum());
 
         if (Objects.isNull(udidRegistryNumInfo)) {
             udidInfo.clearFlag();
-            udidInfo.setRegistrationNoFromUdid(false);
+            udidInfo.setRegistryNumFromUdid(false);
             udidInfo.setMessage("该注册证号在知识库中不存在！");
         } else {
-            udidInfo.setRegistrationNoFromUdid(true);
-            if (!Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getName())) {
+            udidInfo.setRegistryNumFromUdid(true);
+            if (needEdit("name") && !Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getAssetName())) {
                 count++;
                 warnColumn.append("名称");
-                udidInfo.setNameFromUdid(false);
+                udidInfo.setAssetNameFromUdid(false);
             } else {
-                udidInfo.setNameFromUdid(true);
+                udidInfo.setAssetNameFromUdid(true);
             }
-            if (!UdidSearchService.parseJsonArrayToStringList(udidRegistryNumInfo.getGgxh()).contains(udidInfo.getFunctionType())) {
+            if (needEdit("functionType") && !UdidSearchService.parseJsonArrayToStringList(udidRegistryNumInfo.getGgxh()).contains(udidInfo.getFunctionType())) {
                 if (count > 0) {
                     warnColumn.append("、");
                 }
@@ -3005,7 +3031,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             } else {
                 udidInfo.setFunctionTypeFromUdid(true);
             }
-            if (Objects.isNull(udidInfo.getManufacture()) || !Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture().getName())) {
+            if (needEdit("manufacture") && Objects.isNull(udidInfo.getManufacture()) || !Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture().getName())) {
                 if (count > 0) {
                     warnColumn.append("、");
                 }
@@ -3015,20 +3041,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             } else {
                 udidInfo.setManufactureFromUdid(true);
             }
-            if (!UdidSearchService.parseJsonArrayAndStripHyphens(udidRegistryNumInfo.getFlbm()).contains(udidInfo.getMedicalApparatusClassification())) {
+            List<String> medicalClassList = UdidSearchService.parseJsonArrayAndStripHyphens(udidRegistryNumInfo.getFlbm());
+            if (needEdit("medicalApparatusClassification") && CollectionUtils.isNotEmpty(medicalClassList) && !medicalClassList.contains(udidInfo.getMedicalClassCode())) {
                 if (count > 0) {
                     warnColumn.append("、");
                 }
                 count++;
                 warnColumn.append("医疗器械分类");
-                udidInfo.setMedicalApparatusClassificationFromUdid(false);
+                udidInfo.setMedicalClassFromUdid(false);
             } else {
-                udidInfo.setMedicalApparatusClassificationFromUdid(true);
+                udidInfo.setMedicalClassFromUdid(true);
             }
             if (count > 0) {
                 udidInfo.setMessage("检测到" + count + "个字段与知识库不一致（" + warnColumn + "）");
             } else {
-                udidInfo.setMessage("校验与知识库一致");
+                udidInfo.setMessage("");
             }
         }
     }
@@ -3039,8 +3066,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             currentAsset = assetInfoService.getAssetInfo(selected.getId());
         }
         if (Objects.nonNull(currentAsset)) {
+            SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
             udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
-                    supplierService.findSupplierById(selected.getManufactureId()), selected.getMedicalApparatusClassification());
+                    supplierService.findSupplierById(selected.getManufactureId()),
+                    selected.getMedicalApparatusClassification() + "  " + (Objects.isNull(sysAuthGroup) ? "" : sysAuthGroup.getName()));
         } else {
             udidInfo.clearValue();
         }
@@ -3056,16 +3085,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return supplier.isFromUdid() ? DataSourceEnum.UDID.getSourceName() : DataSourceEnum.APM.getSourceName();
     }
 
-    public List<String> completeUdidRegistrationNo(String prefix) {
+    public List<String> completeUdidRegistryNum(String prefix) {
         return udidSearchService.fuzzySearchRegistryNum(prefix);
     }
 
     public List<String> completeUdidAssetName(String prefix) {
-        return udidSearchService.fuzzySearchDeviceName(udidInfo.getRegistrationNo(), prefix);
+        return udidSearchService.fuzzySearchAssetName(udidInfo.getRegistryNum(), prefix);
     }
 
     public List<String> completeUdidFunctionType(String prefix) {
-        return udidSearchService.fuzzySearchDevicePattern(udidInfo.getRegistrationNo(), prefix);
+        return udidSearchService.fuzzySearchFunctionType(udidInfo.getRegistryNum(), prefix);
     }
 
     public List<Supplier> completeUdidManufacture(String query) {
@@ -3073,7 +3102,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         List<Supplier> apmSupplierList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID(), query, 1000);
 
         // udid供应商
-        List<String> udidSupplierNameList = udidSearchService.fuzzySearchRegistrantName(udidInfo.getRegistrationNo(), query);
+        List<String> udidSupplierNameList = udidSearchService.fuzzySearchManufacture(udidInfo.getRegistryNum(), query);
 
         // 构造NMPA制造商列表
         List<Supplier> udidSupplierList = udidSupplierNameList.stream()
@@ -3092,16 +3121,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return udidSupplierList;
     }
 
-    public void onUdidRegistrationNoSelect(AjaxBehaviorEvent event) {
-        log.info("before: {}", selected.getRegistrationNo());
-        log.info("after: {}", udidInfo.getRegistrationNo());
+    public List<String> completeUdidCategory(String prefix) {
+        return udidSearchService.fuzzySearchCategory(udidInfo.getRegistryNum(), prefix);//.stream()
+    }
 
+    public void onUdidRegistryNumSelect(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
-            log.info("selected: {}", ((SelectEvent) event).getObject());
-            udidInfo.setRegistrationNo((String) ((SelectEvent) event).getObject());
+            udidInfo.setRegistryNum((String) ((SelectEvent) event).getObject());
         }
 
-        if (!Objects.equals(selected.getRegistrationNo(), udidInfo.getRegistrationNo())) {
+        if (!Objects.equals(selected.getRegistrationNo(), udidInfo.getRegistryNum())) {
             udidInfo.clearValue();
             udidInfo.clearFlag();
             udidInfo.clearMessage();

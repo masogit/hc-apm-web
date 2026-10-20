@@ -12,7 +12,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 @FacesConverter("udidSupplierConverter")
-public class UdisSupplierConverter implements Converter {
+public class UdidSupplierConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {

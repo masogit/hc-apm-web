@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.UdidDeviceCategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.ge.apm.domain.UdidDeviceCategory">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+        <result property="cat1Code" column="cat1_code" jdbcType="INTEGER"/>
+        <result property="cat2Code" column="cat2_code" jdbcType="INTEGER"/>
+        <result property="cat3Code" column="cat3_code" jdbcType="INTEGER"/>
+        <result property="categoryCode" column="category_code" jdbcType="VARCHAR"/>
+        <result property="catalogName" column="catalog_name" jdbcType="VARCHAR"/>
+        <result property="primaryCategory" column="primary_category" jdbcType="VARCHAR"/>
+        <result property="secondaryCategory" column="secondary_category" jdbcType="VARCHAR"/>
+        <result property="productDescription" column="product_description" jdbcType="VARCHAR"/>
+        <result property="intendedUse" column="intended_use" jdbcType="VARCHAR"/>
+        <result property="productExamples" column="product_examples" jdbcType="VARCHAR"/>
+        <result property="managementClass" column="management_class" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="fuzzySearch" resultMap="BaseResultMap">
+        SELECT *
+        FROM udid_device_category
+        <where>
+            <if test="registryNum != null and registryNum != ''">
+                and exists (select 1 from udid_registry_num_info where registry_num = #{registryNum} and flbm::text ilike CONCAT('%', category_code, '%'))
+            </if>
+            <if test="category != null and category != ''">
+                and (category_code ilike CONCAT('%', #{category}, '%') or secondary_category ilike CONCAT('%', #{category}, '%'))
+            </if>
+        </where>
+        ORDER BY category_code
+    </select>
+</mapper>

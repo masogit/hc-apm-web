@@ -17,7 +17,7 @@ public interface UdidRegistryNumInfoMapper extends BaseMapper<UdidRegistryNumInf
     UdidRegistryNumInfo selectByRegistryNum(@Param("registryNum") String registryNum);
 
     List<UdidRegistryNumInfo> fuzzySearch(@Param("registryNum") String registryNum,
-                                          @Param("registrantName") String registrantName,
-                                          @Param("deviceName") String deviceName,
-                                          @Param("devicePattern") String devicePattern);
+                                          @Param("manufacture") String manufacture,
+                                          @Param("assetName") String assetName,
+                                          @Param("functionType") String functionType);
 }

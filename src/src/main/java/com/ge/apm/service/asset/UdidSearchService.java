@@ -1,7 +1,9 @@
 package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSON;
+import com.ge.apm.dao.mapper.UdidDeviceCategoryMapper;
 import com.ge.apm.dao.mapper.UdidRegistryNumInfoMapper;
+import com.ge.apm.domain.UdidDeviceCategory;
 import com.ge.apm.domain.UdidRegistryNumInfo;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Data
@@ -18,6 +21,8 @@ import java.util.stream.Collectors;
 @Service
 public class UdidSearchService {
 
+    @Autowired
+    private UdidDeviceCategoryMapper udidDeviceCategoryMapper;
     @Autowired
     private UdidRegistryNumInfoMapper udidRegistryNumInfoMapper;
 
@@ -29,6 +34,7 @@ public class UdidSearchService {
     public List<String> fuzzySearchRegistryNum(String registryNum) {
 
         List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", "", "");
+
         return result.stream()
                 .map(UdidRegistryNumInfo::getRegistryNum)
                 .filter(StringUtils::isNotBlank)
@@ -40,12 +46,13 @@ public class UdidSearchService {
     /**
      * 模糊查询制造商
      *
-     * @param registryNum    注册证号
-     * @param registrantName 制造商
+     * @param registryNum 注册证号
+     * @param manufacture 制造商
      */
-    public List<String> fuzzySearchRegistrantName(String registryNum, String registrantName) {
+    public List<String> fuzzySearchManufacture(String registryNum, String manufacture) {
 
-        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, registrantName, "", "");
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, manufacture, "", "");
+
         return result.stream()
                 .map(UdidRegistryNumInfo::getRegistrantName)
                 .filter(StringUtils::isNotBlank)
@@ -58,11 +65,12 @@ public class UdidSearchService {
      * 模糊查询设备名称
      *
      * @param registryNum 注册证号
-     * @param deviceName  设备名称
+     * @param assetName   设备名称
      */
-    public List<String> fuzzySearchDeviceName(String registryNum, String deviceName) {
+    public List<String> fuzzySearchAssetName(String registryNum, String assetName) {
 
-        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", deviceName, "");
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", assetName, "");
+
         return result.stream()
                 .map(UdidRegistryNumInfo::getProductName)
                 .filter(StringUtils::isNotBlank)
@@ -74,20 +82,21 @@ public class UdidSearchService {
     /**
      * 模糊查询设备型号
      *
-     * @param registryNum   注册证号
-     * @param devicePattern 设备型号
+     * @param registryNum  注册证号
+     * @param functionType 设备型号
      */
-    public List<String> fuzzySearchDevicePattern(String registryNum, String devicePattern) {
+    public List<String> fuzzySearchFunctionType(String registryNum, String functionType) {
 
-        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", "", devicePattern);
+        List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", "", functionType);
+
         return result.stream()
                 .map(UdidRegistryNumInfo::getGgxh)
                 .filter(StringUtils::isNotBlank)
                 .flatMap(s -> parseJsonArrayToStringList(s).stream())
                 .filter(StringUtils::isNotBlank)
-                // 支持输入筛选
-                .filter(s -> StringUtils.isBlank(devicePattern) || s.toLowerCase().contains(devicePattern.toLowerCase()))
                 .distinct()
+                // 支持输入筛选
+                .filter(s -> StringUtils.isBlank(functionType) || s.toLowerCase().contains(functionType.toLowerCase()))
                 .sorted(String::compareTo)
                 .collect(Collectors.toList());
     }
@@ -95,19 +104,51 @@ public class UdidSearchService {
     /**
      * 模糊查询
      *
-     * @param registryNum    注册证号
-     * @param registrantName 制造商
-     * @param deviceName     设备名称
-     * @param devicePattern  设备型号
+     * @param registryNum  注册证号
+     * @param manufacture  制造商
+     * @param assetName    设备名称
+     * @param functionType 设备型号
      */
-    private List<UdidRegistryNumInfo> fuzzySearch(String registryNum, String registrantName,
-                                                  String deviceName, String devicePattern) {
+    private List<UdidRegistryNumInfo> fuzzySearch(String registryNum, String manufacture,
+                                                  String assetName, String functionType) {
 
-        if (StringUtils.isBlank(registryNum) && StringUtils.isBlank(registrantName)
-                && StringUtils.isBlank(deviceName) && StringUtils.isBlank(devicePattern)) {
+        if (StringUtils.isBlank(registryNum) && StringUtils.isBlank(manufacture)
+                && StringUtils.isBlank(assetName) && StringUtils.isBlank(functionType)) {
             return Lists.newArrayList();
         }
-        return udidRegistryNumInfoMapper.fuzzySearch(registryNum, registrantName, deviceName, devicePattern);
+        return udidRegistryNumInfoMapper.fuzzySearch(registryNum, manufacture, assetName, functionType);
+    }
+
+    /**
+     * 模糊查询设备型号
+     *
+     * @param category 器械分类代码或名称
+     */
+    public List<String> fuzzySearchCategory(String registryNum, String category) {
+
+        List<UdidDeviceCategory> result = fuzzySearch(registryNum, category);
+
+        return result.stream()
+                .map(UdidDeviceCategory::getDisplayCategory)
+                .filter(StringUtils::isNotBlank)
+                .distinct()
+                // 支持输入筛选
+                .filter(s -> StringUtils.isBlank(category) || s.toLowerCase().contains(category.toLowerCase()))
+                .sorted(String::compareTo)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 模糊查询
+     *
+     * @param category 器械分类代码或名称
+     */
+    private List<UdidDeviceCategory> fuzzySearch(String registryNum, String category) {
+
+        if (StringUtils.isBlank(registryNum) && StringUtils.isBlank(category)) {
+            return Lists.newArrayList();
+        }
+        return udidDeviceCategoryMapper.fuzzySearch(registryNum, category);
     }
 
     /**
@@ -135,7 +176,10 @@ public class UdidSearchService {
             return Lists.newArrayList();
         }
         try {
-            return JSON.parseArray(jsonArray, String.class);
+            List<String> list = JSON.parseArray(jsonArray, String.class);
+            // 移除可能的null元素（如输入"[null]"）
+            list.removeIf(Objects::isNull);
+            return list;
         } catch (Exception e) {
             log.warn("Failed to parse JSON array: {}", jsonArray, e);
             return Lists.newArrayList();
