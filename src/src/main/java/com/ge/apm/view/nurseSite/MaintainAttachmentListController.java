@@ -205,7 +205,7 @@ public class MaintainAttachmentListController implements Serializable, ServerEve
         }
 
         // Load attachments
-        attachmentList = blobObjectRepository.fetchListByMaintainId(maintainId);
+        attachmentList = blobObjectRepository.findByBoUuid(itemId);
     }
 
     private void generateShowLables() {
