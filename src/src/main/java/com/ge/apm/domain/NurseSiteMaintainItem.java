@@ -145,6 +145,8 @@ public class NurseSiteMaintainItem implements Serializable {
 
 	@Transient
 	private Map<String, NurseSiteMaintainConfigCheckItem> configMap;
+	@Transient
+	private List<V2_BlobObject> signatureList;
     public String getUpdateByUid() {
         return updateByUid;
     }
@@ -448,5 +450,13 @@ public class NurseSiteMaintainItem implements Serializable {
 
 	public void setUsingDeptUid(String usingDeptUid) {
 		this.usingDeptUid = usingDeptUid;
+	}
+
+	public List<V2_BlobObject> getSignatureList() {
+		return signatureList;
+	}
+
+	public void setSignatureList(List<V2_BlobObject> signatureList) {
+		this.signatureList = signatureList;
 	}
 }

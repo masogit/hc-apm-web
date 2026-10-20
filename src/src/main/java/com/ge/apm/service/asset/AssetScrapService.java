@@ -49,9 +49,10 @@ public class AssetScrapService  extends MicroServiceInvoker {
         }
     }
 
-    public void autoResolve(Integer assetId) {
+    public void autoResolve(Integer assetId, Integer resolverId) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("assetId", String.valueOf(assetId));
+        map.put("resolverId", resolverId);
         String token = UserContextService.getAccessToken();
         HttpEntity<HashMap> requestEntity = new HttpEntity<>(map, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.ASSET_SCRAP_AUTO_RESOLVE);

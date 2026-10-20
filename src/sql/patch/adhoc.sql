@@ -100,3 +100,12 @@ WHERE wc.tenant_uid = v_tenant_uid
 
 END LOOP;
 END $$;
+
+
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, '6', '生命时间轴首页数量设置', 'eventTimeLinePageSet', '生命时间轴首页数量设置', 'f', 't', 2 where not exists (select * from config_item where key = 'eventTimeLinePageSet');
+
+
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type,validation)
+select replace(uuid_generate_v4()::text,'-',''), 1, '[{"key":"巡检","value":"inspection"},{"key":"二级保养","value":"secondMaintenance"},{"key":"三级保养","value":"thirdMaintenance"},{"key":"维修","value":"repair"}]', '生命时间轴卡片显示', 'timeLineShowCards', '生命时间轴卡片显示', 'f', 't', 8 , '[{"key":"巡检","value":"inspection"},{"key":"二级保养","value":"secondMaintenance"},{"key":"三级保养","value":"thirdMaintenance"},{"key":"质量控制","value":"qualityControl"},{"key":"维修","value":"repair"},{"key":"计量","value":"measuring"},{"key":"盘点","value":"inventory"}]' where not exists (select * from config_item where key = 'timeLineShowCards');

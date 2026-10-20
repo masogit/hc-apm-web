@@ -514,7 +514,7 @@
                             <p:column headerText="#{msg.clinicalDeptName}">
                                 <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
                             </p:column>
-                            <p:column headerText="维保金额（元）">
+                            <p:column headerText="维保金额（元）" rendered="#{contractInfoEditController.selected.contractType eq 'Full' or contractInfoEditController.selected.contractType eq 'Artificial'}">
                                 <h:outputText value="#{item.amount}" >
                                         <f:convertNumber maxFractionDigits="2"  minFractionDigits="2" />
                                 </h:outputText>
@@ -526,7 +526,7 @@
                                 </f:facet>
 
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete} "  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Parts'}" />
-                                <p:commandLink  value="修改" actionListener="#{contractInfoEditController.modifyContractItem(item)}" style="color:#3e87e8;padding: 10px" process="@this" oncomplete="PF('modifyAssetDlg').show()" update=":modifyAssetForm"/>
+                                <p:commandLink  value="修改" actionListener="#{contractInfoEditController.modifyContractItem(item)}" style="color:#3e87e8;padding: 10px" process="@this" oncomplete="PF('modifyAssetDlg').show()" update=":modifyAssetForm"  rendered="#{contractInfoEditController.selected.contractType eq 'Full' or contractInfoEditController.selected.contractType eq 'Artificial'}"/>
                                 <p:link  outcome="#{contractInfoEditController.getDetailPageLinkByUid(item.assetUid)}">#{msg.View}</p:link>
                             </p:column>
 
