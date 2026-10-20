@@ -158,6 +158,7 @@
                                      update=":measuringTab:resultImportWrapper :measuringTab:growl"
                                      icon="ui-icon-check"
                                      styleClass="btn btn-primary"
+                                     global="false"
                                      disabled="#{!measureFromExcelController.canbeImported or measureFromExcelController.isImported}"
                                      onstart="PF('importStatusDialog').show()"
                                      oncomplete="PF('importStatusDialog').hide()"/>
