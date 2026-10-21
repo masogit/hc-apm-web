@@ -9,7 +9,7 @@
 			</div>
 
 			<div class="ui-g-12 card ">
-				<p:tabView id="inventoryOrderDetailAssetInfoTab"  activeIndex="#{inventoryOrderTabController.queryTab}" >
+				<p:tabView id="inventoryOrderDetailAssetInfoTab" dynamic="true" cache="false"  activeIndex="#{inventoryOrderTabController.queryTab}" >
 					<p:ajax event="tabChange"/>
                     <p:tab title="#{msg.WholeHospitalView}" id="tab4" rendered="#{userContextService.hasCurrentTenantName('')}" >
                         <ui:include src="inventoryOrderDetailAssetInfoList.xhtml" />

@@ -7,6 +7,8 @@ import webapp.framework.web.WebUtil;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Logger;
 
 @ManagedBean
@@ -19,8 +21,8 @@ public class InventoryOrderTabController {
 
     @PostConstruct
     public void init() {
-        String enCodeParameters = WebUtil.getRequestParameter("str");
-        String queryTab = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryTab");
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String queryTab = request.getParameter("queryTab");
         if (StringUtils.isNotEmpty(queryTab)) {
             try {
                 this.queryTab = Integer.parseInt(queryTab);
