@@ -112,3 +112,7 @@ select replace(uuid_generate_v4()::text,'-',''), 1, '[{"key":"巡检","value":"i
 
 
 CREATE INDEX IF NOT EXISTS idx_wechat_msg_send_time_event_name ON wechat_message_history (send_time, event_name);
+
+--YHAAO-29949  his_equipment_data_source 增加索引
+DROP INDEX IF EXISTS idx_his_data_source_create_date;
+CREATE INDEX IF NOT EXISTS idx_his_data_source_create_exec ON his_equipment_data_source (create_date, exec_time);
