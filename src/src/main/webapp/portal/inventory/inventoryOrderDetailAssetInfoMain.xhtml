@@ -9,21 +9,21 @@
 			</div>
 
 			<div class="ui-g-12 card ">
-				<p:tabView id="inventoryOrderDetailAssetInfoTab" dynamic="true" cache="false"  activeIndex="#{inventoryOrderTabController.queryTab}" >
+				<p:tabView id="inventoryOrderDetailAssetInfoTab" dynamic="true" cache="false"  activeIndex="#{inventoryOrderTabController.activeIndex}" >
 					<p:ajax event="tabChange"/>
                     <p:tab title="#{msg.WholeHospitalView}" id="tab4" rendered="#{userContextService.hasCurrentTenantName('')}" >
                         <ui:include src="inventoryOrderDetailAssetInfoList.xhtml" />
                     </p:tab>
-					<p:tab title="#{msg.NonInventory}" id="tab0">
+					<p:tab title="#{msg.NonInventory}" id="tab0" disabled="#{not empty inventoryOrderTabController.queryTab  and inventoryOrderTabController.queryTab != '0'}">
 						<ui:include src="inventoryOrderDetailAssetInfo.xhtml" />
 					</p:tab>
-					<p:tab title="#{msg.Inventorized}" id="tab1">
+					<p:tab title="#{msg.Inventorized}" id="tab1" disabled="#{not empty inventoryOrderTabController.queryTab  and inventoryOrderTabController.queryTab != '1'}">
 						<ui:include src="inventoryOrderDetailAssetInfo2.xhtml" />
 					</p:tab>
-					<p:tab title="#{msg.NonLedger}" id="tab2">
+					<p:tab title="#{msg.NonLedger}" id="tab2" disabled="#{not empty inventoryOrderTabController.queryTab  and inventoryOrderTabController.queryTab != '2'}">
 						<ui:include src="inventoryOrderDetailAssetInfo3.xhtml" />
 					</p:tab>
-					<p:tab title="#{msg.HasIssue}" id="tab3">
+					<p:tab title="#{msg.HasIssue}" id="tab3" disabled="#{not empty inventoryOrderTabController.queryTab  and inventoryOrderTabController.queryTab != '3'}">
 						<ui:include src="inventoryOrderDetailAssetInfoIssue.xhtml" />
 					</p:tab>
 				</p:tabView>

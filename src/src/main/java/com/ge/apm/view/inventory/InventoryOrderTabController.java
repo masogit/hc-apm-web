@@ -17,30 +17,38 @@ public class InventoryOrderTabController {
 
     Logger logger = Logger.getLogger(InventoryOrderTabController.class.getName());
 
-    private int queryTab;
+    private String queryTab;
+    private int activeIndex;
 
     @PostConstruct
     public void init() {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String queryTab = request.getParameter("queryTab");
+        queryTab = request.getParameter("queryTab");
         if (StringUtils.isNotEmpty(queryTab)) {
             try {
-                this.queryTab = Integer.parseInt(queryTab);
+                this.activeIndex = Integer.parseInt(queryTab);
             } catch (NumberFormatException e) {
                 logger.info("queryTab is not a number");
-                this.queryTab = 0;
+                this.activeIndex = 0;
             }
         } else {
-            this.queryTab = 0;
+            this.activeIndex = 0;
         }
     }
 
-
-    public int getQueryTab() {
+    public String getQueryTab() {
         return queryTab;
     }
 
-    public void setQueryTab(int queryTab) {
+    public void setQueryTab(String queryTab) {
         this.queryTab = queryTab;
+    }
+
+    public int getActiveIndex() {
+        return activeIndex;
+    }
+
+    public void setActiveIndex(int activeIndex) {
+        this.activeIndex = activeIndex;
     }
 }
