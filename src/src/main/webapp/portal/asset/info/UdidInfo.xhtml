@@ -55,7 +55,7 @@
                             </label>
                         </h:panelGroup>
                         <p:autoComplete id="udidRegistyNum" value="#{assetInfoEditController.udidInfo.registryNum}"
-                                        completeMethod="#{assetInfoEditController.completeUdidRegistryNum}" minQueryLength="1"
+                                        completeMethod="#{assetInfoEditController.completeUdidRegistryNum}"
                                         scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
                                         var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.udidGroup(t)}">
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidRegistryNumChange}" update="UdidInfoForm"/>
