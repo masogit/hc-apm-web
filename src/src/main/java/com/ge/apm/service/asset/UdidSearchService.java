@@ -3,8 +3,10 @@ package com.ge.apm.service.asset;
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.mapper.UdidDeviceCategoryMapper;
 import com.ge.apm.dao.mapper.UdidRegistryNumInfoMapper;
+import com.ge.apm.domain.AutoCompleteVo;
 import com.ge.apm.domain.UdidDeviceCategory;
 import com.ge.apm.domain.UdidRegistryNumInfo;
+import com.ge.healthcare.cn.common.cons.DataSourceEnum;
 import com.ge.healthcare.cn.common.utils.tuple.ApmTriple;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -122,15 +125,16 @@ public class UdidSearchService {
      *
      * @param category 器械分类代码或名称
      */
-    public List<String> fuzzySearchCategory(String registryNum, String category) {
+    public List<AutoCompleteVo> fuzzySearchCategory(String registryNum, String category) {
 
         List<UdidDeviceCategory> result = fuzzySearch(registryNum, category);
 
         return result.stream()
-                .map(e -> e.getDisplayCategoryCode() + "  " + e.getDisplayCategoryName())
-                .filter(StringUtils::isNotBlank)
+                .map(e -> new AutoCompleteVo(e.getDisplayCategoryCode() + "  " + e.getDisplayCategoryName(),
+                        e.getDisplayCategoryCode() + "  " + e.getDisplayCategoryName(), DataSourceEnum.UDID.getSourceName()))
+                .filter(e -> StringUtils.isNotBlank(e.getValue()))
                 .distinct()
-                .sorted(String::compareTo)
+                .sorted(Comparator.comparing(AutoCompleteVo::getValue))
                 .collect(Collectors.toList());
     }
 

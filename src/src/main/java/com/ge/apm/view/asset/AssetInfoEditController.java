@@ -2918,13 +2918,20 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return RiskLevel.values();
     }
 
+    /**
+     * 打开“注册证-知识库参考”对话框，用当前资产数据初始化表单
+     */
     public void showUdidInfo() {
         udidInfo = new UdidInfoForm();
-        udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
-                supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClassDisplay(selected.getMedicalApparatusClassification()));
+        String apmMedicalClassDisplay = getApmMedicalClassDisplay(selected.getMedicalApparatusClassification());
+        udidInfo.fillValue(selected.getRegistrationNo(), new AutoCompleteVo(selected.getName(), selected.getName()), selected.getFunctionType(),
+                supplierService.findSupplierById(selected.getManufactureId()), new AutoCompleteVo(apmMedicalClassDisplay, apmMedicalClassDisplay));
         udidInfo.setChecked(false);
     }
 
+    /**
+     * 将对话框中的表单值应用到资产对象，逐字段校验必填项
+     */
     public void applyUidInfo() {
         if (needEdit("registrationNo")) {
             if (StringUtils.isBlank(udidInfo.getRegistryNum())) {
@@ -2936,13 +2943,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setRegistrationNo(udidInfo.getRegistryNum());
         }
         if (needEdit("name")) {
-            if (StringUtils.isBlank(udidInfo.getAssetName())) {
+            if (Objects.isNull(udidInfo.getAssetName()) || StringUtils.isBlank(udidInfo.getAssetName().getValue())) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("name") + WebUtil.getMessage("ValidationRequire"));
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("validationFailed", true);
                 return;
             }
-            selected.setName(udidInfo.getAssetName());
+            selected.setName(udidInfo.getAssetName().getValue());
         }
         if (needEdit("functionType")) {
             if (customConfig.getAssetFields().get("functionType").isRequired() && StringUtils.isBlank(udidInfo.getFunctionType())) {
@@ -2974,13 +2981,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
         if (needEdit("medicalApparatusClassification")) {
-            if (customConfig.getAssetFields().get("medicalApparatusClassification").isRequired() && Objects.isNull(udidInfo.getMedicalClass())) {
+            if (customConfig.getAssetFields().get("medicalApparatusClassification").isRequired()
+                    && (Objects.isNull(udidInfo.getMedicalClass()) || StringUtils.isBlank(udidInfo.getMedicalClassCode()))) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("medicalApparatusClassification") + WebUtil.getMessage("ValidationRequire"));
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("validationFailed", true);
                 return;
             }
-            if (StringUtils.isNotBlank(udidInfo.getMedicalClass())) {
+            if (Objects.nonNull(udidInfo.getMedicalClass()) && StringUtils.isNotBlank(udidInfo.getMedicalClassCode())) {
                 SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(udidInfo.getMedicalClassCode());
                 if (Objects.isNull(sysAuthGroup)) {
                     WebUtil.addErrorMessage(WebUtil.getMessage("medicalApparatusClassificationNotExists"));
@@ -2994,6 +3002,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    /**
+     * 知识库校验：将表单各字段与注册证知识库比对，标记一致/不一致状态
+     */
     public void checkUdid() {
         int count = 0;
         StringBuilder warnColumn = new StringBuilder();
@@ -3015,7 +3026,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             udidInfo.setMessage("该注册证号在知识库中不存在");
         } else {
             udidInfo.setRegistryNumFromUdid(true);
-            if (needEdit("name") && !Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getAssetName())) {
+            if (needEdit("name") && (Objects.isNull(udidInfo.getAssetName()) || !Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getAssetName().getValue()))) {
                 count++;
                 warnColumn.append("名称");
                 udidInfo.setAssetNameFromUdid(false);
@@ -3032,7 +3043,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             } else {
                 udidInfo.setFunctionTypeFromUdid(true);
             }
-            if (needEdit("manufacture") && Objects.isNull(udidInfo.getManufacture()) || !Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture().getName())) {
+            if (needEdit("manufacture") && (Objects.isNull(udidInfo.getManufacture()) || !Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture().getName()))) {
                 if (count > 0) {
                     warnColumn.append("、");
                 }
@@ -3043,7 +3054,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 udidInfo.setManufactureFromUdid(true);
             }
             List<String> medicalClassList = UdidSearchService.parseJsonArrayAndStripHyphens(udidRegistryNumInfo.getFlbm());
-            if (needEdit("medicalApparatusClassification") && CollectionUtils.isNotEmpty(medicalClassList) && !medicalClassList.contains(udidInfo.getMedicalClassCode())) {
+            if (needEdit("medicalApparatusClassification") && CollectionUtils.isNotEmpty(medicalClassList)
+                    && (Objects.isNull(udidInfo.getMedicalClass()) || !medicalClassList.contains(udidInfo.getMedicalClassCode()))) {
                 if (count > 0) {
                     warnColumn.append("、");
                 }
@@ -3063,14 +3075,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    /**
+     * 重置表单为原始资产数据（编辑模式从数据库重新读取，创建模式清空）
+     */
     public void resetUdid() {
         AssetInfo currentAsset = null;
         if (isEditAction()) {
             currentAsset = assetInfoService.getAssetInfo(selected.getId());
         }
         if (Objects.nonNull(currentAsset)) {
-            udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
-                    supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClassDisplay(selected.getMedicalApparatusClassification()));
+            String apmMedicalClassDisplay = getApmMedicalClassDisplay(currentAsset.getMedicalApparatusClassification());
+            udidInfo.fillValue(currentAsset.getRegistrationNo(), new AutoCompleteVo(currentAsset.getName(), currentAsset.getName()), currentAsset.getFunctionType(),
+                    supplierService.findSupplierById(currentAsset.getManufactureId()), new AutoCompleteVo(apmMedicalClassDisplay, apmMedicalClassDisplay));
         } else {
             udidInfo.clearValue();
         }
@@ -3078,15 +3094,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         udidInfo.clearMessage();
     }
 
+    /**
+     * 根据分类代码拼接医疗器械分类的显示文本，格式："代码  名称"
+     */
     private String getApmMedicalClassDisplay(String medicalClassCode) {
         if (StringUtils.isBlank(medicalClassCode)) {
             return "";
         }
-        SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
-        return selected.getMedicalApparatusClassification() + "  " + (Objects.isNull(sysAuthGroup) ? "" : sysAuthGroup.getName());
+        SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(medicalClassCode);
+        return medicalClassCode + "  " + (Objects.isNull(sysAuthGroup) ? "" : sysAuthGroup.getName());
     }
 
-    public String groupByUdid(String s) {
+    public String udidGroup(Object o) {
         return DataSourceEnum.UDID.getSourceName();
     }
 
@@ -3094,21 +3113,44 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return supplier.isFromUdid() ? DataSourceEnum.UDID.getSourceName() : DataSourceEnum.APM.getSourceName();
     }
 
+    /**
+     * 注册证号模糊搜索（返回纯字符串列表）
+     */
     public List<String> completeUdidRegistryNum(String prefix) {
         return udidSearchService.fuzzySearchRegistryNum(prefix);
     }
 
-    public List<String> completeUdidAssetName(String prefix) {
-        return udidSearchService.fuzzySearchAssetName(udidInfo.getRegistryNum(), prefix);
+    /**
+     * 名称模糊搜索，合并 UDI 知识库 + APM 已有资产名称，按来源分组
+     */
+    public List<AutoCompleteVo> completeUdidAssetName(String prefix) {
+        List<AutoCompleteVo> udidAssetList = udidSearchService.fuzzySearchAssetName(udidInfo.getRegistryNum(), prefix)
+                .stream()
+                .map(s -> new AutoCompleteVo(s, s, DataSourceEnum.UDID.getSourceName()))
+                .collect(Collectors.toList());
+
+        List<AutoCompleteVo> apmAssetList = completeAssetName(prefix)
+                .stream()
+                .map(s -> new AutoCompleteVo(s, s, true, DataSourceEnum.APM.getSourceName()))
+                .collect(Collectors.toList());
+
+        udidAssetList.addAll(apmAssetList);
+        return udidAssetList;
     }
 
+    /**
+     * 设备型号模糊搜索（返回纯字符串列表）
+     */
     public List<String> completeUdidFunctionType(String prefix) {
         return udidSearchService.fuzzySearchFunctionType(udidInfo.getRegistryNum(), prefix);
     }
 
+    /**
+     * 制造商模糊搜索，合并 UDI 知识库 + APM 供应商列表
+     */
     public List<Supplier> completeUdidManufacture(String query) {
         // apm供应商
-        List<Supplier> apmSupplierList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID(), query, 1000);
+        List<Supplier> apmSupplierList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID(), query, 20);
 
         // udid供应商
         List<String> udidSupplierNameList = udidSearchService.fuzzySearchManufacture(udidInfo.getRegistryNum(), query);
@@ -3121,7 +3163,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                     supplier.setId(Objects.isNull(apmSupplier) ? -1 : apmSupplier.getId());
                     supplier.setFromUdid(true);
                     supplier.setName(name);
-                    supplier.setName(name);
                     return supplier;
                 }).collect(Collectors.toList());
 
@@ -3130,10 +3171,31 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return udidSupplierList;
     }
 
-    public List<String> completeUdidCategory(String prefix) {
-        return udidSearchService.fuzzySearchCategory(udidInfo.getRegistryNum(), prefix);
+    /**
+     * 医疗器械分类模糊搜索，合并 UDI 知识库 + APM 权限组分类
+     */
+    public List<AutoCompleteVo> completeUdidCategory(String prefix) {
+        List<AutoCompleteVo> udidCategoryList = udidSearchService.fuzzySearchCategory(udidInfo.getRegistryNum(), prefix);
+
+        List<SysAuthGroup> apmSysAuthGroupList;
+        if (StringUtils.isBlank(prefix)) {
+            apmSysAuthGroupList = authGroupDao.listSysAuthGroupForUdid();
+        } else {
+            apmSysAuthGroupList = authGroupDao.listSysAuthGroupForUdid(prefix);
+        }
+
+        List<AutoCompleteVo> apmCategoryList = apmSysAuthGroupList.stream()
+                .map(s -> new AutoCompleteVo(s.getClassificationCode() + "  " + s.getName(),
+                        s.getClassificationCode() + "  " + s.getName(), true, DataSourceEnum.APM.getSourceName()))
+                .collect(Collectors.toList());
+
+        udidCategoryList.addAll(apmCategoryList);
+        return udidCategoryList;
     }
 
+    /**
+     * 注册证号变更（SelectEvent: 下拉选中 / 非SelectEvent: 手动输入blur）
+     */
     public void onUdidRegistryNumChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             udidInfo.setRegistryNum((String) ((SelectEvent) event).getObject());
@@ -3144,16 +3206,22 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    /**
+     * 名称变更
+     */
     public void onUdidAssetNameChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
-            udidInfo.setAssetName((String) ((SelectEvent) event).getObject());
+            udidInfo.setAssetName((AutoCompleteVo) ((SelectEvent) event).getObject());
         }
 
-        if (!Objects.equals(selected.getName(), udidInfo.getAssetName())) {
+        if (Objects.isNull(udidInfo.getAssetName()) || !Objects.equals(selected.getName(), udidInfo.getAssetName().getValue())) {
             udidInfo.setChecked(false);
         }
     }
 
+    /**
+     * 设备型号变更
+     */
     public void onUdidFunctionTypeChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             udidInfo.setFunctionType((String) ((SelectEvent) event).getObject());
@@ -3164,6 +3232,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    /**
+     * 制造商变更
+     */
     public void onUdidManufactureChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             udidInfo.setManufacture((Supplier) ((SelectEvent) event).getObject());
@@ -3174,16 +3245,22 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    /**
+     * 医疗器械分类变更
+     */
     public void onUdidMedicalClassChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
-            udidInfo.setMedicalClass((String) ((SelectEvent) event).getObject());
+            udidInfo.setMedicalClass((AutoCompleteVo) ((SelectEvent) event).getObject());
         }
 
-        if (!Objects.equals(selected.getMedicalApparatusClassification(), udidInfo.getMedicalClassCode())) {
+        if (Objects.isNull(udidInfo.getMedicalClass()) || !Objects.equals(selected.getMedicalApparatusClassification(), udidInfo.getMedicalClassCode())) {
             udidInfo.setChecked(false);
         }
     }
 
+    /**
+     * 初始化新建制造商表单，从下拉面板按钮传入的 supplierName 参数预填名称
+     */
     public void prepareCreateUdidSupplier() {
         String supplierName = FacesContext.getCurrentInstance()
                 .getExternalContext()
@@ -3195,12 +3272,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         newUdidSupplier.setManufacturerT(true);
     }
 
+    /**
+     * 制造商名称变更时校验：若该名称已存在则回填完整信息，否则保留用户输入的类型标记并重置表单
+     */
     public void onUdidSupplierChange() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newUdidSupplier.getName());
         if (!ObjectUtils.isEmpty(supplier)) {
+            // 已存在：直接使用数据库中的完整供应商信息
             this.newUdidSupplier = supplier;
         } else {
+            // 不存在：保留用户输入的名称和类型标记，重新初始化表单
             String name = newUdidSupplier.getName();
             boolean ManufacturerT = newUdidSupplier.getManufacturerT();
             boolean SupplierT = newUdidSupplier.getSupplierT();
@@ -3213,6 +3295,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    /**
+     * 保存新建制造商：填充租户/机构等上下文信息，保存后回填到 UDI 表单的制造商字段
+     */
     public void saveNewUdidSupplier() {
         if (null == newUdidSupplier.getId()) {
             this.newUdidSupplier.setSiteId(loginUser.getSiteId());

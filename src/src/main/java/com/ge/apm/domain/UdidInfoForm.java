@@ -3,6 +3,8 @@ package com.ge.apm.domain;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+
 @Data
 public class UdidInfoForm {
 
@@ -13,7 +15,7 @@ public class UdidInfoForm {
     private Boolean registryNumFromUdid;
 
     // 资产名称
-    private String assetName;
+    private AutoCompleteVo assetName;
 
     // 资产名称来自udid
     private Boolean assetNameFromUdid;
@@ -31,7 +33,7 @@ public class UdidInfoForm {
     private Boolean manufactureFromUdid;
 
     // 医疗器械分类
-    private String medicalClass;
+    private AutoCompleteVo medicalClass;
 
     // 医疗器械分类来自udid
     private Boolean medicalClassFromUdid;
@@ -42,7 +44,7 @@ public class UdidInfoForm {
     // 知识库校验信息
     private String message;
 
-    public void fillValue(String registryNum, String assetName, String functionType, Supplier manufacture, String medicalClass) {
+    public void fillValue(String registryNum, AutoCompleteVo assetName, String functionType, Supplier manufacture, AutoCompleteVo medicalClass) {
         this.registryNum = registryNum;
         this.assetName = assetName;
         this.functionType = functionType;
@@ -83,10 +85,10 @@ public class UdidInfoForm {
      * @return 首个空白字符前的内容；输入为blank时返回原值
      */
     public String getMedicalClassCode() {
-        if (StringUtils.isBlank(medicalClass)) {
-            return medicalClass;
+        if (Objects.isNull(medicalClass) || StringUtils.isBlank(medicalClass.getValue())) {
+            return "";
         }
-        String[] parts = medicalClass.split("[\\s\\u00A0]+", 2);
+        String[] parts = medicalClass.getValue().split("[\\s\\u00A0]+", 2);
         return parts[0];
     }
 }

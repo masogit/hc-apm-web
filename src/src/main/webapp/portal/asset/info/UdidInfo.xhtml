@@ -55,9 +55,9 @@
                             </label>
                         </h:panelGroup>
                         <p:autoComplete id="udidRegistyNum" value="#{assetInfoEditController.udidInfo.registryNum}"
-                                        completeMethod="#{assetInfoEditController.completeUdidRegistryNum}"
+                                        completeMethod="#{assetInfoEditController.completeUdidRegistryNum}" minQueryLength="1"
                                         scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
-                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
+                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.udidGroup(t)}">
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidRegistryNumChange}" update="UdidInfoForm"/>
                             <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidRegistryNumChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
@@ -86,8 +86,8 @@
                         </h:panelGroup>
                         <p:autoComplete id="udidAsstName" value="#{assetInfoEditController.udidInfo.assetName}"
                                         completeMethod="#{assetInfoEditController.completeUdidAssetName}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
-                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
+                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" converter="autoCompleteVoConverter"
+                                        var="t" itemLabel="#{t.label}" itemValue="#{t}" groupBy="#{t.group}">
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidAssetNameChange}" update="UdidInfoForm"/>
                             <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidAssetNameChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
@@ -123,7 +123,7 @@
                         <p:autoComplete id="udidFunctionType" value="#{assetInfoEditController.udidInfo.functionType}"
                                         completeMethod="#{assetInfoEditController.completeUdidFunctionType}"
                                         scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
-                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
+                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.udidGroup(t)}">
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidFunctionTypeChange}" update="UdidInfoForm"/>
                             <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidFunctionTypeChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
@@ -202,8 +202,8 @@
                         </h:panelGroup>
                         <p:autoComplete id="udidMedicalClass" value="#{assetInfoEditController.udidInfo.medicalClass}"
                                         completeMethod="#{assetInfoEditController.completeUdidCategory}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
-                                        groupBy="#{assetInfoEditController.groupByUdid(t)}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" converter="autoCompleteVoConverter"
+                                        var="t" itemLabel="#{t.label}" itemValue="#{t}" groupBy="#{t.group}">
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidMedicalClassChange}" update="UdidInfoForm"/>
                             <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidMedicalClassChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
