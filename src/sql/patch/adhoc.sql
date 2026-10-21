@@ -109,3 +109,10 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit, user_parent_config, value_type,validation)
 select replace(uuid_generate_v4()::text,'-',''), 1, '[{"key":"巡检","value":"inspection"},{"key":"二级保养","value":"secondMaintenance"},{"key":"三级保养","value":"thirdMaintenance"},{"key":"维修","value":"repair"}]', '生命时间轴卡片显示', 'timeLineShowCards', '生命时间轴卡片显示', 'f', 't', 8 , '[{"key":"巡检","value":"inspection"},{"key":"二级保养","value":"secondMaintenance"},{"key":"三级保养","value":"thirdMaintenance"},{"key":"质量控制","value":"qualityControl"},{"key":"维修","value":"repair"},{"key":"计量","value":"measuring"},{"key":"盘点","value":"inventory"}]' where not exists (select * from config_item where key = 'timeLineShowCards');
+
+
+CREATE INDEX IF NOT EXISTS idx_wechat_msg_send_time_event_name ON wechat_message_history (send_time, event_name);
+
+--YHAAO-29949  his_equipment_data_source 增加索引
+DROP INDEX IF EXISTS idx_his_data_source_create_date;
+CREATE INDEX IF NOT EXISTS idx_his_data_source_create_exec ON his_equipment_data_source (create_date, exec_time);
