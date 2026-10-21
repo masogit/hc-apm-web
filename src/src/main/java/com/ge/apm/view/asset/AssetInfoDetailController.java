@@ -648,7 +648,7 @@ public class AssetInfoDetailController {
             InventoryOrder inventoryOrder = inventoryOrderRepository.findById(inventoryOrderDetail.getInventoryOrderId());
             InventoryIssue inventoryIssue = inventoryIssueRepository.findProjectionByAssetIdAndInventoryOrderId(assetId, inventoryOrder.getId());
             int queryIndex = inventoryIssue == null ? 1 : 3;
-            url = "orderId="+uid+"queryTabisFinished=false&queryTab="+queryIndex+"&assetUid=" +selected.getUid();
+            url = "orderId="+inventoryOrder.getId()+"&isFinished=true&queryTab="+queryIndex+"&assetUid=" +selected.getUid();
             url = contextPath + "/portal/inventory/inventoryOrderDetailAssetInfoMain.xhtml?" + url;
         }
         log.info("timeline_url:"+url);
