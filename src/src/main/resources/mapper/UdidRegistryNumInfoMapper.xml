@@ -96,5 +96,6 @@
                 and ggxh::text ilike CONCAT('%', #{functionType}, '%')
             </if>
         </where>
+        ORDER BY registry_num LIMIT 100
     </select>
 </mapper>

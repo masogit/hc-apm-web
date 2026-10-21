@@ -19,15 +19,15 @@
     <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" height="460" width="960">
         <h:form id="UdidInfoForm">
             <h:panelGroup id="display">
-                <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%"
-                             rendered="#{assetInfoEditController.isEditAction() and assetInfoEditController.udidInfo != null}">
+                <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%" rendered="#{assetInfoEditController.udidInfo != null}">
                     <p:row>
                         <p:column style="width: 75%; text-align: left">
                             <p:outputLabel value="#{assetInfoEditController.udidInfo.message}" rendered="#{not empty assetInfoEditController.udidInfo.message}" style="color: #ffc107"/>
                         </p:column>
                         <p:column style="width: 25%; text-align: right">
                             <p:commandButton id="udidCheck" value="知识库校验" actionListener="#{assetInfoEditController.checkUdid()}" update="UdidInfoForm"/>
-                            <p:commandButton id="udidReset" value="重置" actionListener="#{assetInfoEditController.resetUdid()}" update="UdidInfoForm"/>
+                            <p:commandButton id="udidReset" value="重置" actionListener="#{assetInfoEditController.resetUdid()}" update="UdidInfoForm"
+                                             rendered="#{assetInfoEditController.isEditAction()}"/>
                         </p:column>
                     </p:row>
                 </p:panelGrid>
@@ -56,10 +56,10 @@
                         </h:panelGroup>
                         <p:autoComplete id="udidRegistyNum" value="#{assetInfoEditController.udidInfo.registryNum}"
                                         completeMethod="#{assetInfoEditController.completeUdidRegistryNum}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" minQueryLength="3"
+                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
                                         var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
-                            <p:ajax event="valueChange" process="@this" listener="#{assetInfoEditController.onUdidRegistryNumSelect}" update="UdidInfoForm"/>
-                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidRegistryNumSelect}" update="UdidInfoForm"/>
+                            <p:ajax process="@this" listener="#{assetInfoEditController.onUdidRegistryNumChange}" update="UdidInfoForm"/>
+                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidRegistryNumChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
                     </h:panelGroup>
 
@@ -88,8 +88,8 @@
                                         completeMethod="#{assetInfoEditController.completeUdidAssetName}"
                                         scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
                                         var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
-                            <p:ajax process="@this"/>
-                            <p:ajax event="itemSelect" process="@this"/>
+                            <p:ajax process="@this" listener="#{assetInfoEditController.onUdidAssetNameChange}" update="UdidInfoForm"/>
+                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidAssetNameChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
                     </h:panelGroup>
 
@@ -124,8 +124,8 @@
                                         completeMethod="#{assetInfoEditController.completeUdidFunctionType}"
                                         scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
                                         var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupByUdid(t)}">
-                            <p:ajax process="@this"/>
-                            <p:ajax event="itemSelect" process="@this"/>
+                            <p:ajax process="@this" listener="#{assetInfoEditController.onUdidFunctionTypeChange}" update="UdidInfoForm"/>
+                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidFunctionTypeChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
                     </h:panelGroup>
 
@@ -168,8 +168,8 @@
                                                      onclick="invokeCreateUdidSupplier([{name:'supplierName', value:'#{t.name}'}])"/>
                                 </div>
                             </p:column>
-                            <p:ajax process="@this"/>
-                            <p:ajax event="itemSelect" process="@this"/>
+                            <p:ajax process="@this" listener="#{assetInfoEditController.onUdidManufactureChange}" update="UdidInfoForm"/>
+                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidManufactureChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
                     </h:panelGroup>
 
@@ -204,41 +204,21 @@
                                         completeMethod="#{assetInfoEditController.completeUdidCategory}"
                                         scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
                                         groupBy="#{assetInfoEditController.groupByUdid(t)}" var="t" itemLabel="#{t}" itemValue="#{t}">
-                            <p:ajax process="@this"/>
-                            <p:ajax event="itemSelect" process="@this"/>
+                            <p:ajax process="@this" listener="#{assetInfoEditController.onUdidMedicalClassChange}" update="UdidInfoForm"/>
+                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidMedicalClassChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
                     </h:panelGroup>
 
                     <!-- 空 -->
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
-                    <h:panelGroup/>
+                    <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
+                    <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
+                    <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="应用" actionListener="#{assetInfoEditController.applyUidInfo()}"
-                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'UdidInfoDlg');" update="tab:AssetInfoEditForm"/>
+                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'UdidInfoDlg');" update="tab:AssetInfoEditForm">
+                    <p:confirm header="确认" disabled="#{assetInfoEditController.udidInfo.checked eq true}" message="当前数据未通过知识库校验，确认应用到资产信息中吗？&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                </p:commandButton>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('UdidInfoDlg').hide()"/>
             </h:panelGroup>
 

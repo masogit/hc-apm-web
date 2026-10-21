@@ -2919,15 +2919,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void showUdidInfo() {
-        if (isCreateAction()) {
-            udidInfo = new UdidInfoForm();
-            udidInfo.setRegistryNum(selected.getRegistrationNo());
-        }
-        if (isEditAction()) {
-            udidInfo = new UdidInfoForm();
-            udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
-                    supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClassDisplay(selected.getMedicalApparatusClassification()));
-        }
+        udidInfo = new UdidInfoForm();
+        udidInfo.fillValue(selected.getRegistrationNo(), selected.getName(), selected.getFunctionType(),
+                supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClassDisplay(selected.getMedicalApparatusClassification()));
+        udidInfo.setChecked(false);
     }
 
     public void applyUidInfo() {
@@ -3003,12 +2998,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         int count = 0;
         StringBuilder warnColumn = new StringBuilder();
 
+        if (StringUtils.isBlank(udidInfo.getRegistryNum())) {
+            udidInfo.clearFlag();
+            udidInfo.setRegistryNumFromUdid(false);
+            udidInfo.setChecked(false);
+            udidInfo.setMessage("注册证号为空");
+            return;
+        }
+
         UdidRegistryNumInfo udidRegistryNumInfo = udidSearchService.selectByRegistryNum(udidInfo.getRegistryNum());
 
         if (Objects.isNull(udidRegistryNumInfo)) {
             udidInfo.clearFlag();
             udidInfo.setRegistryNumFromUdid(false);
-            udidInfo.setMessage("该注册证号在知识库中不存在！");
+            udidInfo.setChecked(false);
+            udidInfo.setMessage("该注册证号在知识库中不存在");
         } else {
             udidInfo.setRegistryNumFromUdid(true);
             if (needEdit("name") && !Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getAssetName())) {
@@ -3050,8 +3054,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 udidInfo.setMedicalClassFromUdid(true);
             }
             if (count > 0) {
+                udidInfo.setChecked(false);
                 udidInfo.setMessage("检测到" + count + "个字段与知识库不一致（" + warnColumn + "）");
             } else {
+                udidInfo.setChecked(true);
                 udidInfo.setMessage("");
             }
         }
@@ -3128,15 +3134,53 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return udidSearchService.fuzzySearchCategory(udidInfo.getRegistryNum(), prefix);
     }
 
-    public void onUdidRegistryNumSelect(AjaxBehaviorEvent event) {
+    public void onUdidRegistryNumChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             udidInfo.setRegistryNum((String) ((SelectEvent) event).getObject());
         }
 
         if (!Objects.equals(selected.getRegistrationNo(), udidInfo.getRegistryNum())) {
-            udidInfo.clearValue();
-            udidInfo.clearFlag();
-            udidInfo.clearMessage();
+            udidInfo.setChecked(false);
+        }
+    }
+
+    public void onUdidAssetNameChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            udidInfo.setAssetName((String) ((SelectEvent) event).getObject());
+        }
+
+        if (!Objects.equals(selected.getName(), udidInfo.getAssetName())) {
+            udidInfo.setChecked(false);
+        }
+    }
+
+    public void onUdidFunctionTypeChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            udidInfo.setFunctionType((String) ((SelectEvent) event).getObject());
+        }
+
+        if (!Objects.equals(selected.getFunctionType(), udidInfo.getFunctionType())) {
+            udidInfo.setChecked(false);
+        }
+    }
+
+    public void onUdidManufactureChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            udidInfo.setManufacture((Supplier) ((SelectEvent) event).getObject());
+        }
+
+        if (!Objects.equals(selected.getMaitananceId(), udidInfo.getManufacture().getId().toString())) {
+            udidInfo.setChecked(false);
+        }
+    }
+
+    public void onUdidMedicalClassChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            udidInfo.setMedicalClass((String) ((SelectEvent) event).getObject());
+        }
+
+        if (!Objects.equals(selected.getMedicalApparatusClassification(), udidInfo.getMedicalClassCode())) {
+            udidInfo.setChecked(false);
         }
     }
 

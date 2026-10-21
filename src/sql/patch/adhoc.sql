@@ -100,3 +100,6 @@ WHERE wc.tenant_uid = v_tenant_uid
 
 END LOOP;
 END $$;
+
+
+CREATE UNIQUE INDEX idx_udid_registry_num_info_registry_num ON udid_registry_num_info (registry_num);

@@ -114,10 +114,6 @@ public class UdidSearchService {
     private List<UdidRegistryNumInfo> fuzzySearch(String registryNum, String manufacture,
                                                   String assetName, String functionType) {
 
-        if (StringUtils.isBlank(registryNum) && StringUtils.isBlank(manufacture)
-                && StringUtils.isBlank(assetName) && StringUtils.isBlank(functionType)) {
-            return Lists.newArrayList();
-        }
         return udidRegistryNumInfoMapper.fuzzySearch(registryNum, manufacture, assetName, functionType);
     }
 
