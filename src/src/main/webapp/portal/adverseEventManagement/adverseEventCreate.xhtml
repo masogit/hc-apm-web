@@ -217,12 +217,19 @@
                                 </h:panelGroup>
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="productInfo">
                                     <h:panelGroup>
-                                        <label class="label">产品名称<span style="color:red">*</span></label>
-                                        <p:inputText id="productName" value="#{adverseEventManagementController.selected.productName}" required="false"  requiredMessage="产品名称不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <label class="label">注册证编号<span style="color:red">*</span></label>
+                                        <p:autoComplete id="registrationNum" value="#{adverseEventManagementController.selected.registrationNum}"
+                                                        completeMethod="#{adverseEventManagementController.completeUdidRegistryNum}"
+                                                        scrollHeight="160" panelStyleClass="max-width-200" dropdown="true"
+                                                        var="t" itemLabel="#{t}" itemValue="#{t}"
+                                                        readonly="#{adverseEventManagementController.readOnlyCreateForm}">
+                                            <p:ajax process="@this" listener="#{adverseEventManagementController.onUdidRegistryNumChange}" update=":AdverseEventCreateForm:accordionCreate:productInfo"/>
+                                            <p:ajax event="itemSelect" process="@this" listener="#{adverseEventManagementController.onUdidRegistryNumChange}" update=":AdverseEventCreateForm:accordionCreate:productInfo"/>
+                                        </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">注册证编号<span style="color:red">*</span></label>
-                                        <p:inputText id="registrationNum" value="#{adverseEventManagementController.selected.registrationNum}" required="false"  requiredMessage="注册证编号不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <label class="label">产品名称<span style="color:red">*</span></label>
+                                        <p:inputText id="productName" value="#{adverseEventManagementController.selected.productName}" required="false"  requiredMessage="产品名称不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="false">
                                         <label class="label">曾用注册证编号</label>

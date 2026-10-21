@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.adverseEvent.AdverseEventsService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.asset.UdidSearchService;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.nurseSite.WordReportExportService;
@@ -21,31 +22,26 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.JpaCRUDController;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -139,6 +135,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
     @Setter
     @Getter
     private List<MultiLevelApproval> multiLevelApprovals;
+    private UdidSearchService udidSearchService;
 
     @Override
     protected void init() {
@@ -160,6 +157,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        udidSearchService = WebUtil.getBean(UdidSearchService.class);
 
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
@@ -428,12 +426,15 @@ public class AdverseEventManagementController extends AdverseEventBaseController
     }
 
     public void onSelect(SelectEvent event) {
+        this.selected.setRegistrationInfo(udidSearchService.selectByRegistryNum(assetSelected.getRegistrationNo()));
+
         this.selected.setAssetName(assetSelected.getName());
         this.selected.setDepartment(assetSelected.getClinicalDeptUID());
         this.selected.setOriginPlace(assetSelected.getProductPlace());
         this.selected.setDeviceNum(assetSelected.getDepartNum());
         this.selected.setRegistrationNum(assetSelected.getRegistrationNo());
-        this.selected.setProductName(assetSelected.getName());
+        this.selected.setProductName(StringUtils.hasText(selected.getUdidProductName()) ? selected.getUdidProductName() : assetSelected.getName());
+        this.selected.setMarketingAuthHolder(StringUtils.hasText(selected.getUdidRegistrantName()) ? selected.getUdidRegistrantName() : null);
         this.selected.setPreviouslyRegistrationReport(false);
         this.selected.setProductionDate(assetSelected.getManufactDate());
         this.selected.setModel(assetSelected.getFunctionType());
@@ -641,5 +642,29 @@ public class AdverseEventManagementController extends AdverseEventBaseController
         return adverseEventsRepository;
     }
 
+    /**
+     * 注册证号模糊搜索（返回纯字符串列表）
+     */
+    public List<String> completeUdidRegistryNum(String prefix) {
+        return udidSearchService.fuzzySearchRegistryNum(prefix);
+    }
 
+    /**
+     * 注册证号变更（SelectEvent: 下拉选中 / 非SelectEvent: 手动输入blur）
+     */
+    public void onUdidRegistryNumChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            selected.setRegistrationNum((String) ((SelectEvent) event).getObject());
+        }
+
+        if (StringUtils.hasText(selected.getRegistrationNum())) {
+            this.selected.setRegistrationInfo(udidSearchService.selectByRegistryNum(selected.getRegistrationNum()));
+            this.selected.setProductName(StringUtils.hasText(selected.getUdidProductName()) ? selected.getUdidProductName() : assetSelected.getName());
+            this.selected.setMarketingAuthHolder(StringUtils.hasText(selected.getUdidRegistrantName()) ? selected.getUdidRegistrantName() : null);
+        } else {
+            this.selected.setRegistrationInfo(null);
+            this.selected.setProductName(null);
+            this.selected.setMarketingAuthHolder(null);
+        }
+    }
 }
