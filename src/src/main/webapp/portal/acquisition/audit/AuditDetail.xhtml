@@ -11,7 +11,7 @@
 
         <div class="ui-g-12 card">
             <h:form id="auditForm">
-                <p:accordionPanel id="accordionPanel" multiple="true" activeIndex="0,1,2,3,5">
+                <p:accordionPanel id="accordionPanel" multiple="true" activeIndex="0,1,2,3,4,5">
                     <p:tab title="申报信息" closable="false">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
@@ -197,7 +197,7 @@
                         </p:panelGrid>
                     </p:tab>
                     <p:tab title="辅助论证" closable="true">
-                        <p:commandButton value="采购评估" class="btn btn-xs btn-primary"
+                        <p:commandButton value="采购评估"
                                          actionListener="#{acquisitionPlanAuditEditController.benefitAssess()}"
                                          process="@this" update=":benefitAssessForm"
                                          oncomplete="PF('benefitAssessSidebar').show()"/>
