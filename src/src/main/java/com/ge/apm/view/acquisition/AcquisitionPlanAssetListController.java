@@ -218,7 +218,7 @@ public class AcquisitionPlanAssetListController extends GenericCRUDUUIDControlle
             WebUtil.addErrorMessage("设备信息不完整，无法查看效益评估");
             return;
         }
-        this.benefitAssessIframeUrl = "reports/appraisal/benefit/" + item.getAssetUid();
+        this.benefitAssessIframeUrl = "/reports/appraisal/benefit/" + item.getAssetUid();
     }
 
     public String goToAdd() {
