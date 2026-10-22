@@ -2924,9 +2924,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void showUdidInfo() {
         udidInfo = new UdidInfoForm();
         udidInfo.fillValue(selected.getRegistrationNo(), new AutoCompleteVo(selected.getName(), selected.getName()), selected.getFunctionType(),
-                supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClassDisplay(selected.getMedicalApparatusClassification()));
+                supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClass(selected.getMedicalApparatusClassification()));
 
-        udidInfo.setMedicalClassTree(udidInfoService.buildMedicalClassTree(selected.getRegistrationNo()));
+        udidInfo.setMedicalClassTree(buildMedicalClassTree(selected.getRegistrationNo(), medicalInstrumentsClassificationCompCtrl.getSysAuthGroupTreeForUdid()));
         udidInfo.setChecked(false);
     }
 
@@ -3086,7 +3086,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         if (Objects.nonNull(currentAsset)) {
             udidInfo.fillValue(currentAsset.getRegistrationNo(), new AutoCompleteVo(currentAsset.getName(), currentAsset.getName()), currentAsset.getFunctionType(),
-                    supplierService.findSupplierById(currentAsset.getManufactureId()), getApmMedicalClassDisplay(currentAsset.getMedicalApparatusClassification()));
+                    supplierService.findSupplierById(currentAsset.getManufactureId()), getApmMedicalClass(currentAsset.getMedicalApparatusClassification()));
         } else {
             udidInfo.clearValue();
         }
@@ -3097,7 +3097,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     /**
      * 根据分类代码拼接医疗器械分类的显示文本，格式："代码  名称"
      */
-    private SysAuthGroup getApmMedicalClassDisplay(String medicalClassCode) {
+    private SysAuthGroup getApmMedicalClass(String medicalClassCode) {
         if (StringUtils.isBlank(medicalClassCode)) {
             return null;
         }
@@ -3181,7 +3181,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         if (!Objects.equals(selected.getRegistrationNo(), udidInfo.getRegistryNum())) {
             udidInfo.setChecked(false);
-            udidInfo.setMedicalClassTree(udidInfoService.buildMedicalClassTree(udidInfo.getRegistryNum()));
+            udidInfo.setMedicalClassTree(buildMedicalClassTree(udidInfo.getRegistryNum(), medicalInstrumentsClassificationCompCtrl.getSysAuthGroupTreeForUdid()));
         }
     }
 
@@ -3227,6 +3227,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void onUdidMedicalClassSelect(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         udidInfo.setMedicalClass((SysAuthGroup) node.getData());
+    }
+
+    public TreeNode buildMedicalClassTree(String registryNum, TreeNode apmTree) {
+        TreeNode rootNode = new DefaultTreeNode("medicalClass", null, null);
+
+        TreeNode tempUdidTree = assetInfoService.tempTreeSysAuthGroup(udidInfoService.selectSysAuthGroup(registryNum), "medicalClass");
+        TreeNode udidTree = assetInfoService.finalTreeSysAuthGroupForUdid(tempUdidTree, "medicalClass", DataSourceEnum.UDID.getSourceName());
+        udidTree.setSelectable(false);
+
+        List<TreeNode> children = rootNode.getChildren();
+        children.add(udidTree);
+        children.add(apmTree);
+        rootNode.setExpanded(true);
+
+        return rootNode;
     }
 
     /**

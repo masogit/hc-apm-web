@@ -5,19 +5,15 @@ import com.ge.apm.dao.SysAuthGroupRepository;
 import com.ge.apm.dao.mapper.UdidRegistryNumInfoMapper;
 import com.ge.apm.domain.SysAuthGroup;
 import com.ge.apm.domain.UdidRegistryNumInfo;
-import com.ge.healthcare.cn.common.cons.DataSourceEnum;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -125,7 +121,7 @@ public class UdidInfoService {
      *
      * @param registryNum 注册证号
      */
-    private List<SysAuthGroup> fuzzySearch(String registryNum) {
+    public List<SysAuthGroup> selectSysAuthGroup(String registryNum) {
 
         if (StringUtils.isBlank(registryNum)) {
             return Lists.newArrayList();
@@ -145,7 +141,10 @@ public class UdidInfoService {
             return Lists.newArrayList();
         }
 
-        return authGroupDao.listSysAuthGroupForUdid(categoryList);
+        List<SysAuthGroup> sysAuthGroups = authGroupDao.listSysAuthGroupForUdid(categoryList);
+        // 手动拼接一下
+        sysAuthGroups.forEach(entry -> entry.setName(entry.getClassificationCode() + entry.getName()));
+        return sysAuthGroups;
     }
 
     /**
@@ -159,36 +158,6 @@ public class UdidInfoService {
             return null;
         }
         return udidRegistryNumInfoMapper.selectByRegistryNum(registryNum);
-    }
-
-    public TreeNode buildMedicalClassTree(String registryNum) {
-        TreeNode rootNode = new DefaultTreeNode("medicalClass", null, null);
-
-        TreeNode udidTree = buildTreeNode(fuzzySearch(registryNum), DataSourceEnum.UDID.getSourceName());
-        udidTree.setSelectable(false);
-        TreeNode apmTree = buildTreeNode(authGroupDao.listSysAuthGroup(), DataSourceEnum.APM.getSourceName());
-        apmTree.setSelectable(false);
-
-        List<TreeNode> children = rootNode.getChildren();
-        children.add(udidTree);
-        children.add(apmTree);
-        rootNode.setExpanded(true);
-
-        return rootNode;
-    }
-
-    public TreeNode buildTreeNode(List<SysAuthGroup> medicalClassList, String rootNodeName) {
-        TreeNode tempNode = new DefaultTreeNode("medicalClass", null, null);
-        Map<String, TreeNode> treeMap = medicalClassList.stream().collect(Collectors.toMap(SysAuthGroup::getUid, item -> new DefaultTreeNode("medicalClass", item, null)));
-        for (SysAuthGroup entry : medicalClassList) {
-            treeMap.getOrDefault(entry.getParentUid(), tempNode).getChildren().add(treeMap.get(entry.getUid()));
-        }
-        AssetInfoService.sortSysAuthGroupNaturally(tempNode);
-        TreeNode rootNode = new DefaultTreeNode("medicalClass", new SysAuthGroup(rootNodeName), null);
-        List<TreeNode> children = rootNode.getChildren();
-        children.addAll(tempNode.getChildren());
-        rootNode.setExpanded(true);
-        return rootNode;
     }
 
     /**

@@ -6,21 +6,23 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.aop.SystemEventAuditAopAspect;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SupplierRepository;
+import com.ge.apm.dao.SysAuthGroupRepository;
 import com.ge.apm.dao.mapper.ContractInfoMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.AuditBoTypeEnum;
 import com.ge.healthcare.cn.common.cons.SystemEventAuditEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
-import com.ge.apm.dao.*;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.TreeNodeUtil;
-import com.ge.apm.service.wo.V2_WorkOrderService;
-import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -211,12 +213,9 @@ public class AssetInfoService {
         return sb.toString() + name;
     }
 
-    public TreeNode buildSysAuthGroupInTree() {
-
-        List<SysAuthGroup> groupList = authGroupDao.listSysAuthGroup();
-
-        TreeNode tempNode = new DefaultTreeNode("sysAuthGroup", null, null);
-        Map<String, TreeNode> treeMap = groupList.stream().collect(Collectors.toMap(SysAuthGroup::getUid, item -> new DefaultTreeNode("sysAuthGroup", item, null)));
+    public TreeNode tempTreeSysAuthGroup(List<SysAuthGroup> groupList, String type) {
+        TreeNode tempNode = new DefaultTreeNode(type, null, null);
+        Map<String, TreeNode> treeMap = groupList.stream().collect(Collectors.toMap(SysAuthGroup::getUid, item -> new DefaultTreeNode(type, item, null)));
         for (SysAuthGroup org : groupList) {
             if (treeMap.containsKey(org.getParentUid())) {
                 treeMap.get(org.getParentUid()).getChildren().add(treeMap.get(org.getUid()));
@@ -225,11 +224,24 @@ public class AssetInfoService {
             }
         }
         sortSysAuthGroupNaturally(tempNode);
-        TreeNode rootNode = new DefaultTreeNode("sysAuthGroup", null, null);
+        return tempNode;
+    }
+
+    public TreeNode finalTreeSysAuthGroup(TreeNode treeNode, String type) {
+        TreeNode rootNode = new DefaultTreeNode(type, null, null);
         List<TreeNode> children = rootNode.getChildren();
-        children.add(new DefaultTreeNode("sysAuthGroup", new SysAuthGroup("请选择..."),null));
-        children.addAll(tempNode.getChildren());
+        children.add(new DefaultTreeNode(type, new SysAuthGroup("请选择..."), null));
+        children.addAll(treeNode.getChildren());
         rootNode.setExpanded(true);
+        return rootNode;
+    }
+
+    public TreeNode finalTreeSysAuthGroupForUdid(TreeNode treeNode, String type, String rootNodeName) {
+        TreeNode rootNode = new DefaultTreeNode(type, new SysAuthGroup(rootNodeName), null);
+        List<TreeNode> children = rootNode.getChildren();
+        children.addAll(treeNode.getChildren());
+        rootNode.setExpanded(true);
+        rootNode.setSelectable(false);
         return rootNode;
     }
 

@@ -73,12 +73,11 @@ public class UdidInfoForm {
         this.message = null;
     }
 
-    // udid查询时已拼接分类代码
     public String getMedicalClassLabel() {
         if (null == medicalClass) {
             return "";
         } else {
-            return medicalClass.getName();
+            return medicalClass.getClassificationCode() + "  " + medicalClass.getName().replaceAll("\\d+", "");
         }
     }
 }
