@@ -114,9 +114,11 @@
                                     </h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.description}">
-                                    <h:outputText value="#{stepItem.comments}" />
+                                    <h:outputText value="#{stepItem.comments}" style="word-wrap: break-word;"
+                                                  rendered="#{stepItem.stepName ne '待验收' or userContextService.enableDisplayByKey('repairShowAutoAcceptance')}"/>
+                                    <h:outputText value="#{empty stepItem.comments?'':'验收'}" style="word-wrap: break-word;"
+                                                  rendered="#{stepItem.stepName eq '待验收' and not userContextService.enableDisplayByKey('repairShowAutoAcceptance')}"/>
                                 </p:column>
-
                             </p:dataTable>
 
                             <br/>
