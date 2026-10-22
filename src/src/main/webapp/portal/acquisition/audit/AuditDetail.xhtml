@@ -197,6 +197,10 @@
                         </p:panelGrid>
                     </p:tab>
                     <p:tab title="辅助论证" closable="true">
+                        <p:commandButton value="采购评估" class="btn btn-xs btn-primary"
+                                         actionListener="#{acquisitionPlanAuditEditController.benefitAssess()}"
+                                         process="@this" update=":benefitAssessForm"
+                                         oncomplete="PF('benefitAssessSidebar').show()"/>
                     </p:tab>
                     <p:tab title="工单详情">
                         <p:dataTable id="steplist" value="#{acquisitionPlanAuditEditController.acquisitionPlanStepList}"
@@ -258,6 +262,16 @@
                                  action="#{acquisitionPlanAuditEditController.audit()}" value="提交" id="submitApplication" rendered="#{acquisitionPlanAuditEditController.selected.applicationStatus != 'Approved' and acquisitionPlanAuditEditController.selected.applicationStatus != 'Rejected' and acquisitionPlanAuditEditController.action eq 'Audit'}"/>
                 <p:commandButton update=":growl " immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back"
                                  action="#{acquisitionPlanAuditEditController.backList}" />
+            </h:form>
+
+            <h:form id="benefitAssessForm">
+                <p:sidebar widgetVar="benefitAssessSidebar" position="right" style="width:70%;height:100%;"
+                           dismissable="true" showCloseIcon="true"
+                           onhide="document.getElementById('benefitAssessFrame').src='about:blank'">
+                    <h:outputLabel style="font-size:16px;font-weight:bold;" value="采购评估"/>
+                    <hr/>
+                    <iframe id="benefitAssessFrame" src="#{empty acquisitionPlanAuditEditController.benefitAssessIframeUrl ? 'about:blank' : acquisitionPlanAuditEditController.benefitAssessIframeUrl}" width="100%" height="800" frameborder="0" style="border:none;"></iframe>
+                </p:sidebar>
             </h:form>
 
         </div>
