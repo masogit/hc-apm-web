@@ -6,6 +6,7 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
+import com.ge.apm.domain.acquisition.AcquisitionPlanAsset;
 import com.ge.apm.domain.acquisition.AcquisitionPlanStep;
 import com.ge.apm.service.acquisition.AcquisitionPlanService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -46,6 +47,8 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
     @Getter @Setter
     List<I18nMessage> acquisitionResultList = new ArrayList<>();
 
+    @Getter
+    private String benefitAssessIframeUrl;
 
     @Override
     protected void init() {
@@ -117,6 +120,14 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
             return assetName.substring(0, 30) + "...";
         }
         return assetName;
+    }
+
+    public void benefitAssess() {
+        if (selected == null) {
+            WebUtil.addErrorMessage("购置信息信息不完整，无法查看效益评估");
+            return;
+        }
+        this.benefitAssessIframeUrl = "/reports/appraisal/purchase/" + selected.getId();
     }
     @Override
     protected GenericRepositoryUUID<AcquisitionPlan> getDAO() {
