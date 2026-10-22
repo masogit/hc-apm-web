@@ -8,6 +8,7 @@ import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SupplierController;
@@ -23,6 +24,9 @@ import javaslang.Tuple2;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -30,6 +34,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.primefaces.model.UploadedFile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import webapp.framework.web.WebUtil;
@@ -134,6 +139,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     @Getter
     @Setter
     private ContractInfoItem selectedItem;
+
+    private UploadedFile purchaseImportFile;
+    private List<ContractInfoItem> purchaseImportList;
 
     @Override
     protected void init() {
@@ -541,8 +549,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public String getSupplierName(String supplierUid) {
+        if (supplierUid == null) return null;
         Supplier supplier = supplierDao.findByUid(supplierUid);
-        return supplier == null ? null : supplier.getName();
+        return supplier == null ? supplierUid : supplier.getName();
     }
 
     public String getParentName(String parentId) {
@@ -1005,5 +1014,144 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     public void setContractAttachmentTypeList(List<I18nMessage> contractAttachmentTypeList) {
         this.contractAttachmentTypeList = contractAttachmentTypeList;
+    }
+
+    public UploadedFile getPurchaseImportFile() {
+        return purchaseImportFile;
+    }
+
+    public void setPurchaseImportFile(UploadedFile purchaseImportFile) {
+        this.purchaseImportFile = purchaseImportFile;
+    }
+
+    public List<ContractInfoItem> getPurchaseImportList() {
+        return purchaseImportList;
+    }
+
+    public void setPurchaseImportList(List<ContractInfoItem> purchaseImportList) {
+        this.purchaseImportList = purchaseImportList;
+    }
+
+    public void downloadPurchaseImportTemplate() {
+        try {
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("订购设备导入模板");
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"设备名称", "单价", "数量", "制造商", "型号", "产地"};
+            for (int i = 0; i < headers.length; i++) {
+                headerRow.createCell(i).setCellValue(headers[i]);
+            }
+            for (int i = 0; i < headers.length; i++) {
+                sheet.setColumnWidth(i, 20 * 256);
+            }
+            javax.faces.context.FacesContext fc = javax.faces.context.FacesContext.getCurrentInstance();
+            javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse) fc.getExternalContext().getResponse();
+            response.reset();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=PurchaseItemImportTemplate.xlsx");
+            workbook.write(response.getOutputStream());
+            response.getOutputStream().flush();
+            workbook.close();
+            fc.responseComplete();
+        } catch (Exception e) {
+            WebUtil.addErrorMessage("下载模板失败：" + e.getMessage());
+        }
+    }
+
+    private Supplier createManufacturerByName(String name) {
+        Supplier supplier = new Supplier();
+        supplier.setName(name);
+        supplier.setManufacturerT(true);
+        supplier.setSupplierT(false);
+        supplier.setMaintainerT(false);
+        supplier.setSiteId(currentUser.getSiteId());
+        supplier.setHospitalId(currentUser.getHospitalId());
+        supplier.setTenantUID(currentUser.getTenantUID());
+        supplier.setInstitutionUID(currentUser.getInstitutionUID());
+        supplier.setHospitalUID(currentUser.getHospitalUID());
+        supplier.setSiteUID(currentUser.getSiteUID());
+        supplier.setUid(UUID.randomUUID().toString().replace("-", ""));
+        supplier.setCreatedDate(new Date());
+        supplier.setCreatedBy(currentUser.getName());
+        supplierDao.save(supplier);
+        manufactureList.add(supplier);
+        return supplier;
+    }
+
+    public void handlePurchaseImportFile(FileUploadEvent event) {
+        ExcelDocument doc = null;
+        this.purchaseImportFile = event.getFile();
+        this.purchaseImportList = new ArrayList<>();
+        try {
+            doc = new ExcelDocument(purchaseImportFile.getInputstream(), ExcelDocument.parseTypeByFileName(purchaseImportFile.getFileName()));
+            String sheetName = doc.getWorkBook().getSheetName(0);
+            int lastRowNum = doc.getLastRowNum(sheetName, 2);
+            if (lastRowNum < 1) {
+                WebUtil.addErrorMessage("导入文件没有数据");
+                return;
+            }
+            for (int i = 2; i <= lastRowNum + 1; i++) {
+                Map<String, String> rowMap = doc.getStringDataRowMap(sheetName, 1, i);
+                String assetName = rowMap.get("设备名称");
+                if (StringUtils.isEmpty(assetName)) {
+                    continue;
+                }
+                ContractInfoItem item = new ContractInfoItem();
+                item.setId(UUID.randomUUID().toString().replace("-", ""));
+                item.setItemType(ContractInfoItem.ContractInfoItemType.Purchase.toString());
+                item.setContractId(selected.getId());
+                item.setContractAssetName(assetName);
+
+                String priceStr = rowMap.get("单价");
+                if (!StringUtils.isEmpty(priceStr)) {
+                    item.setContractAssetPrice(Double.parseDouble(priceStr));
+                }
+                String qtyStr = rowMap.get("数量");
+                if (!StringUtils.isEmpty(qtyStr)) {
+                    item.setContractAssetQuantity(Integer.parseInt(qtyStr));
+                }
+                String manufacturerName = rowMap.get("制造商");
+                if (!StringUtils.isEmpty(manufacturerName)) {
+                    Supplier matchedSupplier = manufactureList.stream()
+                            .filter(s -> manufacturerName.equals(s.getName()))
+                            .findFirst().orElse(null);
+                    if (matchedSupplier != null) {
+                        item.setManufacturer(matchedSupplier.getUid());
+                    } else {
+                        Supplier newManu = createManufacturerByName(manufacturerName);
+                        item.setManufacturer(newManu.getUid());
+                    }
+                }
+                item.setPattern(rowMap.get("型号"));
+                item.setProductionPlace(rowMap.get("产地"));
+                purchaseImportList.add(item);
+            }
+            if (purchaseImportList.isEmpty()) {
+                WebUtil.addErrorMessage("导入文件中没有有效数据");
+            } else {
+                WebUtil.addSuccessMessage("解析完成，共" + purchaseImportList.size() + "条数据，请确认后导入");
+            }
+        } catch (Exception e) {
+            WebUtil.addErrorMessage("解析文件失败：" + e.getMessage());
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
+        }
+    }
+
+    public void confirmPurchaseImport() {
+        if (purchaseImportList == null || purchaseImportList.isEmpty()) {
+            WebUtil.addErrorMessage("没有可导入的数据");
+            return;
+        }
+        for (ContractInfoItem item : purchaseImportList) {
+            item.setContractId(selected.getId());
+            contractItemDao.save(item);
+        }
+        allItemList = contractService.getContractItems(selected.getId());
+        purchaseImportList.clear();
+        purchaseImportFile = null;
+        WebUtil.addSuccessMessage("导入成功");
     }
 }

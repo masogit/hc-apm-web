@@ -455,6 +455,8 @@
                             <f:facet name="{Toolbar}">
                                 <p:commandLink value="#{msg.AddOrderedEquipment}" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPurchaseAsset()}" process="@this"
                                                update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
+                                <p:commandLink value="导入" style="color:#3e87e8;padding: 10px" process="@this"
+                                               oncomplete="PF('importPurchaseDlg').show()" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
                             </f:facet>
 
                         </p:dataTable>
@@ -692,6 +694,60 @@
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{contractInfoEditController.cancelPurchaseItem()}" icon="ui-icon-cancel" onclick="PF('addPurchaseDlg').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="importPurchaseDlg" widgetVar="importPurchaseDlg" modal="true" width="650" resizable="true" draggable="true" appendTo="@(body)" header="导入订购设备">
+            <h:form id="importPurchaseForm" enctype="multipart/form-data">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <p><strong>合同信息</strong></p>
+                        <p>合同编号：#{contractInfoEditController.selected.contractNum}  合同名称：#{contractInfoEditController.selected.name}</p>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p>说明：</p>
+                        <p>1. <p:commandLink value="下载导入模板" ajax="false" actionListener="#{contractInfoEditController.downloadPurchaseImportTemplate}" style="color:#3e87e8"/></p>
+                        <p>2. 按模板格式填写数据，其中 设备名称、数量 为必填项</p>
+                        <p>3. 上传文件进行导入</p>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">选择文件：</label>
+                        <p:fileUpload fileUploadListener="#{contractInfoEditController.handlePurchaseImportFile}" value="#{contractInfoEditController.purchaseImportFile}"
+                                      mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                      multiple="false" sizeLimit="10000000" update=":importPurchaseForm:importPurchaseResult :growl"
+                                      auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M"
+                                      allowTypes="/(\.|\/)(xls|xlsx)$/" label="选择文件" />
+                    </h:panelGroup>
+                    <h:panelGroup id="importPurchaseResult">
+                        <p:dataTable value="#{contractInfoEditController.purchaseImportList}" var="item" rendered="#{not empty contractInfoEditController.purchaseImportList}"
+                                     rowKey="#{item.id}" rows="10" paginator="true" paginatorPosition="bottom" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+                            <p:column headerText="设备名称">
+                                <h:outputText value="#{item.contractAssetName}"/>
+                            </p:column>
+                            <p:column headerText="单价">
+                                <h:outputText value="#{item.contractAssetPrice}"/>
+                            </p:column>
+                            <p:column headerText="数量">
+                                <h:outputText value="#{item.contractAssetQuantity}"/>
+                            </p:column>
+                            <p:column headerText="制造商">
+                                <h:outputText value="#{contractInfoEditController.getSupplierName(item.manufacturer)}"/>
+                            </p:column>
+                            <p:column headerText="型号">
+                                <h:outputText value="#{item.pattern}"/>
+                            </p:column>
+                            <p:column headerText="产地">
+                                <h:outputText value="#{item.productionPlace}"/>
+                            </p:column>
+                        </p:dataTable>
+                        <h:panelGroup rendered="#{not empty contractInfoEditController.purchaseImportList}">
+                            <p:commandButton value="确认导入" actionListener="#{contractInfoEditController.confirmPurchaseImport()}"
+                                             update=":AssetContractEditForm:purchaseList :importPurchaseForm :growl" icon="ui-icon-check"
+                                             oncomplete="handleSubmit(args, 'importPurchaseDlg');"/>
+                            <p:commandButton value="取消" immediate="true" icon="ui-icon-cancel" onclick="PF('importPurchaseDlg').hide()"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </p:panelGrid>
             </h:form>
         </p:dialog>
 
