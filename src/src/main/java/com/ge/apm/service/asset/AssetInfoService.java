@@ -233,7 +233,7 @@ public class AssetInfoService {
         return rootNode;
     }
 
-    public void sortSysAuthGroupNaturally(TreeNode root) {
+    public static void sortSysAuthGroupNaturally(TreeNode root) {
         root.getChildren().sort((TreeNode o1, TreeNode o2) -> {
                     SysAuthGroup sag1 = (SysAuthGroup) o1.getData();
                     SysAuthGroup sag2 = (SysAuthGroup) o2.getData();

@@ -5,7 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.adverseEvent.AdverseEventsService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.asset.UdidSearchService;
+import com.ge.apm.service.asset.UdidInfoService;
 import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.nurseSite.WordReportExportService;
@@ -135,7 +135,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
     @Setter
     @Getter
     private List<MultiLevelApproval> multiLevelApprovals;
-    private UdidSearchService udidSearchService;
+    private UdidInfoService udidInfoService;
 
     @Override
     protected void init() {
@@ -157,7 +157,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
         multiLevelApprovalRepository = WebUtil.getBean(MultiLevelApprovalRepository.class);
         systemTemplateService = WebUtil.getBean(SystemTemplateService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        udidSearchService = WebUtil.getBean(UdidSearchService.class);
+        udidInfoService = WebUtil.getBean(UdidInfoService.class);
 
         /*属性类*/
         selectSite = userContextService.getLoginUserOrgInfo();
@@ -426,7 +426,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
     }
 
     public void onSelect(SelectEvent event) {
-        this.selected.setRegistrationInfo(udidSearchService.selectByRegistryNum(assetSelected.getRegistrationNo()));
+        this.selected.setRegistrationInfo(udidInfoService.selectByRegistryNum(assetSelected.getRegistrationNo()));
 
         this.selected.setAssetName(assetSelected.getName());
         this.selected.setDepartment(assetSelected.getClinicalDeptUID());
@@ -646,7 +646,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
      * 注册证号模糊搜索（返回纯字符串列表）
      */
     public List<String> completeUdidRegistryNum(String prefix) {
-        return udidSearchService.fuzzySearchRegistryNum(prefix);
+        return udidInfoService.fuzzySearchRegistryNum(prefix);
     }
 
     /**
@@ -658,7 +658,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
         }
 
         if (StringUtils.hasText(selected.getRegistrationNum())) {
-            this.selected.setRegistrationInfo(udidSearchService.selectByRegistryNum(selected.getRegistrationNum()));
+            this.selected.setRegistrationInfo(udidInfoService.selectByRegistryNum(selected.getRegistrationNum()));
             this.selected.setProductName(StringUtils.hasText(selected.getUdidProductName()) ? selected.getUdidProductName() : assetSelected.getName());
             this.selected.setMarketingAuthHolder(StringUtils.hasText(selected.getUdidRegistrantName()) ? selected.getUdidRegistrantName() : null);
         } else {

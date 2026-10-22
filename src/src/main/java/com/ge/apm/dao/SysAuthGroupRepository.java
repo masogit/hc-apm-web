@@ -11,11 +11,10 @@ public interface SysAuthGroupRepository extends GenericRepository<SysAuthGroup> 
     @Query(value="select uid,classification_code,encoded,split_part(encoded, '-', length(replace(encoded, '-', '//')) - length(encoded) +1) || name as name,parent_uid from sys_auth_group where parent_uid is not null",nativeQuery=true)
     List<SysAuthGroup> listSysAuthGroup();
 
-    @Query(value = "select uid,classification_code,encoded,name,parent_uid from sys_auth_group where parent_uid is not null order by classification_code", nativeQuery = true)
-    List<SysAuthGroup> listSysAuthGroupForUdid();
-
-    @Query(value = "select uid,classification_code,encoded,name,parent_uid from sys_auth_group where parent_uid is not null and (classification_code ilike concat('%',?1,'%') or name ilike concat('%',?1,'%')) order by classification_code", nativeQuery = true)
-    List<SysAuthGroup> listSysAuthGroupForUdid(String query);
+    // udid使用，拼接了分类编码
+    @Query(value = "select uid, classification_code, encoded, classification_code || '  ' ||name as name, parent_uid from sys_auth_group " +
+            "where parent_uid is not null and classification_code in ?1 order by classification_code", nativeQuery = true)
+    List<SysAuthGroup> listSysAuthGroupForUdid(List<String> classificationCodes);
 
 //    SysAuthGroup findByEncoded(String encoded);
 

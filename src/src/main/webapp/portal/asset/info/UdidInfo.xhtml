@@ -16,7 +16,7 @@
         }
     </h:outputStylesheet>
 
-    <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" height="460" width="960">
+    <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" width="960">
         <h:form id="UdidInfoForm">
             <h:panelGroup id="display">
                 <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%" rendered="#{assetInfoEditController.udidInfo != null}">
@@ -200,19 +200,31 @@
                                 </span>
                             </label>
                         </h:panelGroup>
-                        <p:autoComplete id="udidMedicalClass" value="#{assetInfoEditController.udidInfo.medicalClass}"
-                                        completeMethod="#{assetInfoEditController.completeUdidCategory}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" converter="autoCompleteVoConverter"
-                                        var="t" itemLabel="#{t.label}" itemValue="#{t}" groupBy="#{t.group}">
-                            <p:ajax process="@this" listener="#{assetInfoEditController.onUdidMedicalClassChange}" update="UdidInfoForm"/>
-                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidMedicalClassChange}" update="UdidInfoForm"/>
-                        </p:autoComplete>
+                        <p:inputText value="#{assetInfoEditController.udidInfo.medicalClassLabel}" readonly="true" class="udidMedicalClassInput"/>
+                        <p:commandButton id="udidMedicalClass" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                        <p:overlayPanel widgetVar="udidMedicalClassOverPanel" for="udidMedicalClass" hideEffect="fade" dynamic="false"
+                                        style="width:300px" modal="false">
+                            <p:scrollPanel style="height:300px; border: 0" mode="native">
+                                <p:tree class="tree" style="width:98%; border:0;"
+                                        value="#{assetInfoEditController.udidInfo.medicalClassTree}" var="node" selectionMode="single">
+                                    <p:ajax process="@this" event="select" update="@(.udidMedicalClassInput)"
+                                            listener="#{assetInfoEditController.onUdidMedicalClassSelect}"
+                                            oncomplete="PF('udidMedicalClassOverPanel').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+
+                                    <p:treeNode type="medicalClass">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
                     </h:panelGroup>
 
                     <!-- 空 -->
                     <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
                     <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
-                    <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
+                    <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="应用" actionListener="#{assetInfoEditController.applyUidInfo()}"

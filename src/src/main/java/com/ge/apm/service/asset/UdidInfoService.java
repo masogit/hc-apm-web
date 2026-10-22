@@ -1,35 +1,35 @@
 package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSON;
-import com.ge.apm.dao.mapper.UdidDeviceCategoryMapper;
+import com.ge.apm.dao.SysAuthGroupRepository;
 import com.ge.apm.dao.mapper.UdidRegistryNumInfoMapper;
-import com.ge.apm.domain.AutoCompleteVo;
-import com.ge.apm.domain.UdidDeviceCategory;
+import com.ge.apm.domain.SysAuthGroup;
 import com.ge.apm.domain.UdidRegistryNumInfo;
 import com.ge.healthcare.cn.common.cons.DataSourceEnum;
-import com.ge.healthcare.cn.common.utils.tuple.ApmTriple;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Data
 @Slf4j
 @Service
-public class UdidSearchService {
+public class UdidInfoService {
 
     @Autowired
-    private UdidDeviceCategoryMapper udidDeviceCategoryMapper;
-    @Autowired
     private UdidRegistryNumInfoMapper udidRegistryNumInfoMapper;
+    @Autowired
+    private SysAuthGroupRepository authGroupDao;
 
     /**
      * 模糊查询注册证号
@@ -121,31 +121,13 @@ public class UdidSearchService {
     }
 
     /**
-     * 模糊查询设备型号
-     *
-     * @param category 器械分类代码或名称
-     */
-    public List<AutoCompleteVo> fuzzySearchCategory(String registryNum, String category) {
-
-        List<UdidDeviceCategory> result = fuzzySearch(registryNum, category);
-
-        return result.stream()
-                .map(e -> new AutoCompleteVo(e.getDisplayCategoryCode() + "  " + e.getDisplayCategoryName(),
-                        e.getDisplayCategoryCode() + "  " + e.getDisplayCategoryName(), DataSourceEnum.UDID.getSourceName()))
-                .filter(e -> StringUtils.isNotBlank(e.getValue()))
-                .distinct()
-                .sorted(Comparator.comparing(AutoCompleteVo::getValue))
-                .collect(Collectors.toList());
-    }
-
-    /**
      * 模糊查询
      *
-     * @param category 器械分类代码或名称
+     * @param registryNum 注册证号
      */
-    private List<UdidDeviceCategory> fuzzySearch(String registryNum, String category) {
+    private List<SysAuthGroup> fuzzySearch(String registryNum) {
 
-        if (StringUtils.isBlank(registryNum) && StringUtils.isBlank(category)) {
+        if (StringUtils.isBlank(registryNum)) {
             return Lists.newArrayList();
         }
 
@@ -155,16 +137,15 @@ public class UdidSearchService {
             return Lists.newArrayList();
         }
 
-        List<ApmTriple<Integer, Integer, Integer>> categoryTriple = parseJsonArrayToStringList(udidRegistryNumInfo.getFlbm()).stream()
-                .map(UdidSearchService::parseToTriple)
+        List<String> categoryList = parseJsonArrayAndStripHyphens(udidRegistryNumInfo.getFlbm()).stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        if (CollectionUtils.isEmpty(categoryTriple)) {
+        if (CollectionUtils.isEmpty(categoryList)) {
             return Lists.newArrayList();
         }
 
-        return udidDeviceCategoryMapper.fuzzySearch(categoryTriple, category);
+        return authGroupDao.listSysAuthGroupForUdid(categoryList);
     }
 
     /**
@@ -178,6 +159,36 @@ public class UdidSearchService {
             return null;
         }
         return udidRegistryNumInfoMapper.selectByRegistryNum(registryNum);
+    }
+
+    public TreeNode buildMedicalClassTree(String registryNum) {
+        TreeNode rootNode = new DefaultTreeNode("medicalClass", null, null);
+
+        TreeNode udidTree = buildTreeNode(fuzzySearch(registryNum), DataSourceEnum.UDID.getSourceName());
+        udidTree.setSelectable(false);
+        TreeNode apmTree = buildTreeNode(authGroupDao.listSysAuthGroup(), DataSourceEnum.APM.getSourceName());
+        apmTree.setSelectable(false);
+
+        List<TreeNode> children = rootNode.getChildren();
+        children.add(udidTree);
+        children.add(apmTree);
+        rootNode.setExpanded(true);
+
+        return rootNode;
+    }
+
+    public TreeNode buildTreeNode(List<SysAuthGroup> medicalClassList, String rootNodeName) {
+        TreeNode tempNode = new DefaultTreeNode("medicalClass", null, null);
+        Map<String, TreeNode> treeMap = medicalClassList.stream().collect(Collectors.toMap(SysAuthGroup::getUid, item -> new DefaultTreeNode("medicalClass", item, null)));
+        for (SysAuthGroup entry : medicalClassList) {
+            treeMap.getOrDefault(entry.getParentUid(), tempNode).getChildren().add(treeMap.get(entry.getUid()));
+        }
+        AssetInfoService.sortSysAuthGroupNaturally(tempNode);
+        TreeNode rootNode = new DefaultTreeNode("medicalClass", new SysAuthGroup(rootNodeName), null);
+        List<TreeNode> children = rootNode.getChildren();
+        children.addAll(tempNode.getChildren());
+        rootNode.setExpanded(true);
+        return rootNode;
     }
 
     /**
@@ -218,40 +229,5 @@ public class UdidSearchService {
                 .filter(StringUtils::isNotBlank)
                 .map(s -> s.replace("-00", "").replace("-", ""))
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * 将连字符分隔的字符串解析为三元组
-     * <pre>
-     *   "22-01-04" -> ApmTriple(22, 1, 4)
-     *   "6825"     -> ApmTriple(6825, null, null)
-     *   null / ""  -> null
-     * </pre>
-     *
-     * @param value 连字符分隔的字符串
-     * @return 三元组，输入为blank时返回null
-     */
-    public static ApmTriple<Integer, Integer, Integer> parseToTriple(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        }
-        String[] parts = value.split("-", 3);
-        return ApmTriple.of(
-                parseIntegerSafe(parts, 0),
-                parseIntegerSafe(parts, 1),
-                parseIntegerSafe(parts, 2)
-        );
-    }
-
-    private static Integer parseIntegerSafe(String[] parts, int index) {
-        if (parts.length <= index || StringUtils.isBlank(parts[index])) {
-            return null;
-        }
-        try {
-            return Integer.parseInt(parts[index].trim());
-        } catch (NumberFormatException e) {
-            log.warn("Failed to parse integer: '{}'", parts[index]);
-            return null;
-        }
     }
 }

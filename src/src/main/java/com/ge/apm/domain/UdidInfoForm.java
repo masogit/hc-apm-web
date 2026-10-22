@@ -1,9 +1,7 @@
 package com.ge.apm.domain;
 
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Objects;
+import org.primefaces.model.TreeNode;
 
 @Data
 public class UdidInfoForm {
@@ -32,8 +30,11 @@ public class UdidInfoForm {
     // 制造商来自udid
     private Boolean manufactureFromUdid;
 
+    // 医疗器械分类树
+    private TreeNode medicalClassTree;
+
     // 医疗器械分类
-    private AutoCompleteVo medicalClass;
+    private SysAuthGroup medicalClass;
 
     // 医疗器械分类来自udid
     private Boolean medicalClassFromUdid;
@@ -44,7 +45,7 @@ public class UdidInfoForm {
     // 知识库校验信息
     private String message;
 
-    public void fillValue(String registryNum, AutoCompleteVo assetName, String functionType, Supplier manufacture, AutoCompleteVo medicalClass) {
+    public void fillValue(String registryNum, AutoCompleteVo assetName, String functionType, Supplier manufacture, SysAuthGroup medicalClass) {
         this.registryNum = registryNum;
         this.assetName = assetName;
         this.functionType = functionType;
@@ -72,23 +73,12 @@ public class UdidInfoForm {
         this.message = null;
     }
 
-    /**
-     * 提取器械分类代码（首个空白字符前的部分）
-     * <p>按空白字符（空格、NBSP等）分割 medicalClass，返回第一段。</p>
-     * <pre>
-     *   "01 X 射线高压发生器" -> "01"
-     *   "01.1\u00A0伽玛射束"   -> "01.1"
-     *   "6825"               -> "6825"
-     *   null / ""            -> 原值
-     * </pre>
-     *
-     * @return 首个空白字符前的内容；输入为blank时返回原值
-     */
-    public String getMedicalClassCode() {
-        if (Objects.isNull(medicalClass) || StringUtils.isBlank(medicalClass.getValue())) {
+    // udid查询时已拼接分类代码
+    public String getMedicalClassLabel() {
+        if (null == medicalClass) {
             return "";
+        } else {
+            return medicalClass.getName();
         }
-        String[] parts = medicalClass.getValue().split("[\\s\\u00A0]+", 2);
-        return parts[0];
     }
 }
