@@ -8,10 +8,12 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.his.HisEquipmentDataResult;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -29,4 +31,7 @@ public interface HisEquipmentDataResultRepository extends GenericRepositoryUUID<
 
     @Query("select o from HisEquipmentDataResult o  where o.id in ?1 ")
     public List<HisEquipmentDataResult> findByIds(List<String> ids);
+
+    @Query("SELECT DISTINCT h.assetUid FROM HisEquipmentDataResult h WHERE h.assetUid IN :assetUids AND h.tenantUid = :tenantUid")
+    Set<String> findAssetUidsWithPerformanceData(@Param("assetUids") List<String> assetUids, @Param("tenantUid") String tenantUid);
 }

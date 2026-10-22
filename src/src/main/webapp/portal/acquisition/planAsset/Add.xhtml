@@ -1,0 +1,283 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="新增购置设备"/>
+            </div>
+
+            <!-- ============ 一、采购信息选择 ============ -->
+            <div class="ui-g-12 card">
+                <h:form id="addForm">
+                    <p:fieldset legend="采购信息选择">
+
+                    <div class="ui-g form-group" style="margin-bottom:10px;">
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">采购年限</p:outputLabel>
+                            <p:selectOneMenu id="searchYear" value="#{acquisitionPlanAssetAddController.searchYear}" style="width:100%">
+                                <p:ajax event="change" listener="#{acquisitionPlanAssetAddController.loadAppNoList}" update="searchAppNo"/>
+                                <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{acquisitionPlanAssetAddController.yearList}" var="year"
+                                               itemLabel="#{year}" itemValue="#{year}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">设备名称</p:outputLabel>
+                            <p:inputText id="searchAssetName" value="#{acquisitionPlanAssetAddController.searchAssetName}">
+                                <p:ajax event="change" listener="#{acquisitionPlanAssetAddController.loadAppNoList}" update="searchAppNo"/>
+                            </p:inputText>
+                        </div>
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">规格型号</p:outputLabel>
+                            <p:inputText id="searchSpec" value="#{acquisitionPlanAssetAddController.searchSpec}">
+                                <p:ajax event="change" listener="#{acquisitionPlanAssetAddController.loadAppNoList}" update="searchAppNo"/>
+                            </p:inputText>
+                        </div>
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">采购编号</p:outputLabel>
+                            <p:selectOneMenu id="searchAppNo" value="#{acquisitionPlanAssetAddController.selectedPlanId}"
+                                             style="width:100%" filter="true" filterMatchMode="contains">
+                                <p:ajax event="change" listener="#{acquisitionPlanAssetAddController.onAppNoSelect}"
+                                        update="planTable"/>
+                                <f:selectItem itemLabel="请选择" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{acquisitionPlanAssetAddController.appNoOptions}" var="plan"
+                                               itemLabel="#{plan.applicationNo}" itemValue="#{plan.id}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-4">
+                            <p:commandButton value="#{msg.Search}" icon="ui-icon-search"
+                                             actionListener="#{acquisitionPlanAssetAddController.searchPlans}"
+                                             update=":addForm:planTable" styleClass="btn btn-sm btn-gray" style="margin-top:20px;"/>
+                            <p:commandButton value="#{msg.Reset}" icon="ui-icon-cancel"
+                                             actionListener="#{acquisitionPlanAssetAddController.resetPlanSearch}"
+                                             update="@form" styleClass="btn btn-sm btn-gray" style="margin-top:20px;"/>
+                        </div>
+                    </div>
+
+                    <p:dataTable id="planTable" value="#{acquisitionPlanAssetAddController.planSearchResult}" var="plan"
+                                 widgetVar="varPlanTable"
+                                 selectionMode="single" selection="#{acquisitionPlanAssetAddController.selectedPlan}"
+                                 rowKey="#{plan.id}"
+                                 paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                                 rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,50">
+
+                        <p:ajax event="rowSelect" update="@form"/>
+
+                        <p:column headerText="采购编号" width="150">
+                            <h:outputText value="#{plan.applicationNo}"/>
+                        </p:column>
+                        <p:column headerText="采购年限" width="100">
+                            <h:outputText value="#{plan.applicationYear}"/>
+                        </p:column>
+                        <p:column headerText="设备名称" width="200">
+                            <h:outputText value="#{plan.assetName}"/>
+                        </p:column>
+                        <p:column headerText="规格型号" width="150">
+                            <h:outputText value="#{plan.specifications}"/>
+                        </p:column>
+                        <p:column headerText="申请类别" width="100">
+                            <h:outputText value="#{fieldMsg.fieldValue('acquisitionApplicationType', plan.applicationType)}"/>
+                        </p:column>
+                        <p:column headerText="采购数量" width="80">
+                            <h:outputText value="#{plan.applicationPlanCount}"/>
+                        </p:column>
+                        <p:column headerText="预算单价（万元）" width="120">
+                            <h:outputText value="#{plan.budgetUnitPrice}"/>
+                        </p:column>
+                        <p:column headerText="绑定情况" width="80">
+                            <h:outputText value="#{acquisitionPlanAssetAddController.getBindingStatus(plan)}"/>
+                        </p:column>
+                    </p:dataTable>
+                    </p:fieldset>
+                </h:form>
+            </div>
+
+            <!-- ============ 二、设备信息选择 ============ -->
+            <div class="ui-g-12 card">
+                <h:form id="deviceForm">
+                    <p:fieldset legend="设备信息选择">
+
+                    <div class="ui-g form-group" style="margin-bottom:10px;">
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">所属院区<span style="color:red">*</span></p:outputLabel>
+                            <p:inputText id="selectedOrgName" value="#{acquisitionPlanAssetAddController.selectedOrg == null ? '' : acquisitionPlanAssetAddController.selectedOrg.name}" readonly="true" style="width:calc(100% - 32px)"/>
+                            <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width:22px;height:22px;padding-right:0px;"/>
+                            <p:overlayPanel id="popupPanel" appendTo="btnOrg" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                                <p:scrollPanel style="height:300px;border:0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{acquisitionPlanAssetAddController.orgTree}" selection="#{acquisitionPlanAssetAddController.selectedNode}" var="node" selectionMode="single">
+                                        <p:ajax process="@this" event="select" update="deviceForm:selectedOrgName deviceForm:searchClinicalDept" listener="#{acquisitionPlanAssetAddController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide()"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                        <p:treeNode type="hidden" rendered="false"/>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </div>
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">所属科室<span style="color:red">*</span></p:outputLabel>
+                            <p:autoComplete id="searchClinicalDept" dropdown="true" value="#{acquisitionPlanAssetAddController.filterDeptOrg}"
+                                            scrollHeight="300" forceSelection="true"
+                                            completeMethod="#{acquisitionPlanAssetAddController.autoCompleteDept}"
+                                            var="t" itemLabel="#{t.name}" itemValue="#{t}"
+                                            converter="orgInfoConverter" style="width:100%">
+                                <p:ajax event="itemSelect" process="@this"/>
+                            </p:autoComplete>
+                        </div>
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">资产名称</p:outputLabel>
+                            <p:inputText id="searchDeviceName" value="#{acquisitionPlanAssetAddController.searchDeviceName}"
+                                         placeholder="资产名称" style="width:100%"/>
+                        </div>
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">设备型号</p:outputLabel>
+                            <p:inputText id="searchFunctionType" value="#{acquisitionPlanAssetAddController.searchFunctionType}"
+                                         placeholder="设备型号" style="width:100%"/>
+                        </div>
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">制造商</p:outputLabel>
+                            <p:inputText id="searchManufacture" value="#{acquisitionPlanAssetAddController.searchManufacture}"
+                                         placeholder="制造商" style="width:100%"/>
+                        </div>
+                        <div class="ui-g-2">
+                            <p:outputLabel class="label">品牌/制造商简称</p:outputLabel>
+                            <p:inputText id="searchVendor" value="#{acquisitionPlanAssetAddController.searchVendor}"
+                                         placeholder="品牌/制造商简称" style="width:100%"/>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <p:commandButton value="#{msg.Search}" icon="ui-icon-search"
+                                         actionListener="#{acquisitionPlanAssetAddController.searchDevices}"
+                                         update=":deviceForm:deviceTable" styleClass="btn btn-sm btn-gray"/>
+                        <p:commandButton value="#{msg.Reset}" icon="ui-icon-cancel"
+                                         actionListener="#{acquisitionPlanAssetAddController.resetDeviceSearch}"
+                                         update="@form" styleClass="btn btn-sm btn-gray"/>
+                    </div>
+
+                    <!-- 设备查询结果表格 -->
+                    <p:dataTable id="deviceTable" value="#{acquisitionPlanAssetAddController.deviceSearchResult}" var="device"
+                                 widgetVar="varDeviceTable"
+                                 rowKey="#{device.uid}"
+                                 paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                                 rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,50">
+
+                        <p:column width="36">
+                            <p:selectBooleanCheckbox value="#{acquisitionPlanAssetAddController.deviceSelectedMap[device.uid]}"
+                                                     class="deviceCheckBox">
+                                <p:ajax process="@this" update="@this"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="deviceCheckAll" class="deviceCheckAll">
+                                    <p:ajax listener="#{acquisitionPlanAssetAddController.onSelectAllDevices}"
+                                            update="@(.deviceCheckBox) :deviceForm:deviceTable"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="资产名称">
+                            <h:outputText value="#{device.name}"/>
+                        </p:column>
+                        <p:column headerText="设备型号">
+                            <h:outputText value="#{device.functionType}"/>
+                        </p:column>
+                        <p:column headerText="制造商序列号">
+                            <h:outputText value="#{device.serialNum}"/>
+                        </p:column>
+                        <p:column headerText="设备编号（院方）">
+                            <h:outputText value="#{device.departNum}"/>
+                        </p:column>
+                        <p:column headerText="二维码">
+                            <h:outputText value="#{device.qrCode}"/>
+                        </p:column>
+                        <p:column headerText="所属科室">
+                            <h:outputText value="#{device.clinicalDeptName}"/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <!-- 添加已勾选设备按钮 -->
+                    <div style="margin: 10px 0;">
+                        <p:commandButton value="添加已勾选设备" icon="ui-icon-plus"
+                                         actionListener="#{acquisitionPlanAssetAddController.addCheckedDevices}"
+                                         update=":deviceForm:chosenTable :deviceForm:deviceTable growl"
+                                         styleClass="btn btn-sm btn-primary"/>
+                    </div>
+
+                    <!-- 已选设备表格 -->
+
+                    <p:dataTable id="chosenTable" value="#{acquisitionPlanAssetAddController.selectedDeviceList}" var="chosen"
+                                 widgetVar="varChosenTable"
+                                 rowKey="#{chosen.uid}"
+                                 emptyMessage="暂无已选设备"
+                                 rows="10" pageLinks="5">
+
+                        <p:column width="36">
+                            <p:selectBooleanCheckbox value="#{acquisitionPlanAssetAddController.chosenDeviceMap[chosen.uid]}"
+                                                     class="chosenCheckBox">
+                                <p:ajax process="@this" update="@this"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox id="chosenCheckAll" class="chosenCheckAll">
+                                    <p:ajax listener="#{acquisitionPlanAssetAddController.onSelectAllChosen}"
+                                            update="@(.chosenCheckBox) :deviceForm:chosenTable"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="资产名称">
+                            <h:outputText value="#{chosen.name}"/>
+                        </p:column>
+                        <p:column headerText="设备型号">
+                            <h:outputText value="#{chosen.functionType}"/>
+                        </p:column>
+                        <p:column headerText="制造商序列号">
+                            <h:outputText value="#{chosen.serialNum}"/>
+                        </p:column>
+                        <p:column headerText="设备编号（院方）">
+                            <h:outputText value="#{chosen.departNum}"/>
+                        </p:column>
+                        <p:column headerText="二维码">
+                            <h:outputText value="#{chosen.qrCode}"/>
+                        </p:column>
+                        <p:column headerText="所属科室">
+                            <h:outputText value="#{chosen.clinicalDeptName}"/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <!-- 删除/清空按钮 -->
+                    <div style="margin: 10px 0;">
+                        <p:commandButton value="删除已勾选设备" icon="ui-icon-close"
+                                         actionListener="#{acquisitionPlanAssetAddController.removeCheckedDevices}"
+                                         update=":deviceForm:chosenTable growl"
+                                         styleClass="btn btn-sm btn-gray"/>
+                        <p:commandButton value="全部清空" icon="ui-icon-trash"
+                                         actionListener="#{acquisitionPlanAssetAddController.clearAllDevices}"
+                                         update=":deviceForm:chosenTable"
+                                         styleClass="btn btn-sm btn-gray" style="margin-left:10px;"/>
+                    </div>
+
+
+                    </p:fieldset>
+                </h:form>
+            </div>
+
+            <!-- ============ 三、底部操作按钮 ============ -->
+            <div class="ui-g-12" style="text-align:center; margin-top:10px; margin-bottom:20px;">
+                <p:commandButton value="确认添加" icon="ui-icon-check"
+                                 action="#{acquisitionPlanAssetAddController.confirmAdd}"
+                                 update=":deviceForm:chosenTable :addForm:planTable growl"
+                                 styleClass="btn btn-sm btn-primary" style="margin-right:15px;"/>
+                <p:commandButton value="取消" icon="ui-icon-cancel"
+                                 action="#{acquisitionPlanAssetAddController.cancel}"
+                                 immediate="true"
+                                 styleClass="btn btn-sm btn-gray"/>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

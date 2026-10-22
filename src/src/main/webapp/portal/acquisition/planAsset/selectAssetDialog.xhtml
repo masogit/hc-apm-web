@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="selectAssetDlg" widgetVar="varSelectAssetDlg" modal="true" resizable="true" draggable="true"
+              header="关联设备" appendTo="@(body)" width="80%">
+        <h:form id="selectAssetForm">
+
+            <h:panelGrid id="searchGrid" columns="8" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup>
+                    <p:outputLabel class="label">购置计划<span style="color: red">*</span></p:outputLabel>
+                    <p:selectOneMenu id="selectedPlan" value="#{acquisitionPlanAssetSelectController.selectedPlan}"
+                                     converter="acquisitionPlanConverter"
+                                     required="false" style="width: 100%">
+                        <f:selectItem itemLabel="请选择" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{acquisitionPlanAssetSelectController.planList}" var="plan"
+                                       itemLabel="#{acquisitionPlanAssetSelectController.getPlanDisplayName(plan)}"
+                                       itemValue="#{plan}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:outputLabel class="label">#{msg.assetName}</p:outputLabel>
+                    <p:inputText id="search_LIKE_name" placeholder="#{msg.assetName}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:outputLabel class="label">#{msg.departNum}</p:outputLabel>
+                    <p:inputText id="search_LIKE_departNum" placeholder="#{msg.departNum}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:outputLabel class="label">#{msg.financingNum}</p:outputLabel>
+                    <p:inputText id="search_LIKE_financingNum" placeholder="#{msg.financingNum}"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:commandButton value="#{msg.Search}" icon="ui-icon-search"
+                                     actionListener="#{acquisitionPlanAssetSelectController.setSearchFilter}"
+                                     update="selectAssetDatalist" styleClass="btn btn-sm btn-gray"/>
+                    <p:commandButton value="#{msg.Reset}" icon="ui-icon-cancel"
+                                     actionListener="#{acquisitionPlanAssetSelectController.resetSearch}"
+                                     update="selectAssetDatalist searchGrid" styleClass="btn btn-sm btn-gray">
+                        <p:resetInput target="searchGrid"/>
+                    </p:commandButton>
+                </h:panelGroup>
+            </h:panelGrid>
+
+            <p:dataTable id="selectAssetDatalist" value="#{acquisitionPlanAssetSelectController.lazyModel}" var="item"
+                         widgetVar="varSelectAssetDatalist"
+                         selectionMode="single" selection="#{acquisitionPlanAssetSelectController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false"
+                         rowKey="#{item.uid}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                         rows="10" emptyMessage="#{msg.noRecordFound}">
+
+                <p:ajax event="rowSelect" listener="#{acquisitionPlanAssetSelectController.onSelectRow()}" update=""/>
+
+                <p:column width="36" id="checkBoxColumn">
+                    <p:selectBooleanCheckbox value="#{acquisitionPlanAssetSelectController.selectedMap[item.uid]}" class="selectCheckBox">
+                        <p:ajax process="@this" update="@this"/>
+                    </p:selectBooleanCheckbox>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                            <p:ajax listener="#{acquisitionPlanAssetSelectController.onSelectAllOfPage}"
+                                    update="@(.selectCheckBox) :selectAssetForm:selectAssetDatalist"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                </p:column>
+                <p:column headerText="#{msg.name}" sortBy="#{item.name}">
+                    <h:outputText value="#{item.name}"/>
+                </p:column>
+                <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}">
+                    <h:outputText value="#{item.functionType}"/>
+                </p:column>
+                <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}">
+                    <h:outputText value="#{item.manufacture}"/>
+                </p:column>
+                <p:column headerText="#{msg.financingNum}" sortBy="#{item.financingNum}">
+                    <h:outputText value="#{item.financingNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}">
+                    <h:outputText value="#{item.departNum}"/>
+                </p:column>
+                <p:column headerText="#{msg.purchaseDate}" sortBy="#{item.purchaseDate}">
+                    <h:outputText value="#{item.purchaseDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+
+            <p:commandButton value="#{msg.Confirm}" icon="ui-icon-check"
+                             update="growl :formList:datalist"
+                             actionListener="#{acquisitionPlanAssetSelectController.confirmSelection}"
+                             oncomplete="handleSubmit(args, 'varSelectAssetDlg');"
+                             styleClass="btn btn-sm btn-gray"/>
+            <p:commandButton immediate="true" value="#{msg.Cancel}" type="button"
+                             icon="ui-icon-cancel" onclick="PF('varSelectAssetDlg').hide()"
+                             styleClass="btn btn-sm btn-gray"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

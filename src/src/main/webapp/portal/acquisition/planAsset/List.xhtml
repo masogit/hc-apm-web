@@ -1,0 +1,201 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .zoom-06 {
+                zoom: 0.6;
+            }
+
+            .zoom-08 {
+                zoom: 0.8;
+            }
+
+            .width-pct-100 {
+                min-width: 50% !important;
+                max-width: 100% !important;
+            }
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="购置设备管理"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="formList">
+                    <p:panel toggleable="true" collapsed="true" toggleSpeed="300"
+                             style="margin-bottom:10px;">
+                        <f:facet name="header">
+                            <span>筛选</span>
+                        </f:facet>
+                        <h:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <p:outputLabel class="label">是否已产生效益评估</p:outputLabel>
+                                <p:selectOneMenu id="searchPerformance" value="#{acquisitionPlanAssetListController.searchPerformance}" style="width: 200px">
+                                    <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItem itemLabel="是" itemValue="hasData"/>
+                                    <f:selectItem itemLabel="否" itemValue="noData"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:commandButton value="#{msg.Search}" icon="ui-icon-search"
+                                                 process="@form" update=":formList:datalist"
+                                                 actionListener="#{acquisitionPlanAssetListController.search}"
+                                                 styleClass="btn btn-sm btn-gray"/>
+                                <p:commandButton value="#{msg.Reset}" icon="ui-icon-cancel"
+                                                 process="@this" update="@form"
+                                                 actionListener="#{acquisitionPlanAssetListController.resetSearch}"
+                                                 styleClass="btn btn-sm btn-gray">
+                                    <p:resetInput target="@form"/>
+                                </p:commandButton>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </p:panel>
+
+                    <p:dataTable id="datalist" value="#{acquisitionPlanAssetListController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{acquisitionPlanAssetListController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                 sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{acquisitionPlanAssetListController.onFilter}"/>
+
+                        <p:column headerText="操作" exportable="false" width="60">
+                            <h:panelGroup>
+                                <p:commandLink id="deleteButton" title="#{msg.Delete}"
+                                               actionListener="#{acquisitionPlanAssetListController.deleteItem(item)}" update="datalist growl">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+                        </p:column>
+                        <p:column headerText="采购年限" filterBy="#{item.acquisitionPlan.applicationYear}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{acquisitionPlanAssetListController.yearList}" var="year"
+                                                   itemLabel="#{year}" itemValue="#{year}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.acquisitionPlan.applicationYear}"/>
+                        </p:column>
+
+                        <p:column headerText="采购编号" filterBy="#{item.acquisitionPlan.applicationNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.acquisitionPlan.applicationNo}"/>
+                        </p:column>
+
+                        <p:column headerText="申报类别" filterBy="#{item.acquisitionPlan.applicationType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('acquisitionApplicationType')}" var="typeItem"
+                                                   itemLabel="#{typeItem.valueZh}" itemValue="#{typeItem.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('acquisitionApplicationType', item.acquisitionPlan.applicationType)}"/>
+                        </p:column>
+
+                        <p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+
+                        <p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.functionType}"/>
+                        </p:column>
+
+                        <p:column headerText="所属院区" filterBy="#{item.assetInfo.hospital.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.hospital.name}"/>
+                        </p:column>
+
+                        <p:column headerText="所属科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
+                        </p:column>
+
+                        <p:column headerText="制造商序列号" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.serialNum}"/>
+                        </p:column>
+
+                        <p:column headerText="二维码" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.qrCode}"/>
+                        </p:column>
+
+                        <p:column headerText="启用日期" sortBy="#{item.assetInfo.installDate}" filterBy="#{item.assetInfo.installDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterInstallDate" widgetVar="varFilterInstallDate"/>
+                            </f:facet>
+                            <h:outputText value="#{item.assetInfo.installDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="效益评估" width="80" exportable="false">
+                            <p:commandButton value="查看" class="btn btn-xs btn-primary"
+                                             disabled="#{!acquisitionPlanAssetListController.hasPerformanceData(item)}"
+                                             actionListener="#{acquisitionPlanAssetListController.benefitAssess(item)}"
+                                             process="@this" update=":benefitAssessForm"
+                                             oncomplete="PF('benefitAssessSidebar').show()"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+
+                            <p:commandButton id="addButton2" title="添加" icon="ui-icon-plusthick"
+                                             class="btn btn-sm btn-gray" ajax="false"
+                                             action="#{acquisitionPlanAssetListController.goToAdd}"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                             class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="PlanAsset_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:overlayPanel appendTo="formList" id="idPanelFilterInstallDate" widgetVar="panelFilterInstallDate"
+                                    for=":formList:datalist:filterInstallDate" dismissable="false">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="#{msg.From}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"
+                                        pattern="yyyy/MM/dd" widgetVar="varInstallDateFrom" showOn="button"
+                                        showButtonPanel="false" navigator="true" mask="true" size="12"/>
+                            <p:outputLabel value="#{msg.To}"/>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"
+                                        pattern="yyyy/MM/dd" widgetVar="varInstallDateTo" showOn="button"
+                                        showButtonPanel="false" navigator="true" mask="true" size="12"/>
+                        </h:panelGrid>
+                        <p:commandButton onclick="setDateFilter('varDataList','varFilterInstallDate','varInstallDateFrom','varInstallDateTo'); PF('panelFilterInstallDate').hide();"
+                                         title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                        <p:commandButton onclick="PF('panelFilterInstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close"
+                                         immediate="true" type="button" style="zoom: 0.8;"/>
+                    </p:overlayPanel>
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="#{msg.Yes}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                        <p:commandButton value="#{msg.No}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                    </p:confirmDialog>
+                </h:form>
+
+                <h:form id="benefitAssessForm">
+                    <p:sidebar widgetVar="benefitAssessSidebar" position="right" style="width:70%;height:100%;"
+                               dismissable="true" showCloseIcon="true"
+                               onhide="document.getElementById('benefitAssessFrame').src='about:blank'">
+                        <h:outputLabel style="font-size:16px;font-weight:bold;" value="效益评估"/>
+                        <hr/>
+                        <iframe id="benefitAssessFrame" src="#{empty acquisitionPlanAssetListController.benefitAssessIframeUrl ? 'about:blank' : acquisitionPlanAssetListController.benefitAssessIframeUrl}" width="100%" height="800" frameborder="0" style="border:none;"></iframe>
+                    </p:sidebar>
+                </h:form>
+
+                <ui:include src="selectAssetDialog.xhtml"/>
+            </div>
+        </div>
+
+
+
+    </ui:define>
+
+</ui:composition>
