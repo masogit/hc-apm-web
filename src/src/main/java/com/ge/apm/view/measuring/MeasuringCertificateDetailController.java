@@ -22,6 +22,7 @@ import com.ge.healthcare.cn.common.llm.Result;
 import com.ge.healthcare.cn.common.llm.WorkflowResponse;
 import com.ge.healthcare.cn.common.ocr.support.BusinessType;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -74,7 +75,6 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
 
     private MeasuringService measuringService;
 
-    private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 
     private Pattern pattern = Pattern.compile("\\d+");
 
@@ -291,10 +291,10 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                     while (matcher.find()) {
                         validDateToStr += matcher.group();
                     }
-                    Date validDateTo = format.parse(validDateToStr);
+                    Date validDateTo = DateUtil.parse(validDateToStr, "yyyyMMdd");
                     this.selected.setValidDateTo(validDateTo);
                 }
-            } catch (ParseException e) {
+            } catch (Exception e) {
                e.printStackTrace();
             }
         }
@@ -309,13 +309,13 @@ public class MeasuringCertificateDetailController extends GenericCRUDUUIDControl
                 while (matcher.find()) {
                     checkDateStr += matcher.group();
                 }
-                Date checkDate = format.parse(checkDateStr);
+                Date checkDate = DateUtil.parse(checkDateStr, "yyyyMMdd");
                 this.selected.setCheckDate(checkDate);
             }else{
                 this.selected = new MeasuringCertificateDetail();
                 throw new BusinessException("检定日期为空");
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         handleValueChangeAssetSN();

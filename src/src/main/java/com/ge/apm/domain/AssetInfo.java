@@ -11,6 +11,7 @@ import com.ge.apm.domain.dto.SelectItemDto;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +31,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -3146,9 +3146,8 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public Map<String, Object> buildLeaseReqDetail() {
         Map<String, Object> reqDetail = new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         reqDetail.put("assetInfoUID", this.getUid());
-        reqDetail.put("chargingBeginTime", sdf.format(this.getSharedAssetReqDetail().getChargingBeginTime()));
+        reqDetail.put("chargingBeginTime", DateUtil.format(this.getSharedAssetReqDetail().getChargingBeginTime(), "yyyyMMddHHmmss"));
         reqDetail.put("willBeDelivered", this.getSharedAssetReqDetail().getWillBeDelivered());
         reqDetail.put("patientNum", this.getSharedAssetReqDetail().getPatientNum());
         reqDetail.put("patientBedNum", this.getSharedAssetReqDetail().getPatientBedNum());
@@ -3167,10 +3166,9 @@ public class AssetInfo implements ChineseName, Serializable {
 
     public Map<String, Object> buildReturnReqDetail() {
         Map<String, Object> reqDetail = new HashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         reqDetail.put("assetInfoUID", this.getUid());
-        reqDetail.put("chargingBeginTime", sdf.format(this.getSharedAssetReqDetail().getChargingBeginTime()));
-        reqDetail.put("chargingEndTime", sdf.format(this.getSharedAssetReqDetail().getChargingEndTime()));
+        reqDetail.put("chargingBeginTime", DateUtil.format(this.getSharedAssetReqDetail().getChargingBeginTime(), "yyyyMMddHHmmss"));
+        reqDetail.put("chargingEndTime", DateUtil.format(this.getSharedAssetReqDetail().getChargingEndTime(), "yyyyMMddHHmmss"));
         reqDetail.put("isIntact", this.getSharedAssetReqDetail().getIntact());
         reqDetail.put("compensationAmount", Optional.ofNullable(this.getSharedAssetReqDetail().getCompensationAmount()).orElse(BigDecimal.valueOf(0)).doubleValue());
         reqDetail.put("reqComment", this.getSharedAssetReqDetail().getReqComment());
@@ -3496,8 +3494,6 @@ public class AssetInfo implements ChineseName, Serializable {
         this.assetLocation = assetLocation;
     }
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
-
     public String getAssetUsedLifecycle() {
         if (ObjectUtil.isNotEmpty(assetUsedLifecycle)) {
             return assetUsedLifecycle;
@@ -3505,8 +3501,8 @@ public class AssetInfo implements ChineseName, Serializable {
         if (ObjectUtil.isEmpty(installDate) || ObjectUtil.isEmpty(lifecycle)) {
             return null;
         }
-        java.time.temporal.Temporal temporal1 = LocalDate.parse(SDF.format(installDate));
-        java.time.temporal.Temporal temporal2 = LocalDate.parse(SDF.format(System.currentTimeMillis()));
+        java.time.temporal.Temporal temporal1 = LocalDate.parse(DateUtil.format(installDate, "yyyy-MM-dd"));
+        java.time.temporal.Temporal temporal2 = LocalDate.parse(DateUtil.format(new Date(), "yyyy-MM-dd"));
         return String.format("%.0f", Math.floor(Double.parseDouble(String.valueOf(ChronoUnit.MONTHS.between(temporal1, temporal2))) / 12));
     }
 

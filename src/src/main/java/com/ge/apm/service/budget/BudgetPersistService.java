@@ -20,6 +20,7 @@ import com.ge.healthcare.cn.common.core.WechatParam;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,8 +44,6 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -112,8 +111,6 @@ public class BudgetPersistService {
     private ConfigCacheService configCacheService;
 
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-
     @Transactional(rollbackFor = Exception.class)
     public boolean saveApplication(BudgetApplication application,List<V2_BlobObject> attachList,List<String> removeFileBlobIds) {
         if (!Optional.ofNullable(application.getId()).isPresent()) { // 新增  数据状态和步骤为空
@@ -172,15 +169,10 @@ public class BudgetPersistService {
             if(budgetAssetInfo != null){
                 budgetApplicationAsset.setApplicationAssetName(budgetAssetInfo.getName());
             }
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                List<PurchaseBudgetConfig>  purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),
-                        account.getSiteUID(),sdf.parse(sdf.format(budgetApplication.getApplicationDate())));
-                if(!purchaseBudgetConfigList.isEmpty()){
-                    budgetApplication.setApplicationYear(purchaseBudgetConfigList.get(0).getYear());
-                }
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
+            List<PurchaseBudgetConfig>  purchaseBudgetConfigList = purchaseBudgetConfigRepository.queryEffiveConfig(account.getTenantUID(),
+                    account.getSiteUID(), DateUtil.parse(DateUtil.format(budgetApplication.getApplicationDate(), "yyyy-MM-dd"), "yyyy-MM-dd"));
+            if(!purchaseBudgetConfigList.isEmpty()){
+                budgetApplication.setApplicationYear(purchaseBudgetConfigList.get(0).getYear());
             }
 
         }
@@ -403,7 +395,7 @@ public class BudgetPersistService {
         Object o = budgetApplicationDao.getMaxIndex(orderType );
         int index = o == null ? 0 : Integer.parseInt(o.toString());
         index++;
-        String applicationNum = orderType + simpleDateFormat.format(new Date()) + String.format("%04d", index);
+        String applicationNum = orderType + DateUtil.format(new Date(), "yyyyMMdd") + String.format("%04d", index);
         BudgetApplication budgetApplicationExist = budgetApplicationDao.findByApplicationNum(applicationNum);
         if(budgetApplicationExist != null){
                 applicationNum = applicationNum+"_1";

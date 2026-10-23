@@ -5,11 +5,11 @@ import com.ge.apm.domain.ImportFilesVO;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,8 +24,6 @@ public class FileScanExportService {
     private static final String SHEET_IMPORT_FILES_LIST = "ImportFilesList";
     private static final String I18N_BATCH_FILE_TYPE = "batchFileType";
     private static final String I18N_BATCH_FILE_PROCESS_STATUS = "batchFileProcessStatus";
-
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public List<Map<String, Object>> createFileScanData(List<ImportFilesVO> fileScanList){
 
@@ -48,7 +46,7 @@ public class FileScanExportService {
     }
 
     private String formatDate(Date date) {
-        return date != null ? sdf.format(date) : "";
+        return date != null ? DateUtil.format(date, "yyyy-MM-dd HH:mm:ss") : "";
     }
 
     public String getUserName(String userUid) {

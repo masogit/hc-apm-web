@@ -28,7 +28,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import javax.faces.model.SelectItemGroup;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -246,14 +245,12 @@ public class AssetInfoService {
 
     }
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
-
     public static String getAssetUsedLifecycle(Date installDate, Integer lifecycle) {
         if (ObjectUtil.isEmpty(installDate) || ObjectUtil.isEmpty(lifecycle)) {
             return null;
         }
-        Temporal temporal1 = LocalDate.parse(SDF.format(installDate));
-        Temporal temporal2 = LocalDate.parse(SDF.format(System.currentTimeMillis()));
+        Temporal temporal1 = LocalDate.parse(DateUtil.format(installDate, "yyyy-MM-dd"));
+        Temporal temporal2 = LocalDate.parse(DateUtil.format(new Date(), "yyyy-MM-dd"));
         return String.format("%.0f", Math.floor(Double.parseDouble(String.valueOf(ChronoUnit.MONTHS.between(temporal1, temporal2))) / 12));
     }
 

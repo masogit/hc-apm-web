@@ -18,6 +18,7 @@ import com.ge.apm.service.remote.ElasticService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
@@ -36,7 +37,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,8 +56,6 @@ public class AssetHistoryService {
     public static final String FILED_STATUS = "status";
     public static final String IS_VALID = "isValid";
     public static final String ASSET_DISPOSAL_RESULTS = "assetDisposalResults";
-
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private AssetHistoryRepository assetHistoryRepository;
@@ -319,8 +317,7 @@ public class AssetHistoryService {
         }
 
         if (fieldValue instanceof Date) {
-            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-            return  sdf2.format(fieldValue);
+            return DateUtil.format((Date) fieldValue, "yyyy-MM-dd");
         }
         String result = fieldValue.toString();
 
@@ -333,7 +330,7 @@ public class AssetHistoryService {
         }
 
         if (fieldValue instanceof Date) {
-            return sdf.format(fieldValue);
+            return DateUtil.format((Date) fieldValue, "yyyy-MM-dd HH:mm:ss");
         }
 
         String result = fieldValue.toString();
@@ -548,7 +545,7 @@ public class AssetHistoryService {
             resultMap.put("修改人", importFilesVO.get("createdBy"));
             resultMap.put("修改来源", importFilesVO.get("modifySource"));
             if(importFilesVO.get("createdDate") != null){
-                resultMap.put("修改时间", sdf.format(importFilesVO.get("createdDate")));
+                resultMap.put("修改时间", DateUtil.format((Date) importFilesVO.get("createdDate"), "yyyy-MM-dd HH:mm:ss"));
             }
 
             resultList.add(resultMap);

@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import webapp.framework.dao.SearchFilter;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -28,8 +28,6 @@ public class ContractExportService {
 
     private static final String SHEET_WORKORDER_CONTRACT = "Contract List";
     private static final String SHEET_WORKORDER_CONTRACT_ITEM = "ContractItem List";
-
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 
     @Autowired
     private ContractInfoRepository contractInfoDao;
@@ -253,7 +251,7 @@ public class ContractExportService {
     }
 
     private String formatDate(Date date) {
-        return date != null ? sdf.format(date) : "";
+        return date != null ? DateUtil.format(date, "yyyy/MM/dd") : "";
     }
 
 }

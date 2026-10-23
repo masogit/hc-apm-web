@@ -15,6 +15,7 @@ import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.utils.MultilApproveStatusMapping;
 import com.ge.apm.service.wo.WorkOrderExportService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.render.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
@@ -31,7 +32,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
@@ -64,7 +64,6 @@ public class WorkOrderDocxRenderService {
     @Autowired
     private ConfigItemService configItemService;
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private DecimalFormat df = new DecimalFormat("#0.00");
 
     private void copyKeyMapping(Map<String,String> COPY_KEY_MAPPING) {
@@ -524,7 +523,7 @@ public class WorkOrderDocxRenderService {
     }
 
     private String formatDate(Date date) {
-        return date != null ? sdf.format(date) : "";
+        return date != null ? DateUtil.format(date, "yyyy-MM-dd HH:mm:ss") : "";
     }
 
     private String formatDouble(Double num) {

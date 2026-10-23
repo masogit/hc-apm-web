@@ -18,6 +18,7 @@ import com.ge.apm.service.common.ConfigItemService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.acquisition.AcquisitionPlanEditController;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -31,7 +32,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,8 +62,6 @@ public class AcquisitionPlanService {
 
     @Autowired
     private UaaService uaaService;
-
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     public String checkRequire(AcquisitionPlan acquisitionPlan, List<V2_BlobObject> v2BlobObjects){
         StringBuilder sb = new StringBuilder();
@@ -202,7 +200,7 @@ public class AcquisitionPlanService {
         Object o = acquisitionPlanRepository.getMaxIndex();
         int index = o == null ? 0 : Integer.parseInt(o.toString());
         index++;
-        String applicationNum = orderType + simpleDateFormat.format(new Date()) + String.format("%04d", index);
+        String applicationNum = orderType + DateUtil.format(new Date(), "yyyyMMdd") + String.format("%04d", index);
         AcquisitionPlan exist = acquisitionPlanRepository.findByApplicationNo(applicationNum);
         if(exist != null){
             applicationNum = applicationNum+"_1";
