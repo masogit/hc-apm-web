@@ -2,13 +2,14 @@
  */
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import webapp.framework.web.service.UserContext;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 /**
  *
@@ -49,6 +50,8 @@ public class I18nMessage implements Serializable, Comparable {
     private Integer siteId;
     @Column(name = "order_by")
     private Integer orderBy;
+    @Column(name = "enabled", columnDefinition = "boolean default true")
+    private Boolean enabled = true;
     @Transient
     private boolean editable;
     @Transient
@@ -211,6 +214,8 @@ public class I18nMessage implements Serializable, Comparable {
 		builder.append(valueEn);
 		builder.append(", valueTw=");
 		builder.append(valueTw);
+        builder.append(", enabled=");
+        builder.append(enabled);
 		builder.append(", siteId=");
 		builder.append(siteId);
 		builder.append("]");
@@ -237,6 +242,14 @@ public class I18nMessage implements Serializable, Comparable {
 
     public void setOrderBy(Integer orderBy) {
         this.orderBy = orderBy;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getCustomConfig() {

@@ -108,7 +108,7 @@
                         </label>
                         <p:selectOneMenu id="workOrderType" value="#{workOrderMgrController.selectedWorkOrder.workOrderType}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('workOrderType')}" var="item"
+                            <f:selectItems value="#{fieldMsg.getEnabledFieldValueList('workOrderType')}" var="item"
                                            itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
