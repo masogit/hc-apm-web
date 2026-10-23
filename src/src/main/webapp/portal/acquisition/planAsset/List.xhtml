@@ -65,7 +65,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500">
+                                 rowsPerPageTemplate="10,20,50,100,500">
 
                         <p:ajax event="filter" listener="#{acquisitionPlanAssetListController.onFilter}"/>
 
@@ -137,7 +137,7 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="效益评估" width="80" exportable="false">
+                        <p:column headerText="效益评估" width="80" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT')}" >
                             <p:commandButton value="查看" class="btn btn-xs btn-primary"
                                              disabled="#{!acquisitionPlanAssetListController.hasPerformanceData(item)}"
                                              actionListener="#{acquisitionPlanAssetListController.benefitAssess(item)}"
@@ -149,7 +149,7 @@
 
                             <p:commandButton id="addButton2" title="添加" icon="ui-icon-plusthick"
                                              class="btn btn-sm btn-gray" ajax="false"
-                                             action="#{acquisitionPlanAssetListController.goToAdd}"/>
+                                             action="#{acquisitionPlanAssetListController.goToAdd}" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY')}" />
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
                                              class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="PlanAsset_export"/>

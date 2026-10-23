@@ -67,7 +67,7 @@ public class AcquisitionPlanAssetAddController implements Serializable {
     @Getter @Setter
     private AcquisitionPlan selectedPlan;
     @Getter @Setter
-    private String selectedPlanId;
+    private String dropdownPlanId;
 
     // ========== 设备搜索条件 ==========
     @Getter @Setter
@@ -177,16 +177,17 @@ public class AcquisitionPlanAssetAddController implements Serializable {
     }
 
     public void onAppNoSelect() {
-        if (selectedPlanId != null && appNoOptions != null) {
-            selectedPlan = appNoOptions.stream()
-                    .filter(p -> selectedPlanId.equals(p.getId()))
+        selectedPlan = null;
+        if (dropdownPlanId != null && appNoOptions != null) {
+            AcquisitionPlan plan = appNoOptions.stream()
+                    .filter(p -> dropdownPlanId.equals(p.getId()))
                     .findFirst().orElse(null);
-        } else {
-            selectedPlan = null;
-        }
-        if (selectedPlan != null) {
-            planSearchResult = new ArrayList<>();
-            planSearchResult.add(selectedPlan);
+            if (plan != null) {
+                planSearchResult = new ArrayList<>();
+                planSearchResult.add(plan);
+            } else {
+                planSearchResult = null;
+            }
         } else {
             planSearchResult = null;
         }
@@ -246,9 +247,9 @@ public class AcquisitionPlanAssetAddController implements Serializable {
         searchAssetName = null;
         searchSpec = null;
         searchAppNo = null;
+        dropdownPlanId = null;
         planSearchResult = null;
         selectedPlan = null;
-        selectedPlanId = null;
         appNoOptions = null;
     }
 
