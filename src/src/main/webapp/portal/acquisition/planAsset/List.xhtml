@@ -27,34 +27,39 @@
 
             <div class="ui-g-12 card">
                 <h:form id="formList">
-                    <p:panel toggleable="true" collapsed="true" toggleSpeed="300"
-                             style="margin-bottom:10px;">
-                        <f:facet name="header">
+                    <div class="filter-toggle-bar" style="margin-bottom:10px;">
+                        <span onclick="toggleFilterPanel()" style="cursor:pointer; display:inline-flex; align-items:center; gap:5px; color:#666; font-size:13px; user-select:none;">
+                            <span id="filterArrow" style="display:inline-block; transition:transform 0.3s; font-size:10px;">&#9660;</span>
                             <span>筛选</span>
-                        </f:facet>
-                        <h:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:outputLabel class="label">是否已产生效益评估</p:outputLabel>
-                                <p:selectOneMenu id="searchPerformance" value="#{acquisitionPlanAssetListController.searchPerformance}" style="width: 200px">
-                                    <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItem itemLabel="是" itemValue="hasData"/>
-                                    <f:selectItem itemLabel="否" itemValue="noData"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:commandButton value="#{msg.Search}" icon="ui-icon-search"
-                                                 process="@form" update=":formList:datalist"
-                                                 actionListener="#{acquisitionPlanAssetListController.search}"
-                                                 styleClass="btn btn-sm btn-gray"/>
-                                <p:commandButton value="#{msg.Reset}" icon="ui-icon-cancel"
-                                                 process="@this" update="@form"
-                                                 actionListener="#{acquisitionPlanAssetListController.resetSearch}"
-                                                 styleClass="btn btn-sm btn-gray">
-                                    <p:resetInput target="@form"/>
-                                </p:commandButton>
-                            </h:panelGroup>
-                        </h:panelGrid>
-                    </p:panel>
+                        </span>
+                        <div id="filterPanel" style="display:none; margin-top:8px; padding:8px 12px; background:#f5f5f5; border-radius:4px;">
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <h:panelGroup style="display:flex; flex-direction:column; gap:4px;">
+                                    <p:outputLabel for="searchPerformance" value="是否已产生效益评估" style="white-space:nowrap; font-weight:normal; margin-bottom:0;"/>
+                                    <p:selectOneMenu id="searchPerformance" value="#{acquisitionPlanAssetListController.searchPerformance}" style="width:160px;">
+                                        <p:ajax event="change" process="@this" update=":formList:datalist"
+                                                listener="#{acquisitionPlanAssetListController.search}"/>
+                                        <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItem itemLabel="是" itemValue="hasData"/>
+                                        <f:selectItem itemLabel="否" itemValue="noData"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function toggleFilterPanel() {
+                            var panel = document.getElementById('filterPanel');
+                            var arrow = document.getElementById('filterArrow');
+                            if (panel.style.display === 'none') {
+                                panel.style.display = 'block';
+                                arrow.style.transform = 'rotate(180deg)';
+                            } else {
+                                panel.style.display = 'none';
+                                arrow.style.transform = 'rotate(0deg)';
+                            }
+                        }
+                    </script>
 
                     <p:dataTable id="datalist" value="#{acquisitionPlanAssetListController.lazyModel}" var="item"
                                  widgetVar="varDataList"
