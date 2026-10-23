@@ -27,14 +27,15 @@
 
             <div class="ui-g-12 card">
                 <h:form id="formList">
+                    <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT')}">
                     <div class="filter-toggle-bar" style="margin-bottom:10px;">
                         <span onclick="toggleFilterPanel()" style="cursor:pointer; display:inline-flex; align-items:center; gap:5px; color:#666; font-size:13px; user-select:none;">
                             <span id="filterArrow" style="display:inline-block; transition:transform 0.3s; font-size:10px;">&#9660;</span>
                             <span>筛选</span>
                         </span>
-                        <div id="filterPanel" style="display:none; margin-top:8px; padding:8px 12px; background:#f5f5f5; border-radius:4px;">
+                        <div id="filterPanel" style="display:none; margin-top:8px; border:1px solid #ddd; border-radius:4px; padding:10px 12px;">
                             <div style="display:flex; align-items:center; gap:15px;">
-                                <h:panelGroup style="display:flex; flex-direction:column; gap:4px;">
+                                <h:panelGroup style="display:flex; align-items:center; gap:15px;">
                                     <p:outputLabel for="searchPerformance" value="是否已产生效益评估" style="white-space:nowrap; font-weight:normal; margin-bottom:0;"/>
                                     <p:selectOneMenu id="searchPerformance" value="#{acquisitionPlanAssetListController.searchPerformance}" style="width:160px;">
                                         <p:ajax event="change" process="@this" update=":formList:datalist"
@@ -60,6 +61,7 @@
                             }
                         }
                     </script>
+                    </h:panelGroup>
 
                     <p:dataTable id="datalist" value="#{acquisitionPlanAssetListController.lazyModel}" var="item"
                                  widgetVar="varDataList"
@@ -74,7 +76,7 @@
 
                         <p:ajax event="filter" listener="#{acquisitionPlanAssetListController.onFilter}"/>
 
-                        <p:column headerText="操作" exportable="false" width="60">
+                        <p:column headerText="操作" exportable="false" width="60" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY')}">
                             <h:panelGroup>
                                 <p:commandLink id="deleteButton" title="#{msg.Delete}"
                                                actionListener="#{acquisitionPlanAssetListController.deleteItem(item)}" update="datalist growl">
