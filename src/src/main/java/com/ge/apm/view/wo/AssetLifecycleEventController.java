@@ -132,6 +132,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		if(!cancelled){
 			searchFilters.add(new SearchFilter("status", Operator.NE, 3));
 		}
+        searchFilters.removeIf(e -> e.fieldName.equals("id"));
         if(StrUtil.isNotEmpty(queryOrderId)){
             searchFilters.add(new SearchFilter("id", Operator.EQ, queryOrderId));
         }
