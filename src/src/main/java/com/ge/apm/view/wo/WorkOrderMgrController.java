@@ -258,6 +258,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private OrgTreeController orgTreeController;
     private AssetInfoRepository assetInfoRepository;
     private AssetTypeGroupService assetTypeGroupService;
+    private AssetLifecycleEvent3Controller assetLifecycleEvent3Controller;
+    private AssetLifecycleEvent6Controller assetLifecycleEvent6Controller;
     @Setter@Getter
     private String highlevelApprovalComments;
     List<V2_WorkOrder_Detail_Return> v2WorkOrderDetailReturnList;
@@ -406,6 +408,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             orgTreeController = WebUtil.getBean(OrgTreeController.class);
             assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
             assetTypeGroupService = WebUtil.getBean(AssetTypeGroupService.class);
+            assetLifecycleEvent3Controller = WebUtil.getBean(AssetLifecycleEvent3Controller.class);
+            assetLifecycleEvent6Controller = WebUtil.getBean(AssetLifecycleEvent6Controller.class);
             selectSite = cacheService.findOrgByUid(loginUser.getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             if (!myWorkOrderInitialized) {
@@ -838,6 +842,8 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         tabTitle = msg.getDetail();
         queryIndex = 0;
         selected = null;
+        assetLifecycleEvent3Controller.setQueryOrderId(null);
+        assetLifecycleEvent6Controller.setQueryOrderId(null);
     }
 
     public void updateQueryIndex(int query){

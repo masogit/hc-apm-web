@@ -40,6 +40,8 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.wo.AssetLifecycleEvent4Controller;
+import com.ge.apm.view.wo.AssetLifecycleEvent5Controller;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.ge.healthcare.cn.common.cons.RepairSourceEnum;
@@ -177,7 +179,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private ConfigItemValueRepository configItemValueRepository;
     private AssetInfoRepository assetInfoRepository;
     private OrgInfoRepository orgDao;
-
+    private AssetLifecycleEvent4Controller assetLifecycleEvent4Controller;
+    private AssetLifecycleEvent5Controller assetLifecycleEvent5Controller;
     List<String> ruleStrList;
     @Setter @Getter
     private Boolean nochange = false;
@@ -1945,6 +1948,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService = WebUtil.getBean(V2_PmOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        assetLifecycleEvent4Controller = WebUtil.getBean(AssetLifecycleEvent4Controller.class);
+        assetLifecycleEvent5Controller = WebUtil.getBean(AssetLifecycleEvent5Controller.class);
         if (!myPmOrderInitialized) {
             Boolean saved = (Boolean) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get("myPmOrderSaved");
@@ -2513,6 +2518,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }*/
 //        queryIndex = -1;
         selected = null;
+        assetLifecycleEvent4Controller.setQueryOrderId(null);
+        assetLifecycleEvent5Controller.setQueryOrderId(null);
     }
     public void updateQueryIndex(int query){
         queryIndex = query;
