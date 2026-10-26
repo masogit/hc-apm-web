@@ -25,7 +25,6 @@ import webapp.framework.web.WebUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -101,8 +100,6 @@ public class DepartmentConvertService {
         return  WordExportServiceUtil.generate(datas,templateBytes, bindings);
     }
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
-
     public Map<String, Object> getData(AssetDepartmentConvert assetDepartmentConvert) {
         Map<String, Object> map = new HashMap<>();
 
@@ -116,7 +113,7 @@ public class DepartmentConvertService {
         map.put(out_dept_name.name(), assetDepartmentConvert.getOutDeptName());
         map.put(in_dept_name.name(), assetDepartmentConvert.getInDeptName());
         if(assetDepartmentConvert.getTransferInAt()!=null){
-            String date = SDF.format(assetDepartmentConvert.getTransferInAt());
+            String date = DateUtil.format(assetDepartmentConvert.getTransferInAt(), "yyyy-MM-dd");
             map.put(out_date.name(), date);
         }
         String statusName=getStatusName ("assetStatus",assetInfo.getStatus().toString());

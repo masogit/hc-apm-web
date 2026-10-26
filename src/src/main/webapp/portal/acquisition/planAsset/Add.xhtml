@@ -39,7 +39,7 @@
                         </div>
                         <div class="ui-g-2">
                             <p:outputLabel class="label">采购编号</p:outputLabel>
-                            <p:selectOneMenu id="searchAppNo" value="#{acquisitionPlanAssetAddController.selectedPlanId}"
+                            <p:selectOneMenu id="searchAppNo" value="#{acquisitionPlanAssetAddController.dropdownPlanId}"
                                              style="width:100%" filter="true" filterMatchMode="contains">
                                 <p:ajax event="change" listener="#{acquisitionPlanAssetAddController.onAppNoSelect}"
                                         update="planTable"/>
@@ -66,7 +66,7 @@
                                  rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,50">
 
-                        <p:ajax event="rowSelect" update="@form"/>
+                        <p:ajax event="rowSelect" />
 
                         <p:column headerText="采购编号" width="150">
                             <h:outputText value="#{plan.applicationNo}"/>
@@ -267,8 +267,10 @@
             </div>
 
             <!-- ============ 三、底部操作按钮 ============ -->
+            <h:form id="actionForm">
             <div class="ui-g-12" style="text-align:center; margin-top:10px; margin-bottom:20px;">
                 <p:commandButton value="确认添加" icon="ui-icon-check"
+                                 process=":addForm @this"
                                  action="#{acquisitionPlanAssetAddController.confirmAdd}"
                                  update=":deviceForm:chosenTable :addForm:planTable growl"
                                  styleClass="btn btn-sm btn-primary" style="margin-right:15px;"/>
@@ -277,6 +279,7 @@
                                  immediate="true"
                                  styleClass="btn btn-sm btn-gray"/>
             </div>
+            </h:form>
         </div>
     </ui:define>
 

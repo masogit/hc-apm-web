@@ -104,6 +104,11 @@ public class QrCodeTemplateCreateController {
         }
         templateJsonObject = thisTemplate.getJSONObject();
 
+        // 设置跳转功能页面方式默认值
+        JSONObject qrCodeElements = templateJsonObject.getJSONObject("QrCodeElements");
+        if (qrCodeElements != null && Strings.isNullOrEmpty(qrCodeElements.getString("EncodingMethod"))) {
+            qrCodeElements.put("EncodingMethod", "redirect2FuncPage");
+        }
     }
     
     public void createNewElement() {

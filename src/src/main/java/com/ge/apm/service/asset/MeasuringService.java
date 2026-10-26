@@ -44,7 +44,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.DateUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 
 import java.beans.PropertyDescriptor;
 import java.io.*;
@@ -92,7 +92,6 @@ public class MeasuringService {
     private final String HEADER_CERTIFICATE_TYPE = "证书类型";
     private static final String MEASURING_STATUS= "measuringStatus";
     private int progress;
-    private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 
     private Pattern pattern = Pattern.compile("\\d+");
     @Autowired
@@ -391,7 +390,7 @@ public class MeasuringService {
                     MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndSiteUID(tempAssetInfo.getMeasuringItemCategory().toString(), currentUserAccount.getSiteUID());
                     Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
                     if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
-                        nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
+                        nextMeteringDate = webapp.framework.util.DateUtil.addMonth(checkDate,measureCycle);
                     }
                 }
             }
@@ -924,10 +923,10 @@ public class MeasuringService {
                     while (matcher.find()) {
                         validDateToStr += matcher.group();
                     }
-                    Date validDateTo = format.parse(validDateToStr);
+                    Date validDateTo = DateUtil.parse(validDateToStr, "yyyyMMdd");
                     detail.setValidDateTo(validDateTo);
                 }
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 LOGGER.error(e.getLocalizedMessage(),e.getMessage());
             }
         }
@@ -939,10 +938,10 @@ public class MeasuringService {
                 while (matcher.find()) {
                     checkDateStr += matcher.group();
                 }
-                Date checkDate = format.parse(checkDateStr);
+                Date checkDate = DateUtil.parse(checkDateStr, "yyyyMMdd");
                 detail.setCheckDate(checkDate);
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(),e.getMessage());
         }
     }

@@ -205,7 +205,7 @@
     <p:dataTable id="datalist" value="#{workOrderReportExportController.workOrderList}" var="item"
                  widgetVar="varDataList"
                  selection="#{workOrderReportExportController.selectedItems}"
-                 rowKey="#{item.woId}" lazy="false" paginator="true" paginatorPosition="both"
+                 rowKey="#{item.woId}" lazy="false" paginator="true" paginatorPosition="top"
                  paginatorAlwaysVisible="true"
                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"

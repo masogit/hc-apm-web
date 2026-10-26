@@ -189,14 +189,18 @@ public class AssetOwnerSettingController {
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
-
+    
         if (orgInfo == null || orgInfo.getId() == -1) {
             selectedOrg = null;
+            // 选择"所有医院"时，重新加载全部用户
+            userAccountList = userCommonService.getWorkerList(null, null);
         } else {
             selectedOrg = orgInfo;
+            // 选择医院后，按选中的组织UID过滤用户列表
+            userAccountList = userCommonService.getWorkerList(null, selectedOrg.getUid());
             if(Objects.equals(selectedOrg.getOrgLevel(),0) && !Objects.equals(selectedOrg.getOrgType(),4)){
                 queryAsset.setTenantUID(selectedOrg.getUid());
-                clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(), 0);
+                clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(),0);
             }
             if(Objects.equals(selectedOrg.getOrgLevel(),1) && !Objects.equals(selectedOrg.getOrgType(),4)){
                 queryAsset.setInstitutionUID(selectedOrg.getUid());
@@ -215,6 +219,13 @@ public class AssetOwnerSettingController {
                 clinicalDeptList = assetInfoService.getClinicalDeptList(selectedOrg.getUid(),4);
             }
         }
+        // 切换医院时清空已选的负责人，避免数据不一致
+        ownerSearch = null;
+        ownerSearch2 = null;
+        ownerSearch3 = null;
+        queryAsset.setAssetOwnerId(null);
+        queryAsset.setAssetOwnerId2(null);
+        queryAsset.setAssetOwnerId3(null);
         getQueryAssetsList();
     }
 

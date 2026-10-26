@@ -12,6 +12,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.core.WechatParam;
 import com.ge.healthcare.cn.common.core.message.MSGEvent;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +32,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -57,7 +57,6 @@ public class PurchaseOrderService {
     private BudgetApplicationExportService budgetApplicationExportService;
     @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
     private String baseURL;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
     @Autowired
     private UserAccountRepository userDao;
     @Autowired
@@ -167,7 +166,7 @@ public class PurchaseOrderService {
         Object o = purchaseOrderInfoRepository.getMaxIndex();
         int index = o == null ? 0 : Integer.parseInt(o.toString());
         index++;
-        String purchaseNum = "PUR" + simpleDateFormat.format(new Date()) + String.format("%04d", index);
+        String purchaseNum = "PUR" + DateUtil.format(new Date(), "yyyyMMdd") + String.format("%04d", index);
         purchaseOrderInfo.setPurchaseNum(purchaseNum);
         purchaseOrderInfo.setPurchaseNumIndex(index);
         return purchaseOrderInfo;

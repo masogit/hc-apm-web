@@ -35,7 +35,6 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -62,7 +61,6 @@ public class WorkOrderExportService {
     private static final String I18N_REPAIR_RESULT = "repairResult";
     private static final String I18N_HOUR_TYPE = "hoursEntryType";
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
     @Autowired
     ServiceRequestRepository serviceRequestDao;
@@ -571,6 +569,10 @@ public class WorkOrderExportService {
                 serviceRequestPicture = pictureList.stream().filter(item -> "ServiceRequest".equals(item.getBoType())).collect(Collectors.toList());
                 pictureList = woService.getAttachByBoSubType((String) m.get("srId"), V2_BlobObject.BO_SUB_TYPE_IMG);
                 workOrderPicture = pictureList.stream().filter(item -> "WorkOrder".equals(item.getBoType())).collect(Collectors.toList());
+                List<V2_BlobObject> pictureListMvs = getPictureListMvs((String) m.get("woId"));
+                if(CollectionUtils.isNotEmpty(pictureListMvs)){
+                    workOrderPicture.addAll(pictureListMvs);
+                }
                 List<V2_WorkOrder_Detail> byWoId = workOrderDetailDao.findByWoId(woid);
                 Set<String> ids = byWoId.stream().map(p -> p.getId()).collect(Collectors.toSet());
                 List<V2_BlobObject> partPictures = null;
@@ -619,6 +621,23 @@ public class WorkOrderExportService {
         });
 
         return workOrderdata;
+    }
+    public List<V2_BlobObject> getPictureListMvs(String woId){
+        List<V2_BlobObject> pictureListMvs = woService.getAttachByBoSubType(woId, null); //获取MVS附件
+        if(CollectionUtils.isEmpty(pictureListMvs)) return null;
+        pictureListMvs = pictureListMvs.stream()
+                .filter(item ->{
+                    String objectName = item.getObjectName();
+                    if(  V2_BlobObject.BO_SUB_TYPE_EHOME.equals(item.getBoType()) && StringUtils.isNotEmpty(objectName)){
+                        int dotIndex = objectName.lastIndexOf(".");
+                        if (dotIndex < 0) return true; // 无扩展名，视为图片
+                        String substring = objectName.substring(dotIndex + 1);
+                        return !"docx".equalsIgnoreCase(substring) && !"pdf".equalsIgnoreCase(substring);
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+        return pictureListMvs;
     }
     private List<PartsPictureTableRenderPolicy.PartsPictureTable> getPartsPictureTable(List<V2_WorkOrder_Detail> workOrderDetails,
                                                                                        List<V2_BlobObject> blobObjects){
@@ -677,11 +696,11 @@ public class WorkOrderExportService {
     }
 
     private String formatDate(Date date) {
-        return date != null ? sdf.format(date) : "";
+        return date != null ? DateUtil.format(date, "yyyy-MM-dd HH:mm:ss") : "";
     }
 
     public String formatDate2(Date date) {
-        return date != null ? new SimpleDateFormat("yyyy-MM-dd").format(date) : "";
+        return date != null ? DateUtil.format(date, "yyyy-MM-dd") : "";
 
     }
 

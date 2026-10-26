@@ -16,6 +16,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.SystemTemplateEnum;
 import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.utils.util.ObjectUtil;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -41,8 +42,6 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -138,7 +137,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
 
     private List<Field> fieldList = new ArrayList<>();
 
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -555,11 +553,10 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     }
 
     public String getWarrantyFormatTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         if (varWarrantyDateTo == null) {
             return warrantyFormatTime;
         } else {
-            return "~" + sdf.format(varWarrantyDateTo);
+            return "~" + DateUtil.format(varWarrantyDateTo, "yyyy/MM/dd");
         }
     }
 
@@ -967,28 +964,20 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
                         Class<?> type = field.getType();
                         if(name.equals("warrantyDate")){
                             String[] split = filterWarrantyDate.split("~");
-                            try {
-                                if(ObjectUtil.isNotEmpty(split[0])){
-                                    param.put(name, format.parse(split[0]));
-                                    param.put(name+"1", format.parse(split[1]));
-                                }else{
-                                    param.put(name, format.parse(split[1]));
-                                }
-                            } catch (ParseException e) {
-                                throw new RuntimeException(e);
+                            if(ObjectUtil.isNotEmpty(split[0])){
+                                param.put(name, DateUtil.parse(split[0], "yyyy/MM/dd"));
+                                param.put(name+"1", DateUtil.parse(split[1], "yyyy/MM/dd"));
+                            }else{
+                                param.put(name, DateUtil.parse(split[1], "yyyy/MM/dd"));
                             }
                         }else if (type == Date.class){
                             String filterDate =(String) selectedObject.get(name);
                             String[] split = filterDate.split("~");
-                            try {
-                                if(ObjectUtil.isNotEmpty(split[0])){
-                                    param.put(name, format.parse(split[0]));
-                                    param.put(name+"1", format.parse(split[1]));
-                                }else{
-                                    param.put(name, format.parse(split[1]));
-                                }
-                            } catch (ParseException e) {
-                                throw new RuntimeException(e);
+                            if(ObjectUtil.isNotEmpty(split[0])){
+                                param.put(name, DateUtil.parse(split[0], "yyyy/MM/dd"));
+                                param.put(name+"1", DateUtil.parse(split[1], "yyyy/MM/dd"));
+                            }else{
+                                param.put(name, DateUtil.parse(split[1], "yyyy/MM/dd"));
                             }
                         }else{
                             param.put(name,  searchFilter.value);

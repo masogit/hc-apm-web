@@ -1,7 +1,6 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.persistence.*;
@@ -125,9 +124,6 @@ public class NurseSiteMaintainItem implements Serializable {
 	
 	@Column(name="comment")
 	private String comment="";
-	
-	@Transient
-	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
 	
 	@Transient
 	private boolean blnEditComment=false;

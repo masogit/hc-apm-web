@@ -27,34 +27,41 @@
 
             <div class="ui-g-12 card">
                 <h:form id="formList">
-                    <p:panel toggleable="true" collapsed="true" toggleSpeed="300"
-                             style="margin-bottom:10px;">
-                        <f:facet name="header">
+                    <h:panelGroup rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT')}">
+                    <div class="filter-toggle-bar" style="margin-bottom:10px;">
+                        <span onclick="toggleFilterPanel()" style="cursor:pointer; display:inline-flex; align-items:center; gap:5px; color:#666; font-size:13px; user-select:none;">
+                            <span id="filterArrow" style="display:inline-block; transition:transform 0.3s; font-size:10px;">&#9660;</span>
                             <span>筛选</span>
-                        </f:facet>
-                        <h:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
-                                <p:outputLabel class="label">是否已产生效益评估</p:outputLabel>
-                                <p:selectOneMenu id="searchPerformance" value="#{acquisitionPlanAssetListController.searchPerformance}" style="width: 200px">
-                                    <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItem itemLabel="是" itemValue="hasData"/>
-                                    <f:selectItem itemLabel="否" itemValue="noData"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <p:commandButton value="#{msg.Search}" icon="ui-icon-search"
-                                                 process="@form" update=":formList:datalist"
-                                                 actionListener="#{acquisitionPlanAssetListController.search}"
-                                                 styleClass="btn btn-sm btn-gray"/>
-                                <p:commandButton value="#{msg.Reset}" icon="ui-icon-cancel"
-                                                 process="@this" update="@form"
-                                                 actionListener="#{acquisitionPlanAssetListController.resetSearch}"
-                                                 styleClass="btn btn-sm btn-gray">
-                                    <p:resetInput target="@form"/>
-                                </p:commandButton>
-                            </h:panelGroup>
-                        </h:panelGrid>
-                    </p:panel>
+                        </span>
+                        <div id="filterPanel" style="display:none; margin-top:8px; border:1px solid #ddd; border-radius:4px; padding:10px 12px;">
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <h:panelGroup style="display:flex; align-items:center; gap:15px;">
+                                    <p:outputLabel for="searchPerformance" value="是否已产生效益评估" style="white-space:nowrap; font-weight:normal; margin-bottom:0;"/>
+                                    <p:selectOneMenu id="searchPerformance" value="#{acquisitionPlanAssetListController.searchPerformance}" style="width:160px;">
+                                        <p:ajax event="change" process="@this" update=":formList:datalist"
+                                                listener="#{acquisitionPlanAssetListController.search}"/>
+                                        <f:selectItem itemLabel="全部" itemValue="#{null}" noSelectionOption="true"/>
+                                        <f:selectItem itemLabel="是" itemValue="hasData"/>
+                                        <f:selectItem itemLabel="否" itemValue="noData"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function toggleFilterPanel() {
+                            var panel = document.getElementById('filterPanel');
+                            var arrow = document.getElementById('filterArrow');
+                            if (panel.style.display === 'none') {
+                                panel.style.display = 'block';
+                                arrow.style.transform = 'rotate(180deg)';
+                            } else {
+                                panel.style.display = 'none';
+                                arrow.style.transform = 'rotate(0deg)';
+                            }
+                        }
+                    </script>
+                    </h:panelGroup>
 
                     <p:dataTable id="datalist" value="#{acquisitionPlanAssetListController.lazyModel}" var="item"
                                  widgetVar="varDataList"
@@ -65,11 +72,11 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500">
+                                 rowsPerPageTemplate="10,20,50,100,500">
 
                         <p:ajax event="filter" listener="#{acquisitionPlanAssetListController.onFilter}"/>
 
-                        <p:column headerText="操作" exportable="false" width="60">
+                        <p:column headerText="操作" exportable="false" width="60" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY')}">
                             <h:panelGroup>
                                 <p:commandLink id="deleteButton" title="#{msg.Delete}"
                                                actionListener="#{acquisitionPlanAssetListController.deleteItem(item)}" update="datalist growl">
@@ -137,7 +144,7 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="效益评估" width="80" exportable="false">
+                        <p:column headerText="效益评估" width="80" exportable="false" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_AUDIT')}" >
                             <p:commandButton value="查看" class="btn btn-xs btn-primary"
                                              disabled="#{!acquisitionPlanAssetListController.hasPerformanceData(item)}"
                                              actionListener="#{acquisitionPlanAssetListController.benefitAssess(item)}"
@@ -149,7 +156,7 @@
 
                             <p:commandButton id="addButton2" title="添加" icon="ui-icon-plusthick"
                                              class="btn btn-sm btn-gray" ajax="false"
-                                             action="#{acquisitionPlanAssetListController.goToAdd}"/>
+                                             action="#{acquisitionPlanAssetListController.goToAdd}" rendered="#{userContextService.accessContainsFunctionMenu('ACQUISITION_PLAN_MANAGEMENT_APPLY')}" />
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
                                              class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="PlanAsset_export"/>
