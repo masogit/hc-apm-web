@@ -625,7 +625,7 @@ public class AssetInfoDetailController {
             }else {
                 String encodeUrlQueryString = "queryOrderId="+uid;
                 encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
-                url = contextPath + "/portal/woMgr/workOrderList.xhtml?str" + encodeUrlQueryString;
+                url = contextPath + "/portal/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
             }
         }else if("inspection".equals(type) || "secondMaintenance".equals(type) || "thirdMaintenance".equals(type) || "qualityControl".equals(type)){
             V2_PmOrder pmOrder = pmOrderRepository.findById(uid);
@@ -646,9 +646,8 @@ public class AssetInfoDetailController {
             }else {
                 String encodeUrlQueryString = "queryOrderId="+uid;
                 encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
-                url = contextPath + "/portal/pm/pmOrderListAll.xhtml?str" + encodeUrlQueryString;
+                url = contextPath + "/portal/pm/pmOrderListAll.xhtml?str=" + encodeUrlQueryString;
             }
-
         }else if("measuring".equals(type)){
             url = "actionName=View&selectedid="
                     + selected.getUid()
