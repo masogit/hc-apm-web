@@ -220,11 +220,11 @@
                                         <label class="label">注册证编号<span style="color:red">*</span></label>
                                         <p:autoComplete id="registrationNum" value="#{adverseEventManagementController.selected.registrationNum}"
                                                         completeMethod="#{adverseEventManagementController.completeUdidRegistryNum}"
-                                                        scrollHeight="160" panelStyleClass="max-width-200" dropdown="true"
+                                                        scrollHeight="160" panelStyleClass="max-width-200"
                                                         var="t" itemLabel="#{t}" itemValue="#{t}"
                                                         readonly="#{adverseEventManagementController.readOnlyCreateForm}">
-                                            <p:ajax process="@this" listener="#{adverseEventManagementController.onUdidRegistryNumChange}" update=":AdverseEventCreateForm:accordionCreate:productInfo"/>
-                                            <p:ajax event="itemSelect" process="@this" listener="#{adverseEventManagementController.onUdidRegistryNumChange}" update=":AdverseEventCreateForm:accordionCreate:productInfo"/>
+                                            <p:ajax event="itemSelect" process="@this" listener="#{adverseEventManagementController.onUdidRegistryNumSelect}"
+                                                    update=":AdverseEventCreateForm:accordionCreate:productInfo"/>
                                         </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup>

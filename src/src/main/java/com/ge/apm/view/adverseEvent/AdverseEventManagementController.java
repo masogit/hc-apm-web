@@ -650,16 +650,14 @@ public class AdverseEventManagementController extends AdverseEventBaseController
     }
 
     /**
-     * 注册证号变更（SelectEvent: 下拉选中 / 非SelectEvent: 手动输入blur）
+     * 注册证号变更（SelectEvent: 下拉选中）
      */
-    public void onUdidRegistryNumChange(AjaxBehaviorEvent event) {
-        if (event instanceof SelectEvent) {
-            selected.setRegistrationNum((String) ((SelectEvent) event).getObject());
-        }
+    public void onUdidRegistryNumSelect(SelectEvent event) {
+        selected.setRegistrationNum((String) event.getObject());
 
         if (StringUtils.hasText(selected.getRegistrationNum())) {
             this.selected.setRegistrationInfo(udidInfoService.selectByRegistryNum(selected.getRegistrationNum()));
-            this.selected.setProductName(StringUtils.hasText(selected.getUdidProductName()) ? selected.getUdidProductName() : assetSelected.getName());
+            this.selected.setProductName(StringUtils.hasText(selected.getUdidProductName()) ? selected.getUdidProductName() : (Objects.nonNull(assetSelected) ? assetSelected.getName() : null));
             this.selected.setMarketingAuthHolder(StringUtils.hasText(selected.getUdidRegistrantName()) ? selected.getUdidRegistrantName() : null);
         } else {
             this.selected.setRegistrationInfo(null);
