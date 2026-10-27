@@ -610,33 +610,43 @@ public class AssetInfoDetailController {
         String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
         if("repair".equals(type)){
             V2_WorkOrder workOrder = workOrderRepository.findById(uid);
-            if(checkMvsData(workOrder.getAssetUid()).equals("0")){
-                String encodeUrlQueryString = "actionName=View&selectedid="
-                        + uid
-                        + "&queryIndex=12" ;
+            if(workOrder != null){
+                if(checkMvsData(workOrder.getAssetUid()).equals("0")){
+                    String encodeUrlQueryString = "actionName=View&selectedid="
+                            + uid + "&queryIndex=12" ;
+                    encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+                    url = contextPath + "/portal/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
+                }else if(checkMvsData(workOrder.getAssetUid()).equals("1")){
+                    String encodeUrlQueryString = "actionName=View&selectedid="
+                            + uid + "&assetUid=" + selected.getUid()
+                            + "&queryIndex=11";
+                    url = contextPath + "/portal/woMgr/mvs/woMvsMgrViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+                }
+            }else {
+                String encodeUrlQueryString = "queryOrderId="+uid;
                 encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
                 url = contextPath + "/portal/woMgr/workOrderList.xhtml?str=" + encodeUrlQueryString;
-            }else if(checkMvsData(workOrder.getAssetUid()).equals("1")){
-                String encodeUrlQueryString = "actionName=View&selectedid="
-                        + uid + "&assetUid=" + selected.getUid()
-                        + "&queryIndex=11"
-                ;
-                url = contextPath + "/portal/woMgr/mvs/woMvsMgrViewNew.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
             }
         }else if("inspection".equals(type) || "secondMaintenance".equals(type) || "thirdMaintenance".equals(type) || "qualityControl".equals(type)){
             V2_PmOrder pmOrder = pmOrderRepository.findById(uid);
-            if(checkMvsData(pmOrder.getAssetUid()).equals("0")){
-                String encodeUrlQueryString = "actionName=View&selectedid="
-                        +uid + "&assetUid=" + selected.getUid()
-                        + "&queryIndex=10";
+            if(pmOrder != null){
+                if(checkMvsData(pmOrder.getAssetUid()).equals("0")){
+                    String encodeUrlQueryString = "actionName=View&selectedid="
+                            +uid + "&assetUid=" + selected.getUid()
+                            + "&queryIndex=10";
+                    encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+                    url = contextPath + "/portal/pm/pmOrderViewNew.xhtml?str=" + encodeUrlQueryString;
+                }else if (checkMvsData(pmOrder.getAssetUid()).equals("1")){
+                    String encodeUrlQueryString = "actionName=View&selectedid="
+                            + uid + "&assetUid=" + selected.getUid()
+                            + "&queryIndex=10";
+                    encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
+                    url = contextPath + "/portal/pm/mvs/pmMvsOrderViewNew.xhtml?str=" + encodeUrlQueryString;
+                }
+            }else {
+                String encodeUrlQueryString = "queryOrderId="+uid;
                 encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
-                url = contextPath + "/portal/pm/pmOrderViewNew.xhtml?str=" + encodeUrlQueryString;
-            }else if (checkMvsData(pmOrder.getAssetUid()).equals("1")){
-                String encodeUrlQueryString = "actionName=View&selectedid="
-                        + uid + "&assetUid=" + selected.getUid()
-                        + "&queryIndex=10";
-                encodeUrlQueryString = UrlParamUtil.encodeUrlQueryString(encodeUrlQueryString);
-                url = contextPath + "/portal/pm/mvs/pmMvsOrderViewNew.xhtml?str=" + encodeUrlQueryString;
+                url = contextPath + "/portal/pm/pmOrderListAll.xhtml?str=" + encodeUrlQueryString;
             }
         }else if("measuring".equals(type)){
             url = "actionName=View&selectedid="

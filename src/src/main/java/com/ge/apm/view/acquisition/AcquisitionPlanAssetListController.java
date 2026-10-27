@@ -3,12 +3,18 @@ package com.ge.apm.view.acquisition;
 import com.ge.apm.dao.AcquisitionPlanAssetRepository;
 import com.ge.apm.dao.AcquisitionPlanRepository;
 import com.ge.apm.dao.HisEquipmentDataResultRepository;
+import com.ge.apm.dao.mapper.AcquisitionPlanAssetMapper;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
 import com.ge.apm.domain.acquisition.AcquisitionPlanAsset;
+import com.ge.apm.domain.acquisition.HospitalAreaClassification;
+import com.ge.apm.service.acquisition.AcquisitionPlanService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.cons.ApmFunction;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.data.FilterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +38,7 @@ public class AcquisitionPlanAssetListController extends GenericCRUDUUIDControlle
     private static final Logger log = LoggerFactory.getLogger(AcquisitionPlanAssetListController.class);
 
     private AcquisitionPlanAssetRepository dao;
+    private AcquisitionPlanAssetMapper planAssetMapper;
     private AcquisitionPlanRepository planDao;
     private HisEquipmentDataResultRepository hisDataResultDao;
     private UserAccount loginUser;
@@ -49,13 +56,18 @@ public class AcquisitionPlanAssetListController extends GenericCRUDUUIDControlle
     @Getter
     private List<String> yearList;
 
+    private AcquisitionPlanService acquisitionPlanService;
+    private UaaService uaaService;
     @Override
     protected void init() {
         super.init();
         dao = WebUtil.getBean(AcquisitionPlanAssetRepository.class);
+        planAssetMapper = WebUtil.getBean(AcquisitionPlanAssetMapper.class);
         planDao = WebUtil.getBean(AcquisitionPlanRepository.class);
         hisDataResultDao = WebUtil.getBean(HisEquipmentDataResultRepository.class);
         loginUser = UserContextService.getCurrentUserAccount();
+        uaaService = WebUtil.getBean(UaaService.class);
+        acquisitionPlanService = WebUtil.getBean(AcquisitionPlanService.class);
         loadYearList();
     }
 
@@ -90,14 +102,6 @@ public class AcquisitionPlanAssetListController extends GenericCRUDUUIDControlle
     @Override
     public void onFilter(FilterEvent event) {
         super.onFilter(event);
-        // 始终添加租户隔离过滤
-        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
-        // 绩效过滤
-        if ("hasData".equals(searchPerformance) && !performanceDataAssetUids.isEmpty()) {
-            this.searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.IN, new ArrayList<>(performanceDataAssetUids)));
-        } else if ("noData".equals(searchPerformance) && !performanceDataAssetUids.isEmpty()) {
-            this.searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.NotIN, new ArrayList<>(performanceDataAssetUids)));
-        }
     }
 
     @Override
@@ -105,22 +109,124 @@ public class AcquisitionPlanAssetListController extends GenericCRUDUUIDControlle
         selected = null;
         performanceDataAssetUids = Collections.emptySet();
         try {
-            Page<AcquisitionPlanAsset> page;
-            if ("hasData".equals(searchPerformance)) {
-                page = dao.findWithPerformanceData(loginUser.getTenantUID(), pageRequest);
-            } else if ("noData".equals(searchPerformance)) {
-                page = dao.findWithoutPerformanceData(loginUser.getTenantUID(), pageRequest);
-            } else {
-                this.setSearchFilter();
-                page = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            if (this.searchFilters == null) {
+                searchFilters = new ArrayList();
             }
-            // 加载当前页的绩效数据UID，用于按钮置灰判断
+
+            Map<String, Object> param = new HashMap<>();
+            param.put("tenantUid", loginUser.getTenantUID());
+            param.put("offset", pageRequest.getPageNumber() * pageRequest.getPageSize());
+            param.put("pageSize", pageRequest.getPageSize());
+
+            // 绩效过滤
+            if ("hasData".equals(searchPerformance) || "noData".equals(searchPerformance)) {
+                param.put("searchPerformance", searchPerformance);
+            }
+
+            // 权限过滤
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID(), "1*"));
+            Set<String> functionList = UserContextService.getCurrentUserFunction();
+            if (!functionList.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER.name())
+                    && !functionList.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP.name())
+                    && !functionList.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_BUREAU_PARTY.name())
+                    && !functionList.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_VIEW.name())) {
+                if (!this.hasFilterOnField("hospitalUID")) {
+                    HospitalAreaClassification hospitalAreaClassification = acquisitionPlanService.getHospitalAreaClassification(loginUser);
+                    if (hospitalAreaClassification != null) {
+                        List<String> hospitalUidList = acquisitionPlanService.getHospitals(hospitalAreaClassification, loginUser.getHospitalUID());
+                        if (CollectionUtils.isNotEmpty(hospitalUidList)) {
+                            param.put("hospitalUidList", hospitalUidList);
+                        } else {
+                            param.put("hospitalUid", loginUser.getHospitalUID());
+                        }
+                    } else {
+                        List<String> orgUidList = uaaService.getOrgListByUser(loginUser.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                        param.put("institutionUidList", orgUidList);
+                        param.put("hospitalUid", loginUser.getHospitalUID());
+                        param.put("siteUid", loginUser.getSiteUID());
+                    }
+                }
+            }
+
+            // 列过滤条件转换
+            covQueryCondition(this.searchFilters, param);
+
+            List<AcquisitionPlanAsset> list = new ArrayList<>(planAssetMapper.selectList(param));
+            Long count = planAssetMapper.selectListCount(param);
+
+            Page<AcquisitionPlanAsset> page = new PageImpl<>(list, pageRequest, count);
             loadCurrentPagePerformanceUids(page);
             return page;
         } catch (Exception e) {
             log.error("loadData error: " + e.getMessage(), e);
             WebUtil.addErrorMessage("数据加载失败: " + e.getMessage());
             return new PageImpl<>(new ArrayList<>(), pageRequest, 0);
+        }
+    }
+
+    /**
+     * 将 DataTable 列过滤的 SearchFilter 转换为 MyBatis 参数
+     */
+    private void covQueryCondition(List<SearchFilter> searchFilters, Map<String, Object> param) {
+        if (searchFilters == null) return;
+        for (SearchFilter sf : searchFilters) {
+            String fieldName = sf.fieldName;
+            switch (fieldName) {
+                case "tenantUID":
+                    // 已在 param 中设置，跳过
+                    break;
+                case "hospitalUID":
+                    if (sf.operator == SearchFilter.Operator.IN && sf.value instanceof List) {
+                        param.put("hospitalUidList", sf.value);
+                    } else {
+                        param.put("hospitalUid", sf.value);
+                    }
+                    break;
+                case "institutionUID":
+                    if (sf.value instanceof List) {
+                        param.put("institutionUidList", sf.value);
+                    }
+                    break;
+                case "siteUID":
+                    param.put("siteUid", sf.value);
+                    break;
+                case "acquisitionPlan.applicationYear":
+                    param.put("applicationYear", sf.value);
+                    break;
+                case "acquisitionPlan.applicationNo":
+                    param.put("applicationNo", sf.value);
+                    break;
+                case "acquisitionPlan.applicationType":
+                    param.put("applicationType", sf.value);
+                    break;
+                case "assetInfo.name":
+                    param.put("assetName", sf.value);
+                    break;
+                case "assetInfo.functionType":
+                    param.put("functionType", sf.value);
+                    break;
+                case "assetInfo.hospital.name":
+                    param.put("hospitalName", sf.value);
+                    break;
+                case "assetInfo.clinicalDeptName":
+                    param.put("clinicalDeptName", sf.value);
+                    break;
+                case "assetInfo.serialNum":
+                    param.put("serialNum", sf.value);
+                    break;
+                case "assetInfo.qrCode":
+                    param.put("qrCode", sf.value);
+                    break;
+                case "assetInfo.installDate":
+                    if (sf.operator == SearchFilter.Operator.GTE) {
+                        param.put("installDateGTE", sf.value);
+                    } else if (sf.operator == SearchFilter.Operator.LTE) {
+                        param.put("installDateLTE", sf.value);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -147,26 +253,8 @@ public class AcquisitionPlanAssetListController extends GenericCRUDUUIDControlle
         }
     }
 
-    @Override
-    public void setSearchFilter() {
-        if (this.searchFilters == null) {
-            this.searchFilters = new ArrayList<>();
-        }
-        // 不重复添加 tenantUID（onFilter 可能已经设置过了）
-        boolean hasTenantFilter = false;
-        for (SearchFilter sf : this.searchFilters) {
-            if ("tenantUID".equals(sf.fieldName)) {
-                hasTenantFilter = true;
-                break;
-            }
-        }
-        if (!hasTenantFilter) {
-            this.searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, loginUser.getTenantUID()));
-        }
-    }
-
     public void search() {
-        // searchFilters will be built by setSearchFilter() called from loadData()
+        // searchFilters will be converted by covQueryCondition() in loadData()
     }
 
     public void resetSearch() {

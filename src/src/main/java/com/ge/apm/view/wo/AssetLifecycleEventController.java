@@ -64,6 +64,8 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
     @Getter
     @Setter
     private List<OrgInfo> clinicalDeptList;
+    @Getter @Setter
+    protected String queryOrderId;
 
 	protected void init() {
 		uaaService = WebUtil.getBean(UaaService.class);
@@ -81,6 +83,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		String enCodeParameters = WebUtil.getRequestParameter("str");
 		if (!Strings.isNullOrEmpty(enCodeParameters)) {
 			queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+            queryOrderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryOrderId");
 		}
 	}
 
@@ -129,6 +132,10 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		if(!cancelled){
 			searchFilters.add(new SearchFilter("status", Operator.NE, 3));
 		}
+        searchFilters.removeIf(e -> e.fieldName.equals("id"));
+        if(StrUtil.isNotEmpty(queryOrderId)){
+            searchFilters.add(new SearchFilter("id", Operator.EQ, queryOrderId));
+        }
 		//PageRequest pr = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
 		pageRequest =addRequiredSortById(pageRequest);
 		//Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -136,6 +143,8 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		Page<AssetLifecycleEvent> pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
 		updateSelectStatus(pageResult);
 		ignoreErrorDate(pageResult);
+
+
 		return pageResult;
 	}
 

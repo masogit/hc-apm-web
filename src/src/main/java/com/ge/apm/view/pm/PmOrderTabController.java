@@ -1,5 +1,7 @@
 package com.ge.apm.view.pm;
 
+import com.ge.apm.dao.AssetLifecycleEventRepository;
+import com.ge.apm.domain.AssetLifecycleEvent;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
@@ -27,9 +29,12 @@ public class PmOrderTabController {
     @Getter @Setter
     private boolean showInOrder;
     private UserContextService userContextService;
+
+    private AssetLifecycleEventRepository assetLifecycleEventRepository;
     @PostConstruct
     public void init() {
     	userContextService = WebUtil.getBean(UserContextService.class);
+        assetLifecycleEventRepository = WebUtil.getBean(AssetLifecycleEventRepository.class);
     	if(userContextService.isIBTenant()){
     		if(userContextService.hasAnyRole("AssetStaff,AssetHead")){
     			showInOrder=true;
@@ -53,6 +58,17 @@ public class PmOrderTabController {
                 }
             } else {
                 this.queryTab = 0;
+            }
+            String queryOrderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryOrderId");
+            if (StringUtils.isNotEmpty(queryOrderId)) {
+                AssetLifecycleEvent assetLifecycleEvent = assetLifecycleEventRepository.findById(queryOrderId);
+                if(assetLifecycleEvent != null){
+                    if(assetLifecycleEvent.getEventType() == 4){
+                        this.queryTab = 2;
+                    }else if(assetLifecycleEvent.getEventType() == 5) {
+                        this.queryTab = 3;
+                    }
+                }
             }
 
         }

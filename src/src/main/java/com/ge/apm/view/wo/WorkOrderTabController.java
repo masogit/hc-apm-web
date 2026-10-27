@@ -4,6 +4,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.AssetLifecycleEventRepository;
+import com.ge.apm.domain.AssetLifecycleEvent;
 import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.component.tabview.TabView;
@@ -25,9 +27,12 @@ public class WorkOrderTabController {
     @Getter @Setter
     private boolean showInOrder;
     private UserContextService userContextService;
+    private AssetLifecycleEventRepository assetLifecycleEventRepository;
+
     @PostConstruct
     public void init() {
     	userContextService = WebUtil.getBean(UserContextService.class);
+        assetLifecycleEventRepository = WebUtil.getBean(AssetLifecycleEventRepository.class);
     	if(userContextService.isIBTenant()){
     		if(userContextService.hasAnyRole("AssetStaff,AssetHead")){
     			showInOrder=true;
@@ -50,6 +55,17 @@ public class WorkOrderTabController {
                 }
             } else {
                 this.queryTab = 0;
+            }
+            String queryOrderId = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryOrderId");
+            if (StringUtils.isNotEmpty(queryOrderId)) {
+                AssetLifecycleEvent assetLifecycleEvent = assetLifecycleEventRepository.findById(queryOrderId);
+                if(assetLifecycleEvent != null){
+                    if(assetLifecycleEvent.getEventType() == 3){
+                        this.queryTab = userContextService.isYiMaiYangGuangTenant() ? 2 : 1;
+                    }else if(assetLifecycleEvent.getEventType() == 6) {
+                        this.queryTab = userContextService.isYiMaiYangGuangTenant() ? 3 : 2;
+                    }
+                }
             }
         }
         String tabIndex =  WebUtil.getRequestParameter("tabIndex");

@@ -35,7 +35,6 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -62,7 +61,6 @@ public class WorkOrderExportService {
     private static final String I18N_REPAIR_RESULT = "repairResult";
     private static final String I18N_HOUR_TYPE = "hoursEntryType";
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final Logger log = LoggerFactory.getLogger(WorkOrderExportService.class);
     @Autowired
     ServiceRequestRepository serviceRequestDao;
@@ -698,11 +696,11 @@ public class WorkOrderExportService {
     }
 
     private String formatDate(Date date) {
-        return date != null ? sdf.format(date) : "";
+        return date != null ? DateUtil.format(date, "yyyy-MM-dd HH:mm:ss") : "";
     }
 
     public String formatDate2(Date date) {
-        return date != null ? new SimpleDateFormat("yyyy-MM-dd").format(date) : "";
+        return date != null ? DateUtil.format(date, "yyyy-MM-dd") : "";
 
     }
 

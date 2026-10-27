@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.AcquisitionPlanAssetMapper">
+
+    <resultMap id="planAssetMap" type="com.ge.apm.domain.acquisition.AcquisitionPlanAsset">
+        <id property="id" column="id"/>
+        <result property="acquisitionPlanId" column="acquisition_plan_id"/>
+        <result property="assetUid" column="asset_uid"/>
+        <result property="tenantUID" column="tenant_uid"/>
+        <result property="institutionUID" column="institution_uid"/>
+        <result property="hospitalUID" column="hospital_uid"/>
+        <result property="siteUID" column="site_uid"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastModifiedBy" column="last_modified_by"/>
+        <result property="lastModifiedDate" column="last_modified_date"/>
+        <association property="acquisitionPlan" javaType="com.ge.apm.domain.acquisition.AcquisitionPlan">
+            <result property="applicationYear" column="ap_application_year"/>
+            <result property="applicationNo" column="ap_application_no"/>
+            <result property="applicationType" column="ap_application_type"/>
+        </association>
+        <association property="assetInfo" javaType="com.ge.apm.domain.AssetInfo">
+            <result property="name" column="ai_name"/>
+            <result property="functionType" column="ai_function_type"/>
+            <result property="clinicalDeptName" column="ai_clinical_dept_name"/>
+            <result property="serialNum" column="ai_serial_num"/>
+            <result property="qrCode" column="ai_qr_code"/>
+            <result property="installDate" column="ai_install_date"/>
+            <association property="hospital" javaType="com.ge.apm.domain.OrgInfo">
+                <result property="name" column="ai_hospital_name"/>
+            </association>
+        </association>
+    </resultMap>
+
+    <sql id="baseJoins">
+        FROM acquisition_plan_asset a
+        LEFT JOIN acquisition_plan ap ON a.acquisition_plan_id = ap.id
+        LEFT JOIN asset_info ai ON a.asset_uid = ai.uid
+        LEFT JOIN org_info h ON ai.hospital_uid = h.uid
+    </sql>
+
+    <sql id="commonWhere">
+        WHERE a.tenant_uid = #{tenantUid}
+        <!-- 权限过滤 -->
+        <choose>
+            <when test="institutionUidList != null and institutionUidList.size() > 0">
+                AND (
+                    a.institution_uid IN
+                    <foreach item="item" collection="institutionUidList" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    <if test="hospitalUid != null and hospitalUid != ''">
+                        OR a.hospital_uid = #{hospitalUid}
+                    </if>
+                    <if test="siteUid != null and siteUid != ''">
+                        OR a.site_uid = #{siteUid}
+                    </if>
+                )
+            </when>
+            <otherwise>
+                <if test="hospitalUidList != null and hospitalUidList.size() > 0">
+                    AND a.hospital_uid IN
+                    <foreach item="item" collection="hospitalUidList" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="hospitalUid != null and hospitalUid != ''">
+                    AND a.hospital_uid = #{hospitalUid}
+                </if>
+            </otherwise>
+        </choose>
+        <!-- 列过滤条件 -->
+        <if test="applicationYear != null and applicationYear != ''">
+            AND ap.application_year = #{applicationYear}
+        </if>
+        <if test="applicationNo != null and applicationNo != ''">
+            AND ap.application_no LIKE concat('%', #{applicationNo}, '%')
+        </if>
+        <if test="applicationType != null and applicationType != ''">
+            AND ap.application_type = #{applicationType}
+        </if>
+        <if test="assetName != null and assetName != ''">
+            AND ai.name LIKE concat('%', #{assetName}, '%')
+        </if>
+        <if test="functionType != null and functionType != ''">
+            AND ai.function_type LIKE concat('%', #{functionType}, '%')
+        </if>
+        <if test="hospitalName != null and hospitalName != ''">
+            AND h.name LIKE concat('%', #{hospitalName}, '%')
+        </if>
+        <if test="clinicalDeptName != null and clinicalDeptName != ''">
+            AND ai.clinical_dept_name LIKE concat('%', #{clinicalDeptName}, '%')
+        </if>
+        <if test="serialNum != null and serialNum != ''">
+            AND ai.serial_num LIKE concat('%', #{serialNum}, '%')
+        </if>
+        <if test="qrCode != null and qrCode != ''">
+            AND ai.qr_code LIKE concat('%', #{qrCode}, '%')
+        </if>
+        <if test="installDateGTE != null">
+            AND ai.install_date &gt;= #{installDateGTE}
+        </if>
+        <if test="installDateLTE != null">
+            AND ai.install_date <![CDATA[<=]]> #{installDateLTE}
+        </if>
+        <!-- 绩效数据过滤 -->
+        <if test="searchPerformance == 'hasData'">
+            AND EXISTS (SELECT 1 FROM his_equipment_data_result hedr WHERE hedr.asset_uid = a.asset_uid AND hedr.tenant_uid = #{tenantUid})
+        </if>
+        <if test="searchPerformance == 'noData'">
+            AND NOT EXISTS (SELECT 1 FROM his_equipment_data_result hedr WHERE hedr.asset_uid = a.asset_uid AND hedr.tenant_uid = #{tenantUid})
+        </if>
+    </sql>
+
+    <select id="selectList" resultMap="planAssetMap">
+        SELECT
+            a.id,
+            a.acquisition_plan_id,
+            a.asset_uid,
+            a.tenant_uid,
+            a.institution_uid,
+            a.hospital_uid,
+            a.site_uid,
+            a.created_by,
+            a.created_date,
+            a.last_modified_by,
+            a.last_modified_date,
+            ap.application_year AS ap_application_year,
+            ap.application_no AS ap_application_no,
+            ap.application_type AS ap_application_type,
+            ai.name AS ai_name,
+            ai.function_type AS ai_function_type,
+            ai.clinical_dept_name AS ai_clinical_dept_name,
+            ai.serial_num AS ai_serial_num,
+            ai.qr_code AS ai_qr_code,
+            ai.install_date AS ai_install_date,
+            h.name AS ai_hospital_name
+        <include refid="baseJoins"/>
+        <include refid="commonWhere"/>
+        ORDER BY a.created_date DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="selectListCount" resultType="long">
+        SELECT COUNT(*)
+        <include refid="baseJoins"/>
+        <include refid="commonWhere"/>
+    </select>
+
+</mapper>

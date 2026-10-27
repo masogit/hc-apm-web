@@ -10,6 +10,7 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.date.DateUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -35,8 +35,6 @@ public class WorkOrderDetailExportService {
     private static final String SHEET_WORKORDERDETAIL = "WorkOrderDetail List";
     private static final String STATEMENT_STATUS_OPENED = "Opened";
     private static final String STATEMENT_STATUS_CLOSED = "Closed";
-
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
     private OrgInfoTreeService orgInfoTreeService;
@@ -181,7 +179,7 @@ public class WorkOrderDetailExportService {
     }
 
     private String formatDate(Date date) {
-        return date != null ? sdf.format(date) : "";
+        return date != null ? DateUtil.format(date, "yyyy-MM-dd") : "";
     }
 
     public Boolean exportOrderDetailData(ExcelDocument doc, List<Map<String, Object>> workOrderDetailData) {

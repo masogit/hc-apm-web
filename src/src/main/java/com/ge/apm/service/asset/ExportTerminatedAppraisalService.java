@@ -30,7 +30,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -226,7 +225,7 @@ public class ExportTerminatedAppraisalService {
 //        map.put(approvaAauditSignature3.name(), new PictureRenderData(100, 70, signature, defaultSignatureBytes));
         if(assetScrap!=null){
             map.put(apply_name.name(), assetScrap.getCreatedBy());
-            String date = format.format(assetScrap.getCreatedDate());
+            String date = DateUtil.format(assetScrap.getCreatedDate(), "yyyy-MM-dd");
             map.put(apply_date.name(), date);
             map.put(applyResone.name(), assetScrap.getApplyReason());
             map.put(approvalResone.name(), assetScrap.getApprovalReason());
@@ -277,14 +276,12 @@ public class ExportTerminatedAppraisalService {
         return map;
     }
 
-    public  final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
     public  String getAssetUsedLifecycle(Date installDate) {
         if (ObjectUtil.isEmpty(installDate)) {
             return null;
         }
-        Temporal temporal1 = LocalDate.parse(format.format(installDate));
-        Temporal temporal2 = LocalDate.parse(format.format(System.currentTimeMillis()));
+        Temporal temporal1 = LocalDate.parse(DateUtil.format(installDate, "yyyy-MM-dd"));
+        Temporal temporal2 = LocalDate.parse(DateUtil.format(new Date(), "yyyy-MM-dd"));
         return String.format("%.0f", Math.floor(Double.parseDouble(String.valueOf(ChronoUnit.MONTHS.between(temporal1, temporal2))) / 12));
     }
 
