@@ -141,13 +141,81 @@
                     }
                 }
             }
+            // 收集当前用户可访问的菜单数据（名称 + 页面地址）
+            function collectMenuData() {
+                var menus = [];
+                var menuContainer = document.querySelector('.menu-content');
+                if (!menuContainer) {
+                    console.warn('未找到菜单容器 .menu-content');
+                    return menus;
+                }
+                var links = menuContainer.querySelectorAll('a[href]');
+                links.forEach(function(link) {
+                    var href = link.getAttribute('href');
+                    var li = link.parentElement;
+                    if (!li || li.tagName !== 'LI') return;
+
+                    var labelSpan = link.querySelector('span');
+                    var label = labelSpan ? labelSpan.textContent.trim() : link.textContent.trim();
+                    var id = li.id || '';
+
+                    // 过滤无效链接
+                    if (!href || href === '#' || href.startsWith('javascript:') || !label) {
+                        return;
+                    }
+                    // 排除注销按钮
+                    if (href.includes('logout.xhtml')) {
+                        return;
+                    }
+
+                    // 判断是否为子菜单项：子菜单的 a > li > 嵌套 ul，再上一层才是顶层 li
+                    var category = '';
+                    var parentUl = li.parentElement;
+                    if (parentUl &amp;&amp; parentUl.tagName === 'UL' &amp;&amp; parentUl.parentElement &amp;&amp; parentUl.parentElement.tagName === 'LI') {
+                        // 当前是子菜单项，取顶层 li 的 a中的 span 文本作为 category
+                        var parentLi = parentUl.parentElement;
+                        var parentLink = parentLi.querySelector(':scope > a');
+                        if (parentLink) {
+                            var parentSpan = parentLink.querySelector('span');
+                            category = parentSpan ? parentSpan.textContent.trim() : parentLink.textContent.trim();
+                        }
+                    }
+
+                    menus.push({
+                        id: id,
+                        label: label,
+                        url: href,
+                        category: category
+                    });
+                });
+                return menus;
+            }
+            // 发送菜单数据给 iframe
+            function sendMenuDataToIframe() {
+                try {
+                    var menuData = collectMenuData();
+                    // 将菜单数据存入本地存储
+                    localStorage.setItem('aiAssistantMenuData', JSON.stringify(menuData));
+                    var iframe = document.getElementById('aiAssistantPreload');
+                    if (iframe &amp;&amp; iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({
+                            type: 'initMenuData',
+                            data: menuData
+                        }, '*');
+                        console.log('菜单数据已发送给 AI 助手 iframe，共 ' + menuData.length + ' 项');
+                    }
+                } catch (e) {
+                    console.error('发送菜单数据失败:', e);
+                }
+            }
             (function() {
                     var preloadFrame = document.createElement('iframe');
                     preloadFrame.id = 'aiAssistantPreload';
-                    preloadFrame.src = '/wx/acctChatbot?cache=true&amp;view=webpage';
+                    preloadFrame.src = 'http://localhost:9001/wx/acctChatbot?cache=true&amp;view=webpage';
                     preloadFrame.style.cssText = 'position:absolute; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0;';
                     preloadFrame.onload = function() {
                         console.log('AI 助手预加载完成');
+                        sendMenuDataToIframe();
                     };
                     document.body.appendChild(preloadFrame);
                     movePreloadedIframe();
@@ -174,6 +242,22 @@
                 }else if(data.type === 'sharePage'){
                     PF('shareDialog').show()
                     document.querySelector('#shareContainer .link').textContent =window.location.origin+"/geapm/portal/share/shareDetails.xhtml?userShareId="+data.data.shareId
+                }else if(data.type == 'navigate'){
+                    var url = data.url;
+                    if (!url) {
+                        console.warn('navigate 消息缺少 url');
+                        return;
+                    }
+                    var savedMenuData = JSON.parse(localStorage.getItem('aiAssistantMenuData') || '[]');
+                    var isValidUrl = savedMenuData.some(function(item) {
+                        return item.url === url;
+                    });
+                    if (isValidUrl) {
+                        console.log('跳转 url:', url);
+                        window.location.href = url;
+                    } else {
+                        console.warn('url 不在菜单白名单中，拒绝跳转:', url);
+                    }
                 }
             });
         </h:outputScript>
