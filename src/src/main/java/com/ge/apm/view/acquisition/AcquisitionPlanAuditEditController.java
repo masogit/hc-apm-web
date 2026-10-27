@@ -6,7 +6,6 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
-import com.ge.apm.domain.acquisition.AcquisitionPlanAsset;
 import com.ge.apm.domain.acquisition.AcquisitionPlanStep;
 import com.ge.apm.service.acquisition.AcquisitionPlanService;
 import com.ge.apm.service.asset.BlobFileService;
