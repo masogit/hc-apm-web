@@ -160,6 +160,16 @@ public class AssetHistoryService {
                 }
                 String newColumnValue = ((JSONObject) item).getString("newColumnValue") != null ? ((JSONObject) item).getString("newColumnValue") : "";
                 //String columnValue = "新值：" + newColumnValue + " -> 旧值：" + oldColumnValue;
+                // lifecycle和depreciationLifecycle字段存储的是月数，展示时转换为年
+                if ("lifecycle".equals(columnName) || "depreciationLifecycle".equals(columnName)) {
+                    java.text.DecimalFormat df = new java.text.DecimalFormat("########.##");
+                    if (!org.apache.commons.lang3.StringUtils.isBlank(oldColumnValue)) {
+                        try { oldColumnValue = df.format(Double.parseDouble(oldColumnValue) / 12.0); } catch (NumberFormatException ignored) {}
+                    }
+                    if (!org.apache.commons.lang3.StringUtils.isBlank(newColumnValue)) {
+                        try { newColumnValue = df.format(Double.parseDouble(newColumnValue) / 12.0); } catch (NumberFormatException ignored) {}
+                    }
+                }
                 if("qrCode".equals(columnName)){
                     jsonObject.put(columnName+"Old", oldColumnValue);
                     jsonObject.put(columnName+"New", newColumnValue);
