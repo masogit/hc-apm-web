@@ -21,6 +21,7 @@ import com.ge.healthcare.cn.common.utils.util.StrUtil;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -41,18 +42,18 @@ import webapp.framework.web.WebUtil;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ManagedBean
 @ViewScoped
 public class AdverseEventManagementController extends AdverseEventBaseController {
-    private Logger log = Logger.getLogger(AdverseEventManagementController.class.getName());
     /*接口类*/
     private AdverseEventsRepository adverseEventsRepository;
     private AssetInfoRepository assetInfoRepository;
@@ -642,6 +643,11 @@ public class AdverseEventManagementController extends AdverseEventBaseController
         return adverseEventsRepository;
     }
 
+    public void onAssetTypeChange() {
+        log.info("[onAssetTypeChange] assetType = {}", assetType);
+        applyRegistrationInfo();
+    }
+
     /**
      * 注册证号模糊搜索（返回纯字符串列表）
      */
@@ -650,15 +656,37 @@ public class AdverseEventManagementController extends AdverseEventBaseController
     }
 
     /**
-     * 注册证号变更（SelectEvent: 下拉选中）
+     * 由 remoteCommand 显式调用，参数 regNum 直接来自前端 input.val()，
+     * 完全绕开 autoComplete widget 的 change/itemSelect 事件派发时序问题。
      */
-    public void onUdidRegistryNumSelect(SelectEvent event) {
-        selected.setRegistrationNum((String) event.getObject());
+    public void onLookupRegNum() {
+        String regNum = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("regNum");
+        log.info("[onLookupRegNum] regNum={}", regNum);
 
+        // 强制覆盖 bean 的值，不依赖 value 绑定回写
+        selected.setRegistrationNum(regNum);
+
+        applyRegistrationInfo();
+    }
+
+    private void applyRegistrationInfo() {
         if (StringUtils.hasText(selected.getRegistrationNum())) {
             this.selected.setRegistrationInfo(udidInfoService.selectByRegistryNum(selected.getRegistrationNum()));
-            this.selected.setProductName(StringUtils.hasText(selected.getUdidProductName()) ? selected.getUdidProductName() : (Objects.nonNull(assetSelected) ? assetSelected.getName() : null));
-            this.selected.setMarketingAuthHolder(StringUtils.hasText(selected.getUdidRegistrantName()) ? selected.getUdidRegistrantName() : null);
+            this.selected.setProductName(
+                    StringUtils.hasText(selected.getUdidProductName())
+                            ? selected.getUdidProductName()
+                            : (Objects.nonNull(assetSelected) ? assetSelected.getName() : null));
+            // 产品类型为[设备]时才需要设值
+            if (Objects.equals(assetType, 1)) {
+                this.selected.setMarketingAuthHolder(
+                        StringUtils.hasText(selected.getUdidRegistrantName())
+                                ? selected.getUdidRegistrantName() : null);
+            } else {
+                this.selected.setMarketingAuthHolder(null);
+            }
         } else {
             this.selected.setRegistrationInfo(null);
             this.selected.setProductName(null);
