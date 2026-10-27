@@ -219,7 +219,11 @@ public class AdjustmentTransferService {
         selected.setUpdateTime(new Date());
 
         IdleEquipmentStock idleEquipmentStock = stockRepository.findByUid(selected.getStockUid());
-        idleEquipmentStock.setStatus(4);
+        if("noUsageReturn".equals(selected.getReturnType())){
+            idleEquipmentStock.setStatus(1);//可用
+        }else{
+            idleEquipmentStock.setStatus(4);
+        }
         idleEquipmentStock.setBorrowHospitalUid(null);
         idleEquipmentStock.setBorrowDeptUid(null);
         idleEquipmentStock.setBorrowSiteUid(null);
