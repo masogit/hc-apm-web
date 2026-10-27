@@ -1,6 +1,13 @@
 package com.ge.apm.view;
 
+import com.ge.apm.service.common.GatewayURL;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import com.ge.apm.service.orginfo.OrgInfoService;
+import com.ge.apm.service.uaa.AdminConsoleService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.healthcare.cn.common.utils.collection.ListUtil;
@@ -36,6 +43,9 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,6 +60,8 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
     private static final long serialVersionUID = 6868159463011514707L;
 
+    private static final Logger logger = LoggerFactory.getLogger(ReminderRuleController.class);
+
     private PageUtil<ReminderRule> pageUtil = new PageUtil<>();
     private ReminderRuleRepository dao;
     private SysRoleRepository sysRoleRepository;
@@ -58,7 +70,9 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
     private OrgInfoService orgInfoService;
     private ReminderRuleOrgRepository ruleOrgRepository;
     private TenantInfoRepository tenantInfoRepository;
-
+    // 1. 声明字段
+    private AdminConsoleService adminConsoleService;
+    private RestTemplate restTemplate;
     private UserAccount loginUser;
     private List<SysRole> roles;
     private List<CustomRole> customRoles;
@@ -95,6 +109,8 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         loginUser = UserContextService.getCurrentUserAccount();
         roles = sysRoleRepository.find();
         customRoles = uaaService.getTenantCustomRoles(loginUser.getTenantUID());
+        adminConsoleService = WebUtil.getBean(AdminConsoleService.class);
+        restTemplate = WebUtil.getBean(RestTemplate.class);
     }
 
     @Override
@@ -210,6 +226,51 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         url = "reminderEventList.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
+    }
+
+    /**
+     * 立即发送提醒消息
+     * @param ruleId reminder_rule的id
+     */
+    public void sendNow(String ruleId) {
+        logger.info("立即发送提醒消息, ruleId: {}", ruleId);
+        ReminderRule rule = dao.findById(ruleId);
+        if (rule == null) {
+            WebUtil.addErrorMessage("提醒规则不存在");
+            return;
+        }
+        try {
+            String token = UserContextService.getAccessToken();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/json; charset=UTF-8"));
+            headers.add("Authorization", token);
+
+            // 1. 调用 SEND_REMINDER_CREATE 创建提醒事件
+            HashMap<String, Object> createParam = new HashMap<>();
+            createParam.put("ruleId", ruleId);
+            HttpEntity<HashMap> createRequest = new HttpEntity<>(createParam, headers);
+            String createURL = adminConsoleService.getGatewayURL(GatewayURL.SEND_REMINDER_CREATE);
+            ResponseEntity<LinkedHashMap> createResponse = restTemplate.postForEntity(createURL, createRequest, LinkedHashMap.class);
+            logger.info("SEND_REMINDER_CREATE response: status={}, body={}", createResponse.getStatusCode(), createResponse.getBody());
+            if (!HttpStatus.OK.equals(createResponse.getStatusCode())) {
+                WebUtil.addErrorMessage("创建提醒事件失败");
+                return;
+            }
+
+            // 2. 调用 SEND_REMINDER_EXECUTE 执行提醒事件
+            HttpEntity<HashMap> executeRequest = new HttpEntity<>(createParam, headers);
+            String executeURL = adminConsoleService.getGatewayURL(GatewayURL.SEND_REMINDER_EXECUTE);
+            ResponseEntity<LinkedHashMap> executeResponse = restTemplate.postForEntity(executeURL, executeRequest, LinkedHashMap.class);
+            logger.info("SEND_REMINDER_EXECUTE response: status={}, body={}", executeResponse.getStatusCode(), executeResponse.getBody());
+            if (HttpStatus.OK.equals(executeResponse.getStatusCode())) {
+                WebUtil.addSuccessMessage("消息已触发发送，ruleId: " + ruleId);
+            } else {
+                WebUtil.addErrorMessage("执行提醒事件失败");
+            }
+        } catch (Exception e) {
+            logger.error("立即发送提醒消息异常, ruleId: {}", ruleId, e);
+            WebUtil.addErrorMessage("发送异常: " + e.getMessage());
+        }
     }
 
     public void prepareUserScope() {
