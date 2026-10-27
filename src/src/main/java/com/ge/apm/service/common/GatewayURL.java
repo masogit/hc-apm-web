@@ -253,7 +253,8 @@ public enum GatewayURL {
 
 
     UPDATE_I18N_FOR_REDIS("/hcapmmasterdataservice/api/apm/masterData/i8nMessages/updateI18"),
-
+    SEND_REMINDER_CREATE("/hcapmtaskservice/api/apm/task/reminder/createEvent"),
+    SEND_REMINDER_EXECUTE("/hcapmtaskservice//api/apm/task/reminder/executeReminderEvent"),
     ;
     private final String url;
 
