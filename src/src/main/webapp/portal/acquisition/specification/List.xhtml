@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            .wrap-text {
+                word-break: break-word;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="设备分类规范管理"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="formList">
+                    <p:dataTable id="datalist" value="#{acquisitionSpecificationListController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{acquisitionSpecificationListController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending"
+                                 sortBy="#{item.majorCategory}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect"  update="editButton"/>
+
+                        <p:ajax event="filter" listener="#{acquisitionSpecificationListController.onFilter}" 
+                                update="editButton"/>
+
+                        <p:column headerText="大类" filterBy="#{item.majorCategory}" filterMatchMode="EQ" style="width: 10%">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{acquisitionSpecificationListController.majorCategoryOptions}" 
+                                                   var="cat" itemLabel="#{cat}" itemValue="#{cat}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.majorCategory}"/>
+                        </p:column>
+
+                        <p:column headerText="一级分类" filterBy="#{item.firstLevelCategory}" filterMatchMode="LIKE" style="width: 15%">
+                            <h:outputText value="#{item.firstLevelCategory}"/>
+                        </p:column>
+
+                        <p:column headerText="二级分类" filterBy="#{item.secondLevelCategory}" filterMatchMode="LIKE" style="width: 15%">
+                            <h:outputText value="#{item.secondLevelCategory}"/>
+                        </p:column>
+
+                        <p:column headerText="设备等级" filterBy="#{item.deviceGrade}" filterMatchMode="EQ" style="width: 10%">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{acquisitionSpecificationListController.deviceGradeOptions}" 
+                                                   var="grade" itemLabel="#{grade.label}" itemValue="#{grade.value}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.deviceGrade eq 2 ? '三甲' : (item.deviceGrade eq 1 ? '二甲' : '其他')}"/>
+                        </p:column>
+
+                        <p:column headerText="modality" filterBy="#{item.modality}" filterMatchMode="EQ" style="width: 10%">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{acquisitionSpecificationListController.modalityOptions}" 
+                                                   var="m" itemLabel="#{m}" itemValue="#{m}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.modality}"/>
+                        </p:column>
+
+                        <p:column headerText="分类简述" filterBy="#{item.briefDescription}" filterMatchMode="LIKE" style="width: 20%">
+                            <h:outputText value="#{item.briefDescription}" styleClass="wrap-text"/>
+                        </p:column>
+
+                        <p:column headerText="典型示例" filterBy="#{item.typicalExamples}" filterMatchMode="LIKE" style="width: 20%">
+                            <h:outputText value="#{item.typicalExamples}" styleClass="wrap-text"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{acquisitionSpecificationListController.prepareEdit}"
+                                             oncomplete="PF('specificationEditDlg').show()"
+                                             update=":formList :specificationEditDlg" disabled="#{empty acquisitionSpecificationListController.selected }"/>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"></ui:include>
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>
