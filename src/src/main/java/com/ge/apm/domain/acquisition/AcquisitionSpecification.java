@@ -126,5 +126,19 @@ public class AcquisitionSpecification {
         this.typicalExamples = typicalExamples;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof AcquisitionSpecification)) {
+            return false;
+        }
+        AcquisitionSpecification other = (AcquisitionSpecification) object;
+        return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
+    }
 }
