@@ -74,7 +74,6 @@
             </h:panelGroup>-->
             <p:dataTable id="datalist" value="#{acquisitionPlanAuditListController.lazyModel}" var="item"
                          widgetVar="varDataList" styleClass="custom-datatable"
-
                          lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                          rowKey="#{item.id}" sortMode="single" sortOrder="descending"
                          sortBy="#{item.applicationDate}"
@@ -200,7 +199,7 @@
                 <p:commandButton onclick="PF('panelFilterApplicationDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
             </p:overlayPanel>-->
         </h:form>
-        <script>
+        <h:outputScript>
             var newWin;
             function prepareOrderViewWindow() {
                 newWin = window.open('about:blank', '_blank');
@@ -209,7 +208,26 @@
             function openOrderViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
             }
-        </script>
+
+            <!-- 放在 </p:dataTable> 之后或页面底部 -->
+            $(function() {
+                // 等待 PrimeFaces 表格渲染完成
+                setTimeout(function() {
+                    // 自动点击所有未展开的行 toggler
+                    var table = PF('varDataList');
+                    if (table) {
+                        var rows = table.tbody.children('tr');
+                        rows.each(function() {
+                            var toggler = $(this).find('td .ui-row-toggler');
+                            if (toggler.length &amp;&amp; !$(this).hasClass('ui-expanded-row')) {
+                                toggler.click();
+                            }
+                        });
+                    }
+                }, 500);
+            });
+
+        </h:outputScript>
         <h:outputStylesheet>
             /* 隐藏鼠标选中 cell 的光标，并禁止文本选中 */
             .custom-datatable td {

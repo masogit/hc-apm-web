@@ -28,11 +28,12 @@ public class AcquisitionPlanProvider {
 
     public String queryAcquisitionPlanListForPageCount(Map<String, Object> param){
         StringBuilder sb = new StringBuilder();
-        sb.append("select count(1) from acquisition_plan where 1=1 " );
+        sb.append("select count(*) from ( ");
+        sb.append("select application_hospital_name,application_hospital_uid, application_year from acquisition_plan where 1=1 " );
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         String filter = buildFilter(searchFilterList);
         sb.append(filter);
-        sb.append(" group by application_hospital_name,application_hospital_uid, application_year ");
+        sb.append(" group by application_hospital_name,application_hospital_uid, application_year ) t ");
         return sb.toString();
     }
 

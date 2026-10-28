@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -120,6 +121,15 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
             count = Integer.parseInt(c);
         }
 
+        for(AcquisitionPlan item: list){
+            List<SearchFilter> ns = new ArrayList<>();
+            ns.addAll(searchFilters);
+            ns.add(new SearchFilter("applicationHospitalUid", SearchFilter.Operator.EQ, item.getApplicationHospitalUid()));
+            ns.add(new SearchFilter("applicationYear", SearchFilter.Operator.EQ, item.getApplicationYear()));
+            Sort sort = new Sort(Sort.Direction.DESC, "applicationNo");
+            List<AcquisitionPlan> acquisitionPlans = dao.findBySearchFilter(searchFilters, sort);
+            item.setList(acquisitionPlans);
+        }
         return new PageImpl<>(list, pageRequest, count);
     }
 
