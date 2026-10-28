@@ -2,16 +2,18 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.SysAuthGroup;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepository;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface SysAuthGroupRepository extends GenericRepository<SysAuthGroup> {
 
     @Query(value="select uid,classification_code,encoded,split_part(encoded, '-', length(replace(encoded, '-', '//')) - length(encoded) +1) || name as name,parent_uid from sys_auth_group where parent_uid is not null",nativeQuery=true)
     List<SysAuthGroup> listSysAuthGroup();
+
+    @Query(value = "select uid, classification_code, encoded, name, parent_uid from sys_auth_group " +
+            "where parent_uid is not null and classification_code in ?1 order by classification_code", nativeQuery = true)
+    List<SysAuthGroup> listSysAuthGroupForUdid(List<String> classificationCodes);
 
 //    SysAuthGroup findByEncoded(String encoded);
 

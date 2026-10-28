@@ -12,6 +12,7 @@ import com.ge.apm.service.common.ConfigCacheService;
 import com.ge.apm.service.i18n.I18nTypeManageService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.healthcare.cn.common.utils.util.BooleanUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
@@ -289,6 +290,10 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
                 if (Objects.nonNull(tw) && Objects.nonNull(tw.getRawValue())) {
                     i18nMessage.setValueTw(tw.getRawValue());
                 }
+                ExcelDocument.ValueWrapper enabled = (ExcelDocument.ValueWrapper) item.get("是否启用");
+                if (Objects.nonNull(enabled) && Objects.nonNull(enabled.getRawValue())) {
+                    i18nMessage.setEnabled(BooleanUtil.toBoolean(enabled.getRawValue()));
+                }
                 return i18nMessage;
             }).collect(Collectors.toList());
             List<I18nMessage> msgKeyNull = dataList.stream().filter(item -> Objects.isNull(item.getMsgKey())).collect(Collectors.toList());
@@ -319,9 +324,9 @@ public class I18nTypeManageController extends GenericCRUDUUIDController<I18nType
     }
     private boolean i18nEquals(I18nMessage o1,I18nMessage o2){
         StringBuilder stringBuilder_o1 = new StringBuilder();
-        String o1Str = stringBuilder_o1.append(o1.getId()).append(o1.getMsgType()).append(o1.getMsgKey()).append(o1.getValueZh()).append(o1.getValueEn()).append(o1.getValueTw()).toString();
+        String o1Str = stringBuilder_o1.append(o1.getId()).append(o1.getMsgType()).append(o1.getMsgKey()).append(o1.getValueZh()).append(o1.getValueEn()).append(o1.getValueTw()).append(o1.getEnabled()).toString();
         StringBuilder stringBuilder_o2 = new StringBuilder();
-        String o2Str = stringBuilder_o2.append(o2.getId()).append(o2.getMsgType()).append(o2.getMsgKey()).append(o2.getValueZh()).append(o2.getValueEn()).append(o2.getValueTw()).toString();
+        String o2Str = stringBuilder_o2.append(o2.getId()).append(o2.getMsgType()).append(o2.getMsgKey()).append(o2.getValueZh()).append(o2.getValueEn()).append(o2.getValueTw()).append(o2.getEnabled()).toString();
         return o1Str.equals(o2Str);
     }
 

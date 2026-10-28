@@ -31,6 +31,7 @@ import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.healthcare.cn.common.cons.ApmFunction;
+import com.ge.healthcare.cn.common.cons.DataSourceEnum;
 import com.ge.healthcare.cn.common.cons.ModifySourceEnum;
 import com.ge.healthcare.cn.common.llm.EquipmentNameplate;
 import com.ge.healthcare.cn.common.onnx.RiskLevel;
@@ -71,6 +72,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.util.*;
@@ -146,14 +148,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private MasterDataService masterDataService;
     private AssetFileImportSupportingService supportingService;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Boolean> assetInfoRequireField = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private EquipmentNameplate equipmentNameplate = new EquipmentNameplate();
 
-    @Getter @Setter
-    private Map<String,String> result;
+    @Getter
+    @Setter
+    private Map<String, String> result;
 
     private RestTemplate restTemplate;
 
@@ -163,15 +168,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return managementList;
     }
 
-    @Getter @Setter
-    private Map<String,Boolean> useValue = new HashMap<>();
+    @Getter
+    @Setter
+    private Map<String, Boolean> useValue = new HashMap<>();
 
     private FileDownloadService fileDownloadService;
+
     public List<String> managementListString(String query) {
-        if(CollectionUtils.isNotEmpty(managementList)){
-            List<String> list = managementList.stream().map(BuildManagement::getName).filter(item->item.contains(query)).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(managementList)) {
+            List<String> list = managementList.stream().map(BuildManagement::getName).filter(item -> item.contains(query)).collect(Collectors.toList());
             Map<String, List<BuildManagement>> collect = managementList.stream().collect(Collectors.groupingBy(BuildManagement::getName));
-            managementMap=collect;
+            managementMap = collect;
             return list;
         }
         return new ArrayList<>();
@@ -182,16 +189,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.managementList = managementList;
     }
 
-    private List<BuildManagement>  managementList=new ArrayList<>();
-    private Map<String,List<BuildManagement>>  managementMap=new HashMap<>();
+    private List<BuildManagement> managementList = new ArrayList<>();
+    private Map<String, List<BuildManagement>> managementMap = new HashMap<>();
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
 
     private AssetTagsMapper assetTagsMapper;
     private AssetTagsRepository assetTagsDao;
-    private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
+    private List<ZkbFileDirectory> subZkbFileDirectoryList = null;
     SysAuthGroupRepository authGroupDao;
-//    @Getter
+    //    @Getter
 //    @Setter
 //    private List<Supplier> supplierList = Collections.emptyList();
 //    @Getter
@@ -291,17 +298,21 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private Boolean toDeleteNurseMaintainSite = false;
     private List<AssetInfo> unCheckNurseSiteMaintain = Collections.emptyList();
 
-    public void toDelete () {
+    public void toDelete() {
         toDeleteNurseMaintainSite = true;
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private PmOrderRule pmOrderRuleTwoLevel;
-    @Getter @Setter
+    @Getter
+    @Setter
     private PmOrderRule pmOrderRuleThreeLevel;
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<NurseSiteMaintainConfig> listSelectedNurseSiteMaintainConfig;
-    @Getter @Setter
+    @Getter
+    @Setter
     private NurseSiteMaintainConfigJN selectedNurseSiteMaintainConfigJN;
 
     // 签名相关
@@ -319,22 +330,26 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     // TreeNodeName Filter
     private String treeNodeNameFilter;
+
     public String getTreeNodeNameFilter() {
         return treeNodeNameFilter;
     }
+
     public void setTreeNodeNameFilter(String treeNodeNameFilter) {
         this.treeNodeNameFilter = treeNodeNameFilter;
     }
 
-    private boolean approval=false;
+    private boolean approval = false;
     private String applyReason;
     private String approvalReason;
     private String equipmentDisposalMethod;
     private String customDisposalMethod;
     private String assetUploadFileFormats;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String inDeptUid;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String inDeptName;
 
     private boolean showCustomDisposalMethod;
@@ -345,7 +360,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SpecialAssetInfo specialAssetInfo;
 
 
-    private String type=null;
+    private String type = null;
+    @Getter
+    @Setter
+    private UdidInfoForm udidInfo;
+    private UdidInfoService udidInfoService;
+    private SupplierService supplierService;
+    @Getter
+    @Setter
+    private Supplier newUdidSupplier;
 
     @Override
     protected void init() {
@@ -402,7 +425,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetScrapRepository = WebUtil.getBean(AssetScrapRepository.class);
         wxMessageService = WebUtil.getBean(WxMessageService.class);
         specialAssetInfoService = WebUtil.getBean(SpecialAssetInfoService.class);
-        woService= WebUtil.getBean(V2_WorkOrderService.class);
+        woService = WebUtil.getBean(V2_WorkOrderService.class);
         workflowService = WebUtil.getBean(WorkflowService.class);
         v2PmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         v2WorkOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -416,6 +439,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         countyArea = userContextService.isCountyArea();
         assetTypeGroupTreeComponentController.registerController(this);
         configItemService = WebUtil.getBean(ConfigItemService.class);
+        udidInfoService = WebUtil.getBean(UdidInfoService.class);
+        supplierService = WebUtil.getBean(SupplierService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         approval = Boolean.parseBoolean((String) UrlEncryptController.getValueFromMap(encodeStr, "approval"));
@@ -423,12 +448,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         siteUid = WebUtil.getRequestParameter("siteUid");
         createRequest = acService.getCreateRequest(qr_Code, siteUid);
         loginUser = UserContextService.getCurrentUserAccount();
-        if(createRequest != null){
+        if (createRequest != null) {
             qrCode = qr_Code;
             isStatus = true;
             createAssetInfo();
-            if(selected.getAssetClassification32()!=null){
-                selectItemDto=new SelectItemDto(selected.getAssetClassification32(),null);
+            if (selected.getAssetClassification32() != null) {
+                selectItemDto = new SelectItemDto(selected.getAssetClassification32(), null);
             }
             assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
             rejectTextHistory = new ArrayList();
@@ -459,13 +484,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoEditController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            specialAssetInfo=new SpecialAssetInfo();
+            specialAssetInfo = new SpecialAssetInfo();
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             isStatusAssetHistory = true;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(dao.findByUid(selectedId));
-            if(selected.getAssetClassification32()!=null){
-                selectItemDto=new SelectItemDto(selected.getAssetClassification32(),null);
+            if (selected.getAssetClassification32() != null) {
+                selectItemDto = new SelectItemDto(selected.getAssetClassification32(), null);
             }
             String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
             terminate = Boolean.parseBoolean(terminateStr);
@@ -481,19 +506,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
             assetTypeGroupTreeComponentController.onServerEvent(AssetTypeGroupTreeComponentController.ASSET_TYPE_GROUP_CHANGE, this.selected.getAssetType() + "#" + this.selected.getTenantUID());
             assetInfoService.setSupplier(ListUtil.newArrayList(selected));
-            if(Boolean.TRUE.equals(selected.isSpecialAsset())){
-                specialAssetInfo=  specialAssetInfoService.findByAssetId(selected.getId());
+            if (Boolean.TRUE.equals(selected.isSpecialAsset())) {
+                specialAssetInfo = specialAssetInfoService.findByAssetId(selected.getId());
             }
-        }else if ("Copy".equalsIgnoreCase(actionName)) {
+        } else if ("Copy".equalsIgnoreCase(actionName)) {
             isStatusAssetHistory = false;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
-            AssetInfo assetInfo=dao.findByUid(selectedId);
+            AssetInfo assetInfo = dao.findByUid(selectedId);
 
             try {
                 prepareCreate();
                 String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
                 terminate = Boolean.parseBoolean(terminateStr);
-                assetInfoCopySelected(assetInfo,selected);
+                assetInfoCopySelected(assetInfo, selected);
                 OrgInfo orgInfo = orgDao.findByUid(assetInfo.getSiteUID());
                 selectedObjectMap.put("selectedOrg", orgInfo);
 //                changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
@@ -507,15 +532,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 config = configService.findConfigBySite(selected.getSiteUID());
                 beforeEdit();
             } catch (Exception e) {
-                logger.error("AssetInfoEditController copy error: "+e);
+                logger.error("AssetInfoEditController copy error: " + e);
             }
 
         }
         type = (String) UrlEncryptController.getValueFromMap(encodeStr, "type");
 
-        if(StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type) ){
-            if(specialAssetInfo==null){
-                specialAssetInfo=  specialAssetInfoService.findByAssetId(selected.getId());
+        if (StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type)) {
+            if (specialAssetInfo == null) {
+                specialAssetInfo = specialAssetInfoService.findByAssetId(selected.getId());
             }
             selected.setSpecialAsset(true);
             specialAssetInfo.setAssetId(selected.getId());
@@ -529,7 +554,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             specialAssetInfo.setLastModifiedByUid(loginUser.getUid());
             specialAssetInfo.setLastModifiedDate(new Date());
         }
-        if(selected ==null){
+        if (selected == null) {
             try {
                 prepareCreate();
                 selectedObjectMap.put("selectedOrg", orgDao.findByUid(loginUser.getSiteUID()));
@@ -558,7 +583,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             readableFieldsList.remove("assetUsedLifecycle");
             readableFieldsList.remove("assetLifecycleDeadline");
         }
-        if(selected.getUnitPriceElectricity()==null){
+        if (selected.getUnitPriceElectricity() == null) {
             WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
             selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
         }
@@ -594,10 +619,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getAssetUploadFileFormats() {
-        return  configItemService.getConfigItemByKeyToString("assetUploadFileFormats",loginUser);
+        return configItemService.getConfigItemByKeyToString("assetUploadFileFormats", loginUser);
     }
+
     private void assetInfoCopySelected(AssetInfo assetInfo, AssetInfo selected) {
-        BeanUtils.copyProperties(assetInfo,selected);
+        BeanUtils.copyProperties(assetInfo, selected);
         selected.setSerialNum(null);
         selected.setFinancingNum(null);
         selected.setDepartNum(null);
@@ -629,10 +655,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     //重新获取资产状态枚举
     public void updateAssetStatusList() {
         assetStatusList = i18nDao.getByMsgTypeAndSiteId("assetStatus", ApmConstant.DEFAULT_SITE_ID);
-        assetStatusList.stream().forEach(status ->{
-            if(status.getMsgKey().equals("4")){
+        assetStatusList.stream().forEach(status -> {
+            if (status.getMsgKey().equals("4")) {
                 status.setEditable(hasScrappedAuthority());
-            }else{
+            } else {
                 status.setEditable(true);
             }
         });
@@ -644,8 +670,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         rejectText = "";
         WebUtil.addSuccessMessage(WebUtil.getMessage("MessageSent"));
     }
+
     private AssetInfo createAssetInfo() {
-        if (selected == null){
+        if (selected == null) {
             selected = new AssetInfo();
         }
         selected.setQrCode(createRequest.getQrCode());
@@ -669,9 +696,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setLifecycleInYear(createRequest.getLifecycleInYear());// 使用年限
         selected.setAssetClassification32(createRequest.getAssetClassification32());// 使用年限
 
-        if(null != createRequest.getManufactureId()){
+        if (null != createRequest.getManufactureId()) {
             Supplier supplier = supplierDao.getById(Integer.valueOf(createRequest.getManufactureId()));
-            if (null != supplier){
+            if (null != supplier) {
                 selected.setManufactureId(supplier.getId().toString());
                 selected.setManufacture(supplier.getName());
                 selected.setManufactureTel(supplier.getTel());
@@ -680,14 +707,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         if (null != createRequest.getOrgId()) {
             OrgInfo org = acService.getOrgInfo(createRequest.getOrgId());
-            if (org != null){
+            if (org != null) {
                 selected.setClinicalDeptId(org.getId());
                 selected.setClinicalDeptUID(org.getUid());
                 selectedObjectMap.put("clinicalDept", org.getUid() == null ? null : orgDao.findByUid(org.getUid()));
             }
         }
         OrgInfo siteOrg = orgDao.findByUid(createRequest.getSiteUID());
-        if(siteOrg !=null){
+        if (siteOrg != null) {
             selectedObjectMap.put("selectedOrg", siteOrg.getSiteUID() == null ? null : orgDao.findByUid(siteOrg.getSiteUID()));//业务单元
             selected.setHospitalId(siteOrg.getId());
             selected.setSiteId(siteOrg.getSiteId());
@@ -696,7 +723,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("parentAsset", createRequest.getParentAssetId() == null ? null : dao.findById(createRequest.getParentAssetId()));//主设备
         if (null != createRequest.getUserId()) {
             UserAccount owner = acService.getUserInfo(createRequest.getUserId());
-            if(owner != null){
+            if (owner != null) {
                 selected.setAssetOwnerId(owner.getId());
                 selected.setAssetOwnerName(owner.getName());
                 selected.setAssetOwnerTel(owner.getTelephone());
@@ -781,7 +808,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void initOrgTree() {
-        if(getIsSelect46Account()){
+        if (getIsSelect46Account()) {
             return;
         }
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
@@ -835,7 +862,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         onAssetDeptChange("clinicalDept");
         selectedObjectMap.put("assetDept", null);
         onAssetDeptChange("assetDept");
-        if(parentAssetList != null){
+        if (parentAssetList != null) {
             parentAssetList.clear();
         }
     }
@@ -847,8 +874,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private void updateManagementOnSiteChange() {
         managementList.clear();
-        List<BuildManagement>  managementList = buildManagementRepository.findBySiteUID(selected.getSiteUID());
-        if(CollectionUtils.isEmpty(managementList)){
+        List<BuildManagement> managementList = buildManagementRepository.findBySiteUID(selected.getSiteUID());
+        if (CollectionUtils.isEmpty(managementList)) {
             return;
         }
         TreeNode root = new DefaultTreeNode("root", null, null);
@@ -876,9 +903,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             managementList.addAll(buildFloorList);
         });
     }
-
-
-
 
 
     public void onParentAssetChange() {
@@ -927,14 +951,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
 
-
     }
 
     public void onSupplierChange(String idx) {
         changeSelect(idx);
     }
 
-    private void changeSelect(String idx){
+    private void changeSelect(String idx) {
         Supplier supplier = (Supplier) selectedObjectMap.get(idx);
         switch (idx) {
             case "supplier":
@@ -958,19 +981,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
 
-
-
-
-    public void locationNamechangeSelect(SelectEvent event){
+    public void locationNamechangeSelect(SelectEvent event) {
         selected.setLocationCode(null);
         selected.setLocationName(locationName);
-        if(event==null){
+        if (event == null) {
             return;
         }
-        String code =(String) event.getObject();
-        if(StringUtils.isNotBlank(code)){
+        String code = (String) event.getObject();
+        if (StringUtils.isNotBlank(code)) {
             List<BuildManagement> list = managementMap.get(code);
-            if(CollectionUtils.isNotEmpty(list)){
+            if (CollectionUtils.isNotEmpty(list)) {
                 BuildManagement buildManagement = list.get(0);
                 selected.setLocationCode(buildManagement.getNamePyCode());
                 selected.setLocationName(buildManagement.getName());
@@ -986,7 +1006,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //        }
 
 
-    public void locationNamechange(){
+    public void locationNamechange() {
         locationNamechangeSelect(null);
 
     }
@@ -1003,7 +1023,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Override
     public void onAfterNewObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
-        if(attachements !=null){
+        if (attachements != null) {
             if (isOK) {
                 attachements.forEach(item -> {
                     if (item.getBoId() == null) {
@@ -1052,7 +1072,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("AssetInfoEditController handleFileUpload error fileName:" + event.getFile().getFileName()+"error:"+e.getMessage());
+            logger.error("AssetInfoEditController handleFileUpload error fileName:" + event.getFile().getFileName() + "error:" + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -1062,15 +1082,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String checkIfRequireBeforeApplyChange() {
-        if(!unCheckedNursesiteMaintainSite && selected.getUid()!=null) {
+        if (!unCheckedNursesiteMaintainSite && selected.getUid() != null) {
             AssetInfo old = dao.findByUid(selected.getUid());
             Integer oldClinicalId = old.getClinicalDeptId() == null ? 0 : old.getClinicalDeptId();
             Integer newClinicalId = selected.getClinicalDeptId() == null ? 0 : selected.getClinicalDeptId();
-            if((!oldClinicalId.equals(newClinicalId)) || !StringUtils.equals(old.getAssetDeptUID(),selected.getAssetDeptUID())) {
+            if ((!oldClinicalId.equals(newClinicalId)) || !StringUtils.equals(old.getAssetDeptUID(), selected.getAssetDeptUID())) {
                 List<AssetInfo> assets = new ArrayList<>();
                 assets.add(old);
                 unCheckNurseSiteMaintain = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assets);
-                if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain)) {
+                if (CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain)) {
                     unCheckedNursesiteMaintainSite = true;
                     RequestContext requestContext = RequestContext.getCurrentInstance();
                     requestContext.addCallbackParam("unCheckedNursesiteMaintainSite", unCheckedNursesiteMaintainSite);
@@ -1091,17 +1111,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return "";
         }
 
-        if(!checkDepartNumUnique()){
+        if (!checkDepartNumUnique()) {
             WebUtil.addErrorMessage("设备编号已被占用");
             return "";
         }
         // 序列号重复校验（新增时）
-        if(selected.getId() == null && StringUtils.isNotEmpty(selected.getSerialNum())){
-            if(checkSerialNumUnique()){
+        if (selected.getId() == null && StringUtils.isNotEmpty(selected.getSerialNum())) {
+            if (checkSerialNumUnique()) {
                 WebUtil.addErrorMessage("制造商序列号已存在！");
             }
         }
-        if(!checkAssetScrap()){
+        if (!checkAssetScrap()) {
             WebUtil.addErrorMessage("设备在报废流程中,不允许修改状态");
             return "";
         }
@@ -1117,7 +1137,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return "";
         }
 
-        if(selected.getUnitPriceElectricity()==null){
+        if (selected.getUnitPriceElectricity() == null) {
             WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
             selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
         }
@@ -1160,7 +1180,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
         //新增资产建档时
-        if(isStatus){
+        if (isStatus) {
             selected.setQrCode(qr_Code);
         }
         if (null != gbCodeName) {
@@ -1183,17 +1203,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             this.selected.setMvsEquip(1);
         }
 
-        boolean isCreate=false;
-        if(selected.getId()==null){
-            isCreate=true;
+        boolean isCreate = false;
+        if (selected.getId() == null) {
+            isCreate = true;
         }
         selected.setOfflineUpdateDate(new Date());
         this.save();
-        if(selected.isSpecialAsset()){
+        if (selected.isSpecialAsset()) {
             specialAssetInfo.setAssetId(selected.getId());
             specialAssetInfo.setAssetUid(selected.getUid());
             List<AssetAnnualInspectionReport> assetAnnualInspectionReports = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getName() != null).collect(Collectors.toList());
-            assetAnnualInspectionReports.forEach(item->item.setSpecialAssetUid(specialAssetInfo.getId()));
+            assetAnnualInspectionReports.forEach(item -> item.setSpecialAssetUid(specialAssetInfo.getId()));
             List<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getCertificateName() != null).collect(Collectors.toList());
             specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
             specialAssetInfo.setPermitInfos(permitInfos);
@@ -1202,23 +1222,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         }
         AssetInfo assetInfo = new AssetInfo();
-        BeanUtils.copyProperties(selected,assetInfo);
+        BeanUtils.copyProperties(selected, assetInfo);
         if (isCreate) {
 //            newAsset.setId(null);
             assetInfo.setCreateType("Add");
-        }else{
+        } else {
             assetInfo.setCreateType("Edit");
         }
         assetHistoryService.saveAssetHistory(assetInfo);
         creteRule();
-        if(CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain) && toDeleteNurseMaintainSite) {
+        if (CollectionUtils.isNotEmpty(unCheckNurseSiteMaintain) && toDeleteNurseMaintainSite) {
             assetInfoBulkEditCheckService.deleteNursiteMaintain(unCheckNurseSiteMaintain.get(0));
         }
 
-        if(selected != null && selected.getId() != null && selectedPictures != null){
+        if (selected != null && selected.getId() != null && selectedPictures != null) {
             acService.createAttachments(selected, selectedPictures);
         }
-        if(qr_Code !=null && siteUid != null){
+        if (qr_Code != null && siteUid != null) {
             acService.updateQrLib(qr_Code, 3, siteUid);
         }
         // do other stuff after save
@@ -1234,10 +1254,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
 
         saveOrUpdateAssetTags();
-        if(StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type) ){
+        if (StringUtils.isNotBlank(type) && "SpecialAsset".equalsIgnoreCase(type)) {
             return "specialAssetList?faces-redirect=true";
         }
-        if(isStatus){
+        if (isStatus) {
             return "/portal/asset/createAsset/RequestsList?faces-redirect=true";
         }
         if (resultStatus) {
@@ -1248,15 +1268,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private boolean checkAssetScrap() {
-        if(selected.getId()!=null){
+        if (selected.getId() != null) {
             AssetInfo assetInfo = dao.getById(selected.getId());
-            if(assetInfo.getStatus()!=selected.getStatus()){
+            if (assetInfo.getStatus() != selected.getStatus()) {
                 AssetScrap assetScrap = assetScrapRepository.findByAssetId(selected.getId());
-                if(assetScrap==null){
-                    return true ;
-                }else{
-                    if(assetScrap.getCurrentStatus()==2){
-                        return false ;
+                if (assetScrap == null) {
+                    return true;
+                } else {
+                    if (assetScrap.getCurrentStatus() == 2) {
+                        return false;
                     }
                 }
             }
@@ -1266,7 +1286,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private void creteRule() {
-        if(pmOrderRuleThreeLevel!=null || pmOrderRuleTwoLevel!=null) {
+        if (pmOrderRuleThreeLevel != null || pmOrderRuleTwoLevel != null) {
             RelRuleAsset rel = new RelRuleAsset();
             rel.setAssetUID(selected.getUid());
             rel.setCreatedDate(new Date());
@@ -1277,17 +1297,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             /* if(pmOrderRule!=null) {  //一级 暂时用不到
                 rel.setRuleUID1(pmOrderRule.getUid());
             }*/
-            if(pmOrderRuleTwoLevel!=null) { //二级
+            if (pmOrderRuleTwoLevel != null) { //二级
                 rel.setRuleUID2(pmOrderRuleTwoLevel.getUid());
             }
-            if(pmOrderRuleThreeLevel!=null) { //三级
+            if (pmOrderRuleThreeLevel != null) { //三级
                 rel.setRuleUID(pmOrderRuleThreeLevel.getUid());
             }
             relRuleAssetRepository.save(rel);
         }
-        if(CollectionUtils.isNotEmpty(listSelectedNurseSiteMaintainConfig)) {
+        if (CollectionUtils.isNotEmpty(listSelectedNurseSiteMaintainConfig)) {
             List<NurseSiteMaintainConfigItem> items = new ArrayList<>();
-            for(NurseSiteMaintainConfig config : listSelectedNurseSiteMaintainConfig) {
+            for (NurseSiteMaintainConfig config : listSelectedNurseSiteMaintainConfig) {
                 config.setModifyBy(loginUser);
                 config.setModifyByUid(loginUser.getUid());
                 config.setModifyDate(new Date());
@@ -1313,7 +1333,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             nurseSiteMaintainConfigRepository.save(listSelectedNurseSiteMaintainConfig);
             nurseSiteMaintainConfigItemRepository.save(items);
         }
-        if(Objects.nonNull(selectedNurseSiteMaintainConfigJN)) {
+        if (Objects.nonNull(selectedNurseSiteMaintainConfigJN)) {
             selectedNurseSiteMaintainConfigJN.setModifyBy(loginUser);
             selectedNurseSiteMaintainConfigJN.setModifyByUid(loginUser.getUid());
             selectedNurseSiteMaintainConfigJN.setModifyDate(new Date());
@@ -1341,7 +1361,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public boolean checkDepartNumUnique() {
 
-        if(org.springframework.util.StringUtils.isEmpty(selected.getDepartNum())){
+        if (org.springframework.util.StringUtils.isEmpty(selected.getDepartNum())) {
             return true;
         }
 
@@ -1360,12 +1380,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return hisData.isEmpty();
         }
         List<String> hisData = dao.findIdByDepartNumAndTenantUID(selected.getDepartNum(), selected.getTenantUID());
-        if(hisData.isEmpty()){
+        if (hisData.isEmpty()) {
             return true;
         }
         //兼容老数据
-        for( String uid:hisData){
-            if(uid.equals(selected.getUid())){
+        for (String uid : hisData) {
+            if (uid.equals(selected.getUid())) {
                 return true;
             }
         }
@@ -1402,7 +1422,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getListPageLink() {
-        if(isStatus){
+        if (isStatus) {
             return "/portal/asset/createAsset/RequestsList?faces-redirect=true";
         }
         if (!selected.getIsValid() || 4 == selected.getStatus()) {
@@ -1538,7 +1558,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         AssetInfo oldAssetInfo = assetHistoryService.depCopy(selected);
         this.selected.setStatus(4);
         update();
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected,ModifySourceEnum.ASSET_SCRAP.getCode());
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, selected, ModifySourceEnum.ASSET_SCRAP.getCode());
 //        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
 //        logger.info("AssetInfoEditController processToBeTerminated apply assetId:{}"+ selected.getId());
 //        assetScrapService.apply(selected.getId(),"请求报废");
@@ -1555,16 +1575,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return "AssetList?faces-redirect=true";
     }
 
-    public void applyAssetApplication(String action){
+    public void applyAssetApplication(String action) {
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
-        if(StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))){
+        if (StringUtils.isEmpty(this.signatureId) && (this.newSignature && StringUtils.isEmpty(this.signatureContent))) {
             WebUtil.addErrorMessage("签名不可为空！");
             response.setStatus(206);
             return;
         }
-        if(this.newSignature && StringUtils.isNotEmpty(signatureContent)){
+        if (this.newSignature && StringUtils.isNotEmpty(signatureContent)) {
             try {
                 String base64 = signatureContent.substring(signatureContent.indexOf(",") + 1);
                 BASE64Decoder decoder = new BASE64Decoder();
@@ -1574,7 +1594,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 if (null != blobObject) {
                     this.signatureId = blobObject.getObjectStorageId();
                     woService.addUserSignature(this.signatureId);
-                }else{
+                } else {
                     WebUtil.addErrorMessage("签名保存失败！");
                     response.setStatus(206);
                     return;
@@ -1590,7 +1610,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if ("scrap".equals(action)) {
             List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals("Scrap")).collect(Collectors.toList());
             boolean checkOrderWhenScrap = BooleanUtils.isTrue(configItemService.getConfigItemByKey("checkOrderWhenScrap", loginUser));
-            assetScrapService.apply(selected.getId(),applyReason,approvalReason,equipmentDisposalMethod,customDisposalMethod,signatureId,collect,checkOrderWhenScrap);
+            assetScrapService.apply(selected.getId(), applyReason, approvalReason, equipmentDisposalMethod, customDisposalMethod, signatureId, collect, checkOrderWhenScrap);
         } else if ("departmentCovert".equals(action)) {
             Map<String, Object> param = MapUtil.newHashMap();
             param.put("assetUids", bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList()));
@@ -1609,13 +1629,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return Collections.singletonList(uid);
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean nurseSiteMaintainIsComplete = false;
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<String> workOrderList = new ArrayList<>();
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<String> pmOrderList = new ArrayList<>();
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<AssetInfo> bathSelectedList = new ArrayList<>();
 
     public boolean checkAssetOrderIsComplete(List<String> uidList, boolean isScrap) {
@@ -1661,7 +1685,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     @Transactional
-    public void processUnfinishedNurseSiteMaintain(String operationType){
+    public void processUnfinishedNurseSiteMaintain(String operationType) {
         if (assetScrapService.processUnfinishedNurseSiteMaintain(UserContextService.getAccessToken(), bathSelectedList.stream().map(AssetInfo::getUid).collect(Collectors.toList()), operationType)) {
             WebUtil.addSuccessMessage("已自动处理未完成临床助手工单");
         } else {
@@ -1677,7 +1701,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setIsValid(true);
         this.selected.setTerminateDate(null);
         update();
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected,ModifySourceEnum.LEDGER_EDIT.getCode());
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, selected, ModifySourceEnum.LEDGER_EDIT.getCode());
 //        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
         return "AssetTerminateEntryList?faces-redirect=true";
     }
@@ -1831,29 +1855,31 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 //        supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
 //        return autoCompleteService.autoCompleteVendor(query, supplierList);
 
-        return   aimService.getOnlySuplierListBySiteUid(selected.getTenantUID(),query,1000);
+        return aimService.getOnlySuplierListBySiteUid(selected.getTenantUID(), query, 1000);
     }
 
     public List<Supplier> autoCompleteManufacture(String query) {
 //        manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
 //        return autoCompleteService.autoCompleteManufacture(query, manuList);
 
-        return   aimService.getOnlyManuListBySiteUid(selected.getTenantUID(),query,1000);
+        return aimService.getOnlyManuListBySiteUid(selected.getTenantUID(), query, 1000);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
 //        mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
 //        return autoCompleteService.autoCompleteMaintainer(query, mantainList);
 
-        return  aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID(),query,1000);
+        return aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID(), query, 1000);
     }
-    public String selectCreatedBy(String loginName){
+
+    public String selectCreatedBy(String loginName) {
         UserAccount user = userDao.getByLoginName(loginName);
-        if(user != null){
+        if (user != null) {
             return user.getName();
         }
         return null;
     }
+
     public List<String> completeAssetName(String prefix) {
         String tenantUID = loginUser.getTenantUID();
         List<String> names = null;
@@ -1895,7 +1921,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 selected.setAssetDeptId(clinicalDept == null ? null : clinicalDept.getId());
                 selected.setAssetDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
                 break;
-            case "departmentCovert" :
+            case "departmentCovert":
                 clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
                 inDeptUid = clinicalDept.getUid();
                 inDeptName = clinicalDept.getName();
@@ -1920,10 +1946,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
         selected.setUsageStatus(usageStatusconstant);
         String redirectUrl = applyChange();
-        if(StringUtils.isNotBlank(redirectUrl) && usageStatusconstant==2){
+        if (StringUtils.isNotBlank(redirectUrl) && usageStatusconstant == 2) {
             String token = UserContextService.getAccessToken();
-            wxMessageService.submitAssetApprovalSendMessage(selected,"待审核");
-        }else{
+            wxMessageService.submitAssetApprovalSendMessage(selected, "待审核");
+        } else {
             selected.setUsageStatus(usageStatus);
         }
         return redirectUrl;
@@ -1932,11 +1958,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public String submitApprovalExtend(Integer usageStatusconstant) {
         //UsageStatusConstant.INITIAL,UNDER_REVIEW,ARCHIVED
         String redirectUrl = submitApproval(usageStatusconstant);
-        if(StringUtils.isNotBlank(redirectUrl)){
-            redirectUrl="ApprovalList?faces-redirect=true";
+        if (StringUtils.isNotBlank(redirectUrl)) {
+            redirectUrl = "ApprovalList?faces-redirect=true";
         }
         return redirectUrl;
     }
+
     @Override
     public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
@@ -1977,11 +2004,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         //parent asset and child asset will be in the same dept
         if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
             return false;
-        }else{
+        } else {
             selected.setParentAssetUid(assetInfo.getUid());
         }
 
-        if(Objects.equals(selected.getSiteId(),46)){
+        if (Objects.equals(selected.getSiteId(), 46)) {
             selected.setVisibleStatus(1);
         }
         return true;
@@ -2093,26 +2120,27 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
 
-    public String createTpye=null;
+    public String createTpye = null;
     @Getter
     @Setter
-    public String createTpyeName=null;
+    public String createTpyeName = null;
+
     public void prepareCreateSupplier(String type) {
         newSupplier = new Supplier();
-        if("manufacturer".equals(type)){
-            createTpye=type;
+        if ("manufacturer".equals(type)) {
+            createTpye = type;
             newSupplier.setManufacturerT(true);
-            createTpyeName="制造商信息";
+            createTpyeName = "制造商信息";
         }
-        if("supplier".equals(type)){
-            createTpye=type;
+        if ("supplier".equals(type)) {
+            createTpye = type;
             newSupplier.setSupplierT(true);
-            createTpyeName="供应商信息";
+            createTpyeName = "供应商信息";
         }
-        if("maintainer".equals(type)){
-            createTpye=type;
+        if ("maintainer".equals(type)) {
+            createTpye = type;
             newSupplier.setMaintainerT(true);
-            createTpyeName="维修商信息";
+            createTpyeName = "维修商信息";
 
         }
 
@@ -2186,6 +2214,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     /**
      * 获取所有主目录信息
+     *
      * @return
      */
     public List<ZkbFileDirectory> findMainDirectory() {
@@ -2194,23 +2223,22 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     /**
      * 根据主目录值获取子目录信息
+     *
      * @return
      */
     public List<ZkbFileDirectory> getSubZkbFileDirectoryList() {
-        if(this.selected==null||this.selected.getMainDirectory()==null)
-        {
+        if (this.selected == null || this.selected.getMainDirectory() == null) {
             return null;
         }
         List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
                 ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
                 this.selected.getMainDirectory());
-        if(CollectionUtils.isEmpty(mainZkbFileDirectory))
-        {
+        if (CollectionUtils.isEmpty(mainZkbFileDirectory)) {
             return null;
         }
         ZkbFileDirectory zkbFileDirectory = new ZkbFileDirectory();
-        zkbFileDirectory=mainZkbFileDirectory.get(0);
-        subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(zkbFileDirectory);
+        zkbFileDirectory = mainZkbFileDirectory.get(0);
+        subZkbFileDirectoryList = this.zkbFileDirectoryService.findByZkbFileDirectory(zkbFileDirectory);
         return subZkbFileDirectoryList;
     }
 
@@ -2225,7 +2253,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public boolean getIsSelect46Account() {
         return Objects.equals(loginUser.getSiteId(), 46) && loginUser.getTenantUID().equals(loginUser.getSiteUID());
     }
-    private TreeNode buildTree(List<OrgInfo> orgList,int siteId) {
+
+    private TreeNode buildTree(List<OrgInfo> orgList, int siteId) {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
@@ -2235,7 +2264,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
         for (OrgInfo org : orgList) {
             rootNode.setSelectable(true);
-            rootNode.setRowKey("org_"+org.getId());
+            rootNode.setRowKey("org_" + org.getId());
             if (treeMap.containsKey(org.getParentUID())) {
                 treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
             } else {
@@ -2246,30 +2275,31 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         rootNode.setExpanded(true);
         return rootNode;
     }
-    public void filterTreeNode(){
-        List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
+
+    public void filterTreeNode() {
+        List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(), treeNodeNameFilter, loginUser.getSiteId());
     }
 
-    public boolean getAssetScrapEnable(){
-        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(),loginUser.getHospitalUID(),loginUser.getInstitutionUID(),loginUser.getTenantUID(),"assetScrap");
-        return  StringUtils.isNotEmpty(value)?value.equals("true"):false;
+    public boolean getAssetScrapEnable() {
+        String value = configItemValueRepository.findByKeyAndSiteForUseParent(loginUser.getSiteUID(), loginUser.getHospitalUID(), loginUser.getInstitutionUID(), loginUser.getTenantUID(), "assetScrap");
+        return StringUtils.isNotEmpty(value) ? value.equals("true") : false;
 
     }
 
-    public boolean getAssetScrapFunction(){
+    public boolean getAssetScrapFunction() {
         Set<String> functionListByFeatureAndRoles = userContextService.getFunctionListByFeatureAndRoles();
-       return   functionListByFeatureAndRoles.contains(ApmFunction.ASSET_WEB_ASSET_SCRAP_ASSET_BUTTON.name()) ||  functionListByFeatureAndRoles.contains(ApmFunction.ASSET_WEB_ASSET_SCRAP_CLINICAL_BUTTON.name());
+        return functionListByFeatureAndRoles.contains(ApmFunction.ASSET_WEB_ASSET_SCRAP_ASSET_BUTTON.name()) || functionListByFeatureAndRoles.contains(ApmFunction.ASSET_WEB_ASSET_SCRAP_CLINICAL_BUTTON.name());
 
     }
 
-    public boolean getIsAssetStaff(){
+    public boolean getIsAssetStaff() {
 //        List<SysRole> userRoles = sysRoleRepository.getUserRolesByUserId(loginUser.getId());
 //        List<String> strings = Arrays.asList(ApmSystemRole.ClinicalStaff.name(), ApmSystemRole.DeptHead.name(), ApmSystemRole.NursingStaff.name());
 //        List<SysRole> roleList = userRoles.stream().filter(item->!strings.contains(item.getName()) ).collect(Collectors.toList());
         Set<String> functionListByFeatureAndRoles = userContextService.getFunctionListByFeatureAndRoles();
         if (!functionListByFeatureAndRoles.contains(ApmFunction.ASSET_WEB_ASSET_SCRAP_ASSET_BUTTON.name())) {
             return false;
-        }else{
+        } else {
             return true;
         }
 
@@ -2300,14 +2330,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 break;
         }
     }
-    public boolean secondment(){
-        if(StringUtils.isBlank(selected.getUid())){
+
+    public boolean secondment() {
+        if (StringUtils.isBlank(selected.getUid())) {
             return false;
         }
-        return dao.secondment(selected.getUid())>0;
+        return dao.secondment(selected.getUid()) > 0;
     }
 
-    public void checkSerialNumExists () {
+    public void checkSerialNumExists() {
         if (supportingService.isAssetFieldDuplicate("serialNum", selected.getSerialNum(), selected.getSiteUID(), selected.getUid())) {
             WebUtil.addStickyErrorMessage("制造商序列号已存在！");
         }
@@ -2376,6 +2407,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setCustomDisposalMethod(String customDisposalMethod) {
         this.customDisposalMethod = customDisposalMethod;
     }
+
     public boolean getShowCustomDisposalMethod() {
         return showCustomDisposalMethod;
     }
@@ -2400,7 +2432,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.specialAssetInfo = specialAssetInfo;
     }
 
-    public void checkAssessmentNoExists () {
+    public void checkAssessmentNoExists() {
         List<SpecialAssetInfo> list = specialAssetInfoService.findByAssessmentNoAndTenantUID(specialAssetInfo.getAndAssessmentNo(), selected.getTenantUID());
         if (CollectionUtils.isNotEmpty(list)) {
             WebUtil.addWarnMessage("预评批号已存在！");
@@ -2409,6 +2441,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private AssetAnnualInspectionReport assetAnnualInspectionReport;
     private PermitInfo permitInfo;
+
     public void onAddReport() {
         assetAnnualInspectionReport = new AssetAnnualInspectionReport();
     }
@@ -2417,7 +2450,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         permitInfo = new PermitInfo();
     }
 
-    public void onEditReport(String uid,Integer nodId,String name) {
+    public void onEditReport(String uid, Integer nodId, String name) {
         for (AssetAnnualInspectionReport report : specialAssetInfo.getAssetAnnualInspectionReports()) {
             if (StringUtils.isNotBlank(uid) && uid.equals(report.getUid())) {
                 assetAnnualInspectionReport = report;
@@ -2427,7 +2460,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 assetAnnualInspectionReport = report;
                 return;
             }
-            if (null != nodId && nodId==report.getNodeId()) {
+            if (null != nodId && nodId == report.getNodeId()) {
                 assetAnnualInspectionReport = report;
                 return;
             }
@@ -2435,7 +2468,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public void onEditPermitInfo(String uid,Integer nodId,String name) {
+    public void onEditPermitInfo(String uid, Integer nodId, String name) {
         for (PermitInfo permit : specialAssetInfo.getPermitInfos()) {
             if (StringUtils.isNotBlank(uid) && uid.equals(permit.getUid())) {
                 permitInfo = permit;
@@ -2445,7 +2478,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 permitInfo = permit;
                 return;
             }
-            if (null != nodId && nodId==permit.getNodeId()) {
+            if (null != nodId && nodId == permit.getNodeId()) {
                 permitInfo = permit;
                 return;
             }
@@ -2468,12 +2501,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void saveReport() {
 
-        if(assetAnnualInspectionReport!=null &&( assetAnnualInspectionReport.getUid()!=null || assetAnnualInspectionReport.getNodeId()!=null)){
+        if (assetAnnualInspectionReport != null && (assetAnnualInspectionReport.getUid() != null || assetAnnualInspectionReport.getNodeId() != null)) {
             return;
         }
         List<AssetAnnualInspectionReport> assetAnnualInspectionReports = specialAssetInfo.getAssetAnnualInspectionReports();
-        if(assetAnnualInspectionReports==null){
-            assetAnnualInspectionReports=new ArrayList<>();
+        if (assetAnnualInspectionReports == null) {
+            assetAnnualInspectionReports = new ArrayList<>();
         }
         assetAnnualInspectionReport.setCreatedByName(loginUser.getName());
         assetAnnualInspectionReport.setCreatedByUid(loginUser.getUid());
@@ -2482,12 +2515,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void savePermitInfo() {
-        if(permitInfo!=null &&( permitInfo.getUid()!=null || permitInfo.getNodeId()!=null)){
+        if (permitInfo != null && (permitInfo.getUid() != null || permitInfo.getNodeId() != null)) {
             return;
         }
         List<PermitInfo> permitInfos = specialAssetInfo.getPermitInfos();
-        if(permitInfos==null){
-            permitInfos=new ArrayList<>();
+        if (permitInfos == null) {
+            permitInfos = new ArrayList<>();
         }
         permitInfo.setTenantUID(loginUser.getTenantUID());
         permitInfo.setSiteUID(loginUser.getSiteUID());
@@ -2507,7 +2540,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setAssetAnnualInspectionReport(AssetAnnualInspectionReport assetAnnualInspectionReport) {
         this.assetAnnualInspectionReport = assetAnnualInspectionReport;
     }
-    public PermitInfo getPermitInfo( ) {
+
+    public PermitInfo getPermitInfo() {
         return permitInfo;
     }
 
@@ -2519,16 +2553,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public List<AssetAnnualInspectionReport> getAssetAnnualInspectionReports() {
         AssetAnnualInspectionReport assetAnnualInspectionReport = new AssetAnnualInspectionReport();
         assetAnnualInspectionReport.setNodeId(0);
-        List<AssetAnnualInspectionReport> assetAnnualInspectionReports=null;
-        if(specialAssetInfo.getAssetAnnualInspectionReports()==null){
+        List<AssetAnnualInspectionReport> assetAnnualInspectionReports = null;
+        if (specialAssetInfo.getAssetAnnualInspectionReports() == null) {
             assetAnnualInspectionReports = new ArrayList<>();
-        }else{
-            List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getNodeId() ==null|| item.getNodeId() != 0).collect(Collectors.toList());
+        } else {
+            List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getNodeId() == null || item.getNodeId() != 0).collect(Collectors.toList());
             for (int i = 0; i < collect.size(); i++) {
                 AssetAnnualInspectionReport assetAnnualInspectionReport1 = collect.get(i);
-                assetAnnualInspectionReport1.setNodeId(i+1);
+                assetAnnualInspectionReport1.setNodeId(i + 1);
             }
-            assetAnnualInspectionReports=collect;
+            assetAnnualInspectionReports = collect;
 
         }
         specialAssetInfo.setAssetAnnualInspectionReports(assetAnnualInspectionReports);
@@ -2539,19 +2573,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private Set<PermitInfo> permitInfos;
 
     public List<PermitInfo> getPermitInfos() {
-        PermitInfo permitInfo=new PermitInfo();
+        PermitInfo permitInfo = new PermitInfo();
         permitInfo.setNodeId(0);
         List<PermitInfo> permitInfos = null;
-        if(CollectionUtils.isEmpty(specialAssetInfo.getPermitInfos())){
-            permitInfos= new ArrayList<>();
+        if (CollectionUtils.isEmpty(specialAssetInfo.getPermitInfos())) {
+            permitInfos = new ArrayList<>();
 
-        }else{
-            List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getNodeId() ==null|| item.getNodeId() != 0).collect(Collectors.toList());
+        } else {
+            List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getNodeId() == null || item.getNodeId() != 0).collect(Collectors.toList());
             for (int i = 0; i < collect.size(); i++) {
                 PermitInfo permitInfo1 = collect.get(i);
-                permitInfo1.setNodeId(i+1);
+                permitInfo1.setNodeId(i + 1);
             }
-            permitInfos=collect;
+            permitInfos = collect;
 
         }
         specialAssetInfo.setPermitInfos(permitInfos);
@@ -2561,7 +2595,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    public void processInputChange( ) {
+    public void processInputChange() {
         System.out.println("processInputChange");
     }
 
@@ -2572,6 +2606,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
         permitInfo.setBlobObjects(blobObjects);
     }
+
     public void removeReportAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         Set<V2_BlobObject> blobObjects = assetAnnualInspectionReport.getBlobObjects();
@@ -2579,27 +2614,27 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         permitInfo.setBlobObjects(blobObjects);
     }
 
-    public void removeReportAttachmentById(String blobId,Integer nodeId) {
+    public void removeReportAttachmentById(String blobId, Integer nodeId) {
         blobService.deleteBlobFileById(blobId);
 
         List<AssetAnnualInspectionReport> collect = specialAssetInfo.getAssetAnnualInspectionReports().stream().filter(item -> item.getNodeId() == nodeId).collect(Collectors.toList());
         Set<V2_BlobObject> blobObjects = collect.get(0).getBlobObjects();
         blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
         for (AssetAnnualInspectionReport annualInspectionReport : specialAssetInfo.getAssetAnnualInspectionReports()) {
-            if(annualInspectionReport.getNodeId()==nodeId){
+            if (annualInspectionReport.getNodeId() == nodeId) {
                 annualInspectionReport.setBlobObjects(blobObjects);
             }
         }
     }
 
-    public void removePermitAttachmentById(String blobId,Integer nodeId) {
+    public void removePermitAttachmentById(String blobId, Integer nodeId) {
         blobService.deleteBlobFileById(blobId);
 
         List<PermitInfo> collect = specialAssetInfo.getPermitInfos().stream().filter(item -> item.getNodeId() == nodeId).collect(Collectors.toList());
         Set<V2_BlobObject> blobObjects = collect.get(0).getBlobObjects();
         blobObjects = blobObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toSet());
         for (PermitInfo permitInfo : specialAssetInfo.getPermitInfos()) {
-            if(permitInfo.getNodeId()==nodeId){
+            if (permitInfo.getNodeId() == nodeId) {
                 permitInfo.setBlobObjects(blobObjects);
             }
         }
@@ -2611,7 +2646,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (null != blobObject) {
             String type = event.getComponent().getId();
             type = type.substring(type.indexOf("type") + 4);
-            if(permitInfo.getBlobObjects()==null){
+            if (permitInfo.getBlobObjects() == null) {
                 Set<V2_BlobObject> objects = new HashSet<>();
                 permitInfo.setBlobObjects(objects);
             }
@@ -2632,7 +2667,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (null != blobObject) {
             String type = event.getComponent().getId();
             type = type.substring(type.indexOf("type") + 4);
-            if(assetAnnualInspectionReport.getBlobObjects()==null){
+            if (assetAnnualInspectionReport.getBlobObjects() == null) {
                 Set<V2_BlobObject> objects = new HashSet<>();
                 assetAnnualInspectionReport.setBlobObjects(objects);
             }
@@ -2650,11 +2685,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void onAfterNewObjectPermit() {
 
-        if(specialAssetInfo.getPermitInfos() !=null){
+        if (specialAssetInfo.getPermitInfos() != null) {
             specialAssetInfo.getPermitInfos().forEach(item -> {
                 Set<V2_BlobObject> blobObjects = item.getBlobObjects();
-                if(blobObjects!=null){
-                    blobObjects.forEach(ite->{
+                if (blobObjects != null) {
+                    blobObjects.forEach(ite -> {
                         if (ite.getBoUuid() == null) {
 //                                ite.setBoId(object.getId());
                             ite.setBoUuid(item.getUid());
@@ -2666,11 +2701,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             });
         }
 
-        if(specialAssetInfo.getAssetAnnualInspectionReports() !=null){
+        if (specialAssetInfo.getAssetAnnualInspectionReports() != null) {
             specialAssetInfo.getAssetAnnualInspectionReports().forEach(item -> {
                 Set<V2_BlobObject> blobObjects = item.getBlobObjects();
-                if(blobObjects!=null){
-                    blobObjects.forEach(ite->{
+                if (blobObjects != null) {
+                    blobObjects.forEach(ite -> {
 //                                ite.setBoId(object.getId());
                         ite.setBoUuid(item.getUid());
                         blobService.saveBlobObject(ite);
@@ -2683,9 +2718,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+    public boolean verifyFileSuffixName(String fileName, String fileSuffixName) {
 
-        if(fileName.contains(fileSuffixName)){
+        if (fileName.contains(fileSuffixName)) {
             return true;
         }
         return false;
@@ -2703,7 +2738,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             this.signatureContentStream = blobService.getBlobObjectByStorageId(lastSignatureId);
             this.signatureId = lastSignatureId;
             this.newSignature = false;
-        }else{
+        } else {
             this.newSignature = true;
         }
     }
@@ -2716,7 +2751,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
 
-    public void  getSig() {
+    public void getSig() {
 
         if (StringUtils.isNotEmpty(selected.getSiteUID())) {
             WorkflowConfig workflowConfig = workflowService.getWorkflowByOrg(selected.getSiteUID());
@@ -2732,37 +2767,37 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private SelectItemDto selectItemDto;
 
-    public  List<SelectItemDto>  autoAssetClassification32() {
-        AssetClassificationModel assetClassificationModel=new AssetClassificationModel();
+    public List<SelectItemDto> autoAssetClassification32() {
+        AssetClassificationModel assetClassificationModel = new AssetClassificationModel();
         assetClassificationModel.setId(selected.getUid());
         assetClassificationModel.setBrand(selected.getMakerShortName());
         assetClassificationModel.setPattern(selected.getFunctionType());
         assetClassificationModel.setSourceName(selected.getName());
-        if(selected.getManufacture()!=null){
+        if (selected.getManufacture() != null) {
             assetClassificationModel.setFactory(selected.getManufacture());
-        }else if(selected.getManufactureId()!=null){
+        } else if (selected.getManufactureId() != null) {
             Supplier supplier = supplierDao.findByUid((selected.getManufactureId()));
-            assetClassificationModel.setFactory(supplier!=null?supplier.getName():null);
+            assetClassificationModel.setFactory(supplier != null ? supplier.getName() : null);
         }
         // ONNX FULL 模型扩展字段
         assetClassificationModel.setDepartment(selected.getClinicalDeptName());
         String riskVal = selected.getRiskGrade() != null
-            ? FieldValueMessageController.fieldValue("riskGrade", String.valueOf(selected.getRiskGrade())) : null;
+                ? FieldValueMessageController.fieldValue("riskGrade", String.valueOf(selected.getRiskGrade())) : null;
         assetClassificationModel.setRiskLevel(StringUtils.isNotBlank(riskVal) ? riskVal : null);
         String meterVal = selected.getMeasureGrade() != null
-            ? FieldValueMessageController.fieldValue("measureGrade", String.valueOf(selected.getMeasureGrade())) : null;
+                ? FieldValueMessageController.fieldValue("measureGrade", String.valueOf(selected.getMeasureGrade())) : null;
         assetClassificationModel.setMeterLevel(StringUtils.isNotBlank(meterVal) ? meterVal : null);
         assetClassificationModel.setRegistrationNo(selected.getRegistrationNo());
         assetClassificationModel.setIsEmergencyDevice(
                 selected.getEmergencyEquipment() != null ? FieldValueMessageController.fieldValue("emergencyEquipment", String.valueOf(selected.getEmergencyEquipment())) : null);
         assetClassificationModel.setPurchasePrice(
-            selected.getPurchasePrice() != null ? String.valueOf(selected.getPurchasePrice()) : null);
-        return  masterDataService.autoAssetClassification32(assetClassificationModel);
+                selected.getPurchasePrice() != null ? String.valueOf(selected.getPurchasePrice()) : null);
+        return masterDataService.autoAssetClassification32(assetClassificationModel);
 
     }
 
     public void assetClassification32Change() {
-        if(selectItemDto!=null){
+        if (selectItemDto != null) {
             selected.setAssetClassification32(selectItemDto.getLabel());
         }
     }
@@ -2775,80 +2810,81 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selectItemDto = selectItemDto;
     }
 
-    @Setter@Getter
+    @Setter
+    @Getter
     private String selectedFileItemId;
 
-    public void nameplatePhotoPreview(String itemId){
+    public void nameplatePhotoPreview(String itemId) {
         selectedFileItemId = itemId;
     }
 
-    public void  plateRecognition(String objectId){
+    public void plateRecognition(String objectId) {
         try {
             String token = UserContextService.getAccessToken();
             String gatewayURL = microServiceUtil.getGatewayURL(GatewayURL.PLATE_RECOGNITION);
-            gatewayURL = gatewayURL.replace("{objectId}", objectId).concat("?assetUid=").concat(selected == null?"":selected.getUid()==null?"":selected.getUid());
+            gatewayURL = gatewayURL.replace("{objectId}", objectId).concat("?assetUid=").concat(selected == null ? "" : selected.getUid() == null ? "" : selected.getUid());
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", token);
             HttpEntity<Map> requestEntity = new HttpEntity<Map>(headers);
             ResponseEntity<JSONObject> response = restTemplate.exchange(gatewayURL, HttpMethod.GET, requestEntity, JSONObject.class);
-            if(response.getStatusCode().is2xxSuccessful()){
+            if (response.getStatusCode().is2xxSuccessful()) {
                 JSONObject body = response.getBody();
                 JSONObject data = body.getJSONObject("data");
                 equipmentNameplate = data.toJavaObject(EquipmentNameplate.class);
-                WebUtil.addSuccessMessage(WebUtil.getMessage("nameplateRecognition")+"完成");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("nameplateRecognition") + "完成");
             }
         } catch (Exception e) {
             // 识别失败，请重新上传图片之类的
             equipmentNameplate = new EquipmentNameplate();
-            logger.info(e.getLocalizedMessage(),e);
-            WebUtil.addErrorMessage(WebUtil.getMessage("nameplateRecognition")+"识别失败，请重新上传图片");
+            logger.info(e.getLocalizedMessage(), e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("nameplateRecognition") + "识别失败，请重新上传图片");
         }
     }
 
-    public void  plateRecognitionImage(String objectId){
+    public void plateRecognitionImage(String objectId) {
         try {
             String token = UserContextService.getAccessToken();
             String gatewayURL = microServiceUtil.getGatewayURL(GatewayURL.IMAGE_CONTENT_EXTRACTION);
-            gatewayURL = gatewayURL.replace("{objectId}", objectId).concat("?assetUid=").concat(selected == null?"":selected.getUid()==null?"":selected.getUid());
+            gatewayURL = gatewayURL.replace("{objectId}", objectId).concat("?assetUid=").concat(selected == null ? "" : selected.getUid() == null ? "" : selected.getUid());
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", token);
             HttpEntity<Map> requestEntity = new HttpEntity<Map>(headers);
             ResponseEntity<JSONObject> response = restTemplate.exchange(gatewayURL, HttpMethod.GET, requestEntity, JSONObject.class);
-            if(response.getStatusCode().is2xxSuccessful()){
+            if (response.getStatusCode().is2xxSuccessful()) {
                 JSONObject body = response.getBody();
                 JSONObject data = body.getJSONObject("data");
                 result = data.toJavaObject(Map.class);
-                WebUtil.addSuccessMessage(WebUtil.getMessage("nameplateRecognition")+"完成");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("nameplateRecognition") + "完成");
             }
         } catch (Exception e) {
             // 识别失败，请重新上传图片之类的
             result = null;
-            logger.info(e.getLocalizedMessage(),e);
-            WebUtil.addErrorMessage(WebUtil.getMessage("nameplateRecognition")+"识别失败，请重新上传图片");
+            logger.info(e.getLocalizedMessage(), e);
+            WebUtil.addErrorMessage(WebUtil.getMessage("nameplateRecognition") + "识别失败，请重新上传图片");
         }
     }
 
-    public void applyResult(){
+    public void applyResult() {
         String deviceName = equipmentNameplate.getDevice_name();
-        if(StringUtils.isNotEmpty(deviceName) && useValue.get("device_name")){
+        if (StringUtils.isNotEmpty(deviceName) && useValue.get("device_name")) {
             this.selected.setName(deviceName);
         }
 
         String financingNum = equipmentNameplate.getPattern();
-        if(StringUtils.isNotEmpty(financingNum) && useValue.get("pattern")){
+        if (StringUtils.isNotEmpty(financingNum) && useValue.get("pattern")) {
             this.selected.setFunctionType(financingNum);
         }
 
         String serialNum = equipmentNameplate.getSerial_num();
-        if(StringUtils.isNotEmpty(serialNum) && useValue.get("serial_num")){
+        if (StringUtils.isNotEmpty(serialNum) && useValue.get("serial_num")) {
             this.selected.setSerialNum(serialNum);
-            if(checkSerialNumUnique()){
+            if (checkSerialNumUnique()) {
                 WebUtil.addStickyErrorMessage("制造商序列号已存在！");
             }
         }
 
         String manufactory = equipmentNameplate.getManufactory();
-        if(StringUtils.isNotEmpty(manufactory) && useValue.get("manufactory")){
+        if (StringUtils.isNotEmpty(manufactory) && useValue.get("manufactory")) {
 //            List<Supplier> suppliers = autoCompleteManufacture("");
 //            Optional<Supplier> first = suppliers.stream().filter(item -> manufactory.equalsIgnoreCase(item.getName())).findFirst();
 
@@ -2856,35 +2892,35 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
 
             Supplier supplier = null;
-            if(CollectionUtils.isNotEmpty(byTenantUIDAndNameAndManufacturerT)){
+            if (CollectionUtils.isNotEmpty(byTenantUIDAndNameAndManufacturerT)) {
                 supplier = byTenantUIDAndNameAndManufacturerT.get(0);
-            }else{
+            } else {
                 newSupplier = new Supplier();
                 newSupplier.setName(manufactory);
                 newSupplier.setManufacturerT(Boolean.TRUE);
                 createTpye = "manufacturer";
                 saveNewSupplier();
-                supplier =  newSupplier;
+                supplier = newSupplier;
                 WebUtil.addSuccessMessage("制造商创建成功");
             }
-            selectedObjectMap.put("manufacturer",supplier);
+            selectedObjectMap.put("manufacturer", supplier);
             this.selected.setManufacture(supplier.getName());
             this.selected.setManufactureId(supplier.getId().toString());
-            createTpye= null;
+            createTpye = null;
         }
 
         String registryNum = equipmentNameplate.getRegistry_num();
-        if(StringUtils.isNotEmpty(registryNum) && useValue.get("registry_num")){
+        if (StringUtils.isNotEmpty(registryNum) && useValue.get("registry_num")) {
             this.selected.setRegistrationNo(registryNum);
         }
 
         String usingYear = equipmentNameplate.getUsing_year();
-        if(StringUtils.isNotEmpty(usingYear) && useValue.get("using_year")){
+        if (StringUtils.isNotEmpty(usingYear) && useValue.get("using_year")) {
             try {
                 Pattern pattern = Pattern.compile("(?:\\d+\\.?\\d*|\\.\\d+)");
                 Matcher matcher = pattern.matcher(usingYear);
                 StringBuffer buffer = new StringBuffer();
-                while (matcher.find()){
+                while (matcher.find()) {
                     buffer.append(matcher.group());
                 }
                 this.selected.setLifecycleInYear(Double.valueOf(buffer.toString()));
@@ -2893,7 +2929,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
         }
         Date factoryDate = equipmentNameplate.getFactory_date();
-        if(factoryDate != null && useValue.get("factory_date")){
+        if (factoryDate != null && useValue.get("factory_date")) {
             this.selected.setManufactDate(factoryDate);
         }
         equipmentNameplate = null;
@@ -2906,5 +2942,395 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public RiskLevel[] getRiskLevels() {
         return RiskLevel.values();
+    }
+
+    /**
+     * 打开“注册证-知识库参考”对话框，用当前资产数据初始化表单
+     */
+    public void showUdidInfo() {
+        udidInfo = new UdidInfoForm();
+        udidInfo.fillValue(selected.getRegistrationNo(), new AutoCompleteVo(selected.getName(), selected.getName()), selected.getFunctionType(),
+                supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClass(selected.getMedicalApparatusClassification()));
+
+        udidInfo.setMedicalClassTree(buildMedicalClassTree(selected.getRegistrationNo(), medicalInstrumentsClassificationCompCtrl.getSysAuthGroupTreeForUdid()));
+        udidInfo.setChecked(false);
+    }
+
+    /**
+     * 将对话框中的表单值应用到资产对象，逐字段校验必填项
+     */
+    public void applyUidInfo() {
+        if (needEdit("registrationNo")) {
+            if (StringUtils.isBlank(udidInfo.getRegistryNum())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("registrationNo") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            selected.setRegistrationNo(udidInfo.getRegistryNum());
+        }
+        if (needEdit("name")) {
+            if (Objects.isNull(udidInfo.getAssetName()) || StringUtils.isBlank(udidInfo.getAssetName().getValue())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("name") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            selected.setName(udidInfo.getAssetName().getValue());
+        }
+        if (needEdit("functionType")) {
+            if (customConfig.getAssetFields().get("functionType").isRequired() && StringUtils.isBlank(udidInfo.getFunctionType())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("functionType") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            selected.setFunctionType(udidInfo.getFunctionType());
+        }
+        if (needEdit("manufacture")) {
+            if (customConfig.getAssetFields().get("manufacture").isRequired() && Objects.isNull(udidInfo.getManufacture())) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("manufacture") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            if (Objects.nonNull(udidInfo.getManufacture())) {
+                if (Objects.equals(-1, udidInfo.getManufacture().getId())) {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("manufactureNotExists"));
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("validationFailed", true);
+                    return;
+                }
+                selected.setManufacture(udidInfo.getManufacture().getName());
+                selected.setManufactureId(udidInfo.getManufacture().getId().toString());
+                selected.setManufactureTel(udidInfo.getManufacture().getTel());
+                selectedObjectMap.put("manufacturer", udidInfo.getManufacture());
+            }
+        }
+        if (needEdit("medicalApparatusClassification")) {
+            if (customConfig.getAssetFields().get("medicalApparatusClassification").isRequired()
+                    && (Objects.isNull(udidInfo.getMedicalClass()) || StringUtils.isBlank(udidInfo.getMedicalClass().getClassificationCode()))) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("medicalApparatusClassification") + WebUtil.getMessage("ValidationRequire"));
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                return;
+            }
+            if (Objects.nonNull(udidInfo.getMedicalClass()) && StringUtils.isNotBlank(udidInfo.getMedicalClass().getClassificationCode())) {
+                SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(udidInfo.getMedicalClass().getClassificationCode());
+                if (Objects.isNull(sysAuthGroup)) {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("medicalApparatusClassificationNotExists"));
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("validationFailed", true);
+                    return;
+                }
+                selected.setMedicalApparatusClassification(udidInfo.getMedicalClass().getClassificationCode());
+                medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, selected.getMedicalApparatusClassification());
+            }
+        }
+    }
+
+    /**
+     * 知识库校验：将表单各字段与注册证知识库比对，标记一致/不一致状态
+     */
+    public void checkUdid() {
+        int count = 0;
+        StringBuilder warnColumn = new StringBuilder();
+
+        if (StringUtils.isBlank(udidInfo.getRegistryNum())) {
+            udidInfo.clearFlag();
+            udidInfo.setRegistryNumFromUdid(false);
+            udidInfo.setChecked(false);
+            udidInfo.setMessage("注册证号为空");
+            return;
+        }
+
+        UdidRegistryNumInfo udidRegistryNumInfo = udidInfoService.selectByRegistryNum(udidInfo.getRegistryNum());
+
+        if (Objects.isNull(udidRegistryNumInfo)) {
+            udidInfo.clearFlag();
+            udidInfo.setRegistryNumFromUdid(false);
+            udidInfo.setChecked(false);
+            udidInfo.setMessage("该注册证号在知识库中不存在");
+        } else {
+            udidInfo.setRegistryNumFromUdid(true);
+            if (needEdit("name") && (Objects.isNull(udidInfo.getAssetName()) || !Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getAssetName().getValue()))) {
+                count++;
+                warnColumn.append("名称");
+                udidInfo.setAssetNameFromUdid(false);
+            } else {
+                udidInfo.setAssetNameFromUdid(true);
+            }
+            if (needEdit("functionType") && !UdidInfoService.parseJsonArrayToStringList(udidRegistryNumInfo.getGgxh()).contains(udidInfo.getFunctionType())) {
+                if (count > 0) {
+                    warnColumn.append("、");
+                }
+                count++;
+                warnColumn.append("设备型号");
+                udidInfo.setFunctionTypeFromUdid(false);
+            } else {
+                udidInfo.setFunctionTypeFromUdid(true);
+            }
+            if (needEdit("manufacture") && (Objects.isNull(udidInfo.getManufacture()) || !Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture().getName()))) {
+                if (count > 0) {
+                    warnColumn.append("、");
+                }
+                count++;
+                warnColumn.append("制造商");
+                udidInfo.setManufactureFromUdid(false);
+            } else {
+                udidInfo.setManufactureFromUdid(true);
+            }
+            List<String> medicalClassList = UdidInfoService.parseJsonArrayAndStripHyphens(udidRegistryNumInfo.getFlbm());
+            if (needEdit("medicalApparatusClassification") && CollectionUtils.isNotEmpty(medicalClassList)
+                    && (Objects.isNull(udidInfo.getMedicalClass()) || !medicalClassList.contains(udidInfo.getMedicalClass().getClassificationCode()))) {
+                if (count > 0) {
+                    warnColumn.append("、");
+                }
+                count++;
+                warnColumn.append("医疗器械分类");
+                udidInfo.setMedicalClassFromUdid(false);
+            } else {
+                udidInfo.setMedicalClassFromUdid(true);
+            }
+            if (count > 0) {
+                udidInfo.setChecked(false);
+                udidInfo.setMessage("检测到" + count + "个字段与知识库不一致（" + warnColumn + "）");
+            } else {
+                udidInfo.setChecked(true);
+                udidInfo.setMessage("");
+            }
+        }
+    }
+
+    /**
+     * 重置表单为原始资产数据（编辑模式从数据库重新读取，创建模式清空）
+     */
+    public void resetUdid() {
+        AssetInfo currentAsset = null;
+        if (isEditAction()) {
+            currentAsset = assetInfoService.getAssetInfo(selected.getId());
+        }
+        if (Objects.nonNull(currentAsset)) {
+            udidInfo.fillValue(currentAsset.getRegistrationNo(), new AutoCompleteVo(currentAsset.getName(), currentAsset.getName()), currentAsset.getFunctionType(),
+                    supplierService.findSupplierById(currentAsset.getManufactureId()), getApmMedicalClass(currentAsset.getMedicalApparatusClassification()));
+        } else {
+            udidInfo.clearValue();
+        }
+        udidInfo.clearFlag();
+        udidInfo.clearMessage();
+    }
+
+    /**
+     * 根据分类代码拼接医疗器械分类的显示文本，格式："代码  名称"
+     */
+    private SysAuthGroup getApmMedicalClass(String medicalClassCode) {
+        if (StringUtils.isBlank(medicalClassCode)) {
+            return null;
+        }
+        List<SysAuthGroup> sysAuthGroups = authGroupDao.listSysAuthGroupForUdid(Collections.singletonList(medicalClassCode));
+        return CollectionUtils.isEmpty(sysAuthGroups) ? null : sysAuthGroups.get(0);
+    }
+
+    public String udidGroup(Object o) {
+        return DataSourceEnum.UDID.getSourceName();
+    }
+
+    public String groupBySource(Supplier supplier) {
+        return supplier.isFromUdid() ? DataSourceEnum.UDID.getSourceName() : DataSourceEnum.APM.getSourceName();
+    }
+
+    /**
+     * 注册证号模糊搜索（返回纯字符串列表）
+     */
+    public List<String> completeUdidRegistryNum(String prefix) {
+        return udidInfoService.fuzzySearchRegistryNum(prefix);
+    }
+
+    /**
+     * 名称模糊搜索，合并 UDI 知识库 + APM 已有资产名称，按来源分组
+     */
+    public List<AutoCompleteVo> completeUdidAssetName(String prefix) {
+        List<AutoCompleteVo> udidAssetList = udidInfoService.fuzzySearchAssetName(udidInfo.getRegistryNum(), prefix)
+                .stream()
+                .map(s -> new AutoCompleteVo(s, s, DataSourceEnum.UDID.getSourceName()))
+                .collect(Collectors.toList());
+
+        List<AutoCompleteVo> apmAssetList = completeAssetName(prefix)
+                .stream()
+                .map(s -> new AutoCompleteVo(s, s, true, DataSourceEnum.APM.getSourceName()))
+                .collect(Collectors.toList());
+
+        udidAssetList.addAll(apmAssetList);
+        return udidAssetList;
+    }
+
+    /**
+     * 设备型号模糊搜索（返回纯字符串列表）
+     */
+    public List<String> completeUdidFunctionType(String prefix) {
+        return udidInfoService.fuzzySearchFunctionType(udidInfo.getRegistryNum(), prefix);
+    }
+
+    /**
+     * 制造商模糊搜索，合并 UDI 知识库 + APM 供应商列表
+     */
+    public List<Supplier> completeUdidManufacture(String query) {
+        // apm供应商
+        List<Supplier> apmSupplierList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID(), query, 20);
+
+        // udid供应商
+        List<String> udidSupplierNameList = udidInfoService.fuzzySearchManufacture(udidInfo.getRegistryNum(), query);
+
+        // 构造NMPA制造商列表
+        List<Supplier> udidSupplierList = udidSupplierNameList.stream()
+                .map(name -> {
+                    Supplier supplier = new Supplier();
+                    Supplier apmSupplier = supplierDao.findByManufacturerTAndTenantUIDAndName(loginUser.getTenantUID(), name);
+                    supplier.setId(Objects.isNull(apmSupplier) ? -1 : apmSupplier.getId());
+                    supplier.setFromUdid(true);
+                    supplier.setName(name);
+                    return supplier;
+                }).collect(Collectors.toList());
+
+        // 合并两个列表
+        udidSupplierList.addAll(apmSupplierList);
+        return udidSupplierList;
+    }
+
+    /**
+     * 注册证号变更（下拉选中 / 手动输入blur）
+     */
+    public void onLookupRegNum() {
+        String udidRegistryNum = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("udidRegistryNum");
+        log.info("[onLookupRegNum] udidRegistryNum={}", udidRegistryNum);
+
+        // 强制覆盖 bean 的值，不依赖 value 绑定回写
+        udidInfo.setRegistryNum(udidRegistryNum);
+
+        if (!Objects.equals(selected.getRegistrationNo(), udidInfo.getRegistryNum())) {
+            udidInfo.setChecked(false);
+            udidInfo.setMedicalClassTree(buildMedicalClassTree(udidInfo.getRegistryNum(), medicalInstrumentsClassificationCompCtrl.getSysAuthGroupTreeForUdid()));
+        }
+    }
+
+    /**
+     * 名称变更
+     */
+    public void onUdidAssetNameChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            udidInfo.setAssetName((AutoCompleteVo) ((SelectEvent) event).getObject());
+        }
+
+        if (Objects.isNull(udidInfo.getAssetName()) || !Objects.equals(selected.getName(), udidInfo.getAssetName().getValue())) {
+            udidInfo.setChecked(false);
+        }
+    }
+
+    /**
+     * 设备型号变更
+     */
+    public void onUdidFunctionTypeChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            udidInfo.setFunctionType((String) ((SelectEvent) event).getObject());
+        }
+
+        if (!Objects.equals(selected.getFunctionType(), udidInfo.getFunctionType())) {
+            udidInfo.setChecked(false);
+        }
+    }
+
+    /**
+     * 制造商变更
+     */
+    public void onUdidManufactureChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            udidInfo.setManufacture((Supplier) ((SelectEvent) event).getObject());
+        }
+
+        if (!Objects.equals(selected.getManufactureId(), udidInfo.getManufacture().getId().toString())) {
+            udidInfo.setChecked(false);
+        }
+    }
+
+    public void onUdidMedicalClassSelect(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        udidInfo.setMedicalClass((SysAuthGroup) node.getData());
+    }
+
+    public TreeNode buildMedicalClassTree(String registryNum, TreeNode apmTree) {
+        TreeNode rootNode = new DefaultTreeNode("medicalClass", null, null);
+
+        TreeNode tempUdidTree = assetInfoService.tempTreeSysAuthGroup(udidInfoService.selectSysAuthGroup(registryNum), "medicalClass");
+        TreeNode udidTree = assetInfoService.finalTreeSysAuthGroupForUdid(tempUdidTree, "medicalClass", DataSourceEnum.UDID.getSourceName());
+        udidTree.setSelectable(false);
+
+        List<TreeNode> children = rootNode.getChildren();
+        children.add(udidTree);
+        children.add(apmTree);
+        rootNode.setExpanded(true);
+
+        return rootNode;
+    }
+
+    /**
+     * 初始化新建制造商表单，从下拉面板按钮传入的 supplierName 参数预填名称
+     */
+    public void prepareCreateUdidSupplier() {
+        String supplierName = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("supplierName");
+
+        newUdidSupplier = new Supplier();
+        newUdidSupplier.setName(supplierName);
+        newUdidSupplier.setManufacturerT(true);
+    }
+
+    /**
+     * 制造商名称变更时校验：若该名称已存在则回填完整信息，否则保留用户输入的类型标记并重置表单
+     */
+    public void onUdidSupplierChange() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        Supplier supplier = supplierDao.getBySiteIdAndName(loginUser.getSiteId(), this.newUdidSupplier.getName());
+        if (!ObjectUtils.isEmpty(supplier)) {
+            // 已存在：直接使用数据库中的完整供应商信息
+            this.newUdidSupplier = supplier;
+        } else {
+            // 不存在：保留用户输入的名称和类型标记，重新初始化表单
+            String name = newUdidSupplier.getName();
+            boolean ManufacturerT = newUdidSupplier.getManufacturerT();
+            boolean SupplierT = newUdidSupplier.getSupplierT();
+            boolean MaintainerT = newUdidSupplier.getMaintainerT();
+            prepareCreateUdidSupplier();
+            newUdidSupplier.setName(name);
+            newUdidSupplier.setSupplierT(SupplierT);
+            newUdidSupplier.setMaintainerT(MaintainerT);
+            newUdidSupplier.setManufacturerT(ManufacturerT);
+        }
+    }
+
+    /**
+     * 保存新建制造商：填充租户/机构等上下文信息，保存后回填到 UDI 表单的制造商字段
+     */
+    public void saveNewUdidSupplier() {
+        if (null == newUdidSupplier.getId()) {
+            this.newUdidSupplier.setSiteId(loginUser.getSiteId());
+            this.newUdidSupplier.setHospitalId(loginUser.getHospitalId());
+            this.newUdidSupplier.setTenantUID(loginUser.getTenantUID());
+            this.newUdidSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+            this.newUdidSupplier.setHospitalUID(loginUser.getHospitalUID());
+            this.newUdidSupplier.setSiteUID(loginUser.getSiteUID());
+            this.newUdidSupplier.setCreatedDate(new Date());
+            this.newUdidSupplier.setCreatedBy(loginUser.getName());
+        }
+        supplierController.setSelected(newUdidSupplier);
+        supplierController.saveSubmit();
+
+        newUdidSupplier = supplierDao.findByManufacturerTAndTenantUIDAndName(loginUser.getTenantUID(), newUdidSupplier.getName());
+
+        udidInfo.setManufacture(newUdidSupplier);
     }
 }
