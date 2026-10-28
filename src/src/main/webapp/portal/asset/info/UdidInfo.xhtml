@@ -54,13 +54,23 @@
                                 <span style="color:red">*</span>
                             </label>
                         </h:panelGroup>
-                        <p:autoComplete id="udidRegistyNum" value="#{assetInfoEditController.udidInfo.registryNum}"
-                                        completeMethod="#{assetInfoEditController.completeUdidRegistryNum}"
+                        <p:autoComplete id="udidRegistryNum" widgetVar="registryNumWidget" value="#{assetInfoEditController.udidInfo.registryNum}"
+                                        completeMethod="#{assetInfoEditController.completeUdidRegistryNum}" queryDelay="200"
                                         scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
-                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.udidGroup(t)}">
-                            <p:ajax process="@this" listener="#{assetInfoEditController.onUdidRegistryNumChange}" update="UdidInfoForm"/>
-                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidRegistryNumChange}" update="UdidInfoForm"/>
+                                        var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.udidGroup(t)}"
+                                        onblur="(function(){
+                                            window._rt &amp;&amp; clearTimeout(window._rt);
+                                            window._rt = setTimeout(function(){
+                                                var v = PF('registryNumWidget').input.val();
+                                                if (window._lastUdidRegistryNum === v) return;
+                                                window._lastUdidRegistryNum = v;
+                                                lookupRegNum([{name:'udidRegistryNum', value:v}]);
+                                            }, 150);
+                                        })();">
                         </p:autoComplete>
+
+                        <p:remoteCommand name="lookupRegNum" process="@this" update="UdidInfoForm"
+                                         actionListener="#{assetInfoEditController.onLookupRegNum}"/>
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{assetInfoEditController.needEdit('name')}">
@@ -121,7 +131,7 @@
                             </label>
                         </h:panelGroup>
                         <p:autoComplete id="udidFunctionType" value="#{assetInfoEditController.udidInfo.functionType}"
-                                        completeMethod="#{assetInfoEditController.completeUdidFunctionType}"
+                                        completeMethod="#{assetInfoEditController.completeUdidFunctionType}" queryDelay="200"
                                         scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
                                         var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.udidGroup(t)}">
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidFunctionTypeChange}" update="UdidInfoForm"/>
@@ -157,7 +167,7 @@
                             </label>
                         </h:panelGroup>
                         <p:autoComplete id="udidManufacture" value="#{assetInfoEditController.udidInfo.manufacture}"
-                                        completeMethod="#{assetInfoEditController.completeUdidManufacture}"
+                                        completeMethod="#{assetInfoEditController.completeUdidManufacture}" queryDelay="200"
                                         scrollHeight="210" panelStyleClass="max-width-200" dropdown="true" converter="udidSupplierConverter"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupBySource(t)}">
                             <p:column style="border: none">

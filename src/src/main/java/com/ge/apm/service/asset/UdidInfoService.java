@@ -6,7 +6,6 @@ import com.ge.apm.dao.mapper.UdidRegistryNumInfoMapper;
 import com.ge.apm.domain.SysAuthGroup;
 import com.ge.apm.domain.UdidRegistryNumInfo;
 import com.google.common.collect.Lists;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Data
 @Slf4j
 @Service
 public class UdidInfoService {
@@ -134,7 +132,7 @@ public class UdidInfoService {
         }
 
         List<String> categoryList = parseJsonArrayAndStripHyphens(udidRegistryNumInfo.getFlbm()).stream()
-                .filter(Objects::nonNull)
+                .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList());
 
         if (CollectionUtils.isEmpty(categoryList)) {
