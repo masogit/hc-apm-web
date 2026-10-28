@@ -3172,12 +3172,17 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     /**
-     * 注册证号变更（SelectEvent: 下拉选中 / 非SelectEvent: 手动输入blur）
+     * 注册证号变更（下拉选中 / 手动输入blur）
      */
-    public void onUdidRegistryNumChange(AjaxBehaviorEvent event) {
-        if (event instanceof SelectEvent) {
-            udidInfo.setRegistryNum((String) ((SelectEvent) event).getObject());
-        }
+    public void onLookupRegNum() {
+        String udidRegistryNum = FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getRequestParameterMap()
+                .get("udidRegistryNum");
+        log.info("[onLookupRegNum] udidRegistryNum={}", udidRegistryNum);
+
+        // 强制覆盖 bean 的值，不依赖 value 绑定回写
+        udidInfo.setRegistryNum(udidRegistryNum);
 
         if (!Objects.equals(selected.getRegistrationNo(), udidInfo.getRegistryNum())) {
             udidInfo.setChecked(false);

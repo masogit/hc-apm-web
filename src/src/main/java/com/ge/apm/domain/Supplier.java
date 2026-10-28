@@ -241,7 +241,7 @@ public class Supplier implements Serializable, ChineseName {
     @Transient
     List<Date> licensesDateList = null;
 
-    // 制造商存在于APM
+    // 制造商来源于NMPA
     @Getter
     @Setter
     @Transient
