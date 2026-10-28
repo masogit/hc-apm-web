@@ -71,7 +71,7 @@
                         <p:dataTable id="i18nDatalist"  class="datalist" value="#{i18nTypeManageController.selected.i18nMessageList}" var="item" widgetVar="varI18nDataList"
                              selectionMode="single" selection="#{i18nTypeManageController.selectedI18n}"
                              paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                             sortMode="single" sortOrder="ascending" sortBy="#{item.orderBy}"
+                             sortMode="single" sortOrder="ascending" sortBy="#{item.orderBy}" rowStyleClass="#{item.enabled ? '' : 'disabled'}"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                              rows="5" emptyMessage="#{msg.noRecordFound}"
@@ -90,6 +90,9 @@
                             </p:column>
                             <p:column headerText="#{msg.ConfigItemName}-#{msg.Traditional}">
                                 <h:outputText value="#{item.valueTw}"/>
+                            </p:column>
+                            <p:column headerText="是否启用">
+                                <h:outputText value="#{item.enabled ? msg.True2Yes : msg.False2No}"/>
                             </p:column>
                             <f:facet name="{Toolbar}">
                                 <p:commandButton id="addButton" icon="ui-icon-plus" actionListener="#{i18nTypeManageController.prepareAddI18n}" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":i18nCustomEditDlg" oncomplete="PF('i18nCustomEditDlg').show()" disabled="#{i18nTypeManageController.selected.type eq -1}"/>

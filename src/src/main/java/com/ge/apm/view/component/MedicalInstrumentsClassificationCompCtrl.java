@@ -3,6 +3,7 @@ package com.ge.apm.view.component;
 import com.ge.apm.dao.SysAuthGroupRepository;
 import com.ge.apm.domain.SysAuthGroup;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.healthcare.cn.common.cons.DataSourceEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
@@ -28,6 +29,8 @@ public class MedicalInstrumentsClassificationCompCtrl implements ServerEventInte
 
     @Getter @Setter
     private TreeNode sysAuthGroupTree;
+    @Getter @Setter
+    private TreeNode sysAuthGroupTreeForUdid;
 
     @Getter @Setter
     private SysAuthGroup selectedSysAuthGroup;
@@ -48,9 +51,13 @@ public class MedicalInstrumentsClassificationCompCtrl implements ServerEventInte
     }
 
     private void initSysAuthGroupTree() {
+        List<SysAuthGroup> groupList = sysAuthGroupDao.listSysAuthGroup();
 
-        sysAuthGroupTree = assetInfoService.buildSysAuthGroupInTree();
+        TreeNode apmTempTree = assetInfoService.tempTreeSysAuthGroup(groupList, "sysAuthGroup");
+        sysAuthGroupTree = assetInfoService.finalTreeSysAuthGroup(apmTempTree, "sysAuthGroup");
 
+        TreeNode udidTempTree = assetInfoService.tempTreeSysAuthGroup(groupList, "medicalClass");
+        sysAuthGroupTreeForUdid = assetInfoService.finalTreeSysAuthGroupForUdid(udidTempTree, "medicalClass", DataSourceEnum.APM.getSourceName());
     }
 
     public void onSelectSysAuthGroupTreeNode(NodeSelectEvent event) {

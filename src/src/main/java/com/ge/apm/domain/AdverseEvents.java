@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ge.apm.domain.pure.ApprovableTarget;
@@ -20,6 +21,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "adverse_events")
@@ -741,4 +743,22 @@ public class AdverseEvents implements Serializable, ApprovableTarget {
 
     @Column(name = "wo_id")
     private String woId;
+
+    @Transient
+    @TableField(exist = false)
+    private UdidRegistryNumInfo registrationInfo;
+
+    public String getUdidProductName() {
+        if (Objects.isNull(registrationInfo)) {
+            return null;
+        }
+        return registrationInfo.getProductName();
+    }
+
+    public String getUdidRegistrantName() {
+        if (Objects.isNull(registrationInfo)) {
+            return null;
+        }
+        return registrationInfo.getRegistrantName();
+    }
 }

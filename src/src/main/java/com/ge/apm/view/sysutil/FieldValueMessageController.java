@@ -71,6 +71,11 @@ public class FieldValueMessageController implements Serializable {
         return msgList;
     }
 
+    // 获取当前已启用的I18n列表
+    public static List<I18nMessage> getEnabledFieldValueList(String fieldName) {
+        return getFieldValueList(fieldName).stream().filter(I18nMessage::getEnabled).collect(Collectors.toList());
+    }
+
     public static List<I18nMessage> getFieldValueList(String fieldName) {
         Integer instId = -1;
         try {
