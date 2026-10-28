@@ -68,7 +68,8 @@
                                  rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton" listener="#{acquisitionPlanListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />
+
                         <p:ajax event="filter" listener="#{acquisitionPlanListController.onFilter}" update="createButton editButton deleteButton"/>
 
                         <p:column headerText="申请年份" filterBy="#{item.applicationYear}" filterMatchMode="LIKE">
@@ -161,6 +162,16 @@
                 </h:form>
 
                 <!--<ui:include src="Edit.xhtml"/>-->
+                <h:outputScript >
+                    var newWin;
+                    function prepareAssetViewWindow() {
+                        newWin = window.open('about:blank', '_blank');
+                        newWin.document.body.innerHTML = '加载中...';
+                    }
+                    function openAssetViewWindow(xhr, status, args) {
+                        newWin.location.href = args.url;
+                    }
+                </h:outputScript>
             </div>
         </div>
 
