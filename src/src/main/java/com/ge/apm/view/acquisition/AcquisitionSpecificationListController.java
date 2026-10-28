@@ -88,6 +88,62 @@ public class AcquisitionSpecificationListController extends GenericCRUDUUIDContr
     }
     
     /**
+     * 根据 modality 动态获取设备等级选项
+     * CT: 0=32排, 1=64排, 2=128排
+     * MR: 0=1.5T, 1=3.0T, 2=5.0T
+     */
+    public List<SelectItem> getDynamicDeviceGradeOptions() {
+        String modality = this.selected != null ? this.selected.getModality() : null;
+        List<SelectItem> options = new ArrayList<>();
+        if (modality == null || modality.isEmpty()) {
+            return options;
+        }
+        switch (modality) {
+            case "CT":
+                options.add(new SelectItem(0, "32排"));
+                options.add(new SelectItem(1, "64排"));
+                options.add(new SelectItem(2, "128排"));
+                break;
+            case "MR":
+                options.add(new SelectItem(0, "1.5T"));
+                options.add(new SelectItem(1, "3.0T"));
+                options.add(new SelectItem(2, "5.0T"));
+                break;
+            default:
+                break;
+        }
+        return options;
+    }
+    
+    /**
+     * 根据 modality 和设备等级值获取显示文本
+     * CT: 0=32排, 1=64排, 2=128排
+     * MR: 0=1.5T, 1=3.0T, 2=5.0T
+     */
+    public String getDeviceGradeLabel(String modality, Integer deviceGrade) {
+        if (modality == null || deviceGrade == null) {
+            return "";
+        }
+        switch (modality) {
+            case "CT":
+                switch (deviceGrade) {
+                    case 0: return "32排";
+                    case 1: return "64排";
+                    case 2: return "128排";
+                }
+                break;
+            case "MR":
+                switch (deviceGrade) {
+                    case 0: return "1.5T";
+                    case 1: return "3.0T";
+                    case 2: return "5.0T";
+                }
+                break;
+        }
+        return String.valueOf(deviceGrade);
+    }
+    
+    /**
      * 获取模态类型选项列表 [CT, MR]
      */
     public List<String> getModalityOptions() {

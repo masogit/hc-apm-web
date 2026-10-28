@@ -88,7 +88,7 @@
                 <p:column style="width:3rem" ariaHeaderText="Row Toggler">
                     <p:rowToggler />
                 </p:column>
-                <p:ajax event="rowToggle" listener="#{acquisitionPlanAuditListController.onRowToggle}" />
+                <p:ajax event="rowToggle" />
                 <p:column headerText="申报单位" >
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{acquisitionPlanAuditListController.selectedHospital}" >

@@ -24,50 +24,40 @@
 
                     <h:panelGroup>
                         <p:outputLabel class="label">一级分类<span style="color: red">*</span></p:outputLabel>
-                        <p:inputText value="#{acquisitionSpecificationListController.selected.firstLevelCategory}" 
-                                     required="true" requiredMessage="一级分类不能为空！" styleClass="width-pct-100"/>
+                        <p:inputText value="#{acquisitionSpecificationListController.selected.firstLevelCategory}" required="true" requiredMessage="一级分类不能为空！" styleClass="width-pct-100"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
                         <p:outputLabel class="label">二级分类<span style="color: red">*</span></p:outputLabel>
-                        <p:inputText value="#{acquisitionSpecificationListController.selected.secondLevelCategory}" 
-                                     required="true" requiredMessage="二级分类不能为空！" styleClass="width-pct-100"/>
+                        <p:inputText value="#{acquisitionSpecificationListController.selected.secondLevelCategory}" required="true" requiredMessage="二级分类不能为空！" styleClass="width-pct-100"/>
                     </h:panelGroup>
-
                     <h:panelGroup>
-                        <p:outputLabel class="label">设备等级<span style="color: red">*</span></p:outputLabel>
-                        <p:selectOneMenu value="#{acquisitionSpecificationListController.selected.deviceGrade}" styleClass="width-pct-100"  required="true">
+                        <p:outputLabel class="label">modality</p:outputLabel>
+                        <p:selectOneMenu value="#{acquisitionSpecificationListController.selected.modality}" styleClass="width-pct-100" >
                             <f:selectItem itemLabel="请选择" itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{acquisitionSpecificationListController.deviceGradeOptions}" 
-                                           var="grade" itemLabel="#{grade.label}" itemValue="#{grade.value}"/>
+                            <f:selectItems value="#{acquisitionSpecificationListController.modalityOptions}" var="m" itemLabel="#{m}" itemValue="#{m}"/>
+                            <p:ajax update="deviceGradePanel" listener="#{acquisitionSpecificationListController.selected.setDeviceGrade(null)}" />
                         </p:selectOneMenu>
                     </h:panelGroup>
-
-                    <h:panelGroup>
-                        <p:outputLabel class="label">modality<span style="color: red">*</span></p:outputLabel>
-                        <p:selectOneMenu value="#{acquisitionSpecificationListController.selected.modality}" styleClass="width-pct-100"  required="true">
+                    <h:panelGroup id="deviceGradePanel">
+                        <p:outputLabel class="label">设备等级</p:outputLabel>
+                        <p:selectOneMenu value="#{acquisitionSpecificationListController.selected.deviceGrade}" styleClass="width-pct-100" >
                             <f:selectItem itemLabel="请选择" itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{acquisitionSpecificationListController.modalityOptions}" 
-                                           var="m" itemLabel="#{m}" itemValue="#{m}"/>
+                            <f:selectItems value="#{acquisitionSpecificationListController.dynamicDeviceGradeOptions}" var="grade" itemLabel="#{grade.label}" itemValue="#{grade.value}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-
                     <h:panelGroup colspan="2">
                         <p:outputLabel class="label">分类简述</p:outputLabel>
-                        <p:inputTextarea value="#{acquisitionSpecificationListController.selected.briefDescription}" 
-                                         rows="3" cols="30" maxlength="500" styleClass="width-pct-100"/>
+                        <p:inputTextarea value="#{acquisitionSpecificationListController.selected.briefDescription}" rows="3" cols="30" maxlength="500" styleClass="width-pct-100"/>
                     </h:panelGroup>
 
                     <h:panelGroup colspan="2">
                         <p:outputLabel class="label">典型示例</p:outputLabel>
-                        <p:inputTextarea value="#{acquisitionSpecificationListController.selected.typicalExamples}" 
-                                         rows="4" cols="50" maxlength="1000" styleClass="width-pct-100"/>
+                        <p:inputTextarea value="#{acquisitionSpecificationListController.selected.typicalExamples}" rows="4" cols="50" maxlength="1000" styleClass="width-pct-100"/>
                     </h:panelGroup>
                 </p:panelGrid>
-
                 <br/>
-
-                <p:commandButton validateClient="true" update=":growl" oncomplete="PF('specificationEditDlg').hide()"
+                <p:commandButton validateClient="true" update=":growl :formList" oncomplete="PF('specificationEditDlg').hide()"
                                  action="#{acquisitionSpecificationListController.save}" 
                                  value="#{msg.Save}" icon="ui-icon-check"/>
                 <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" oncomplete="PF('specificationEditDlg').hide()"

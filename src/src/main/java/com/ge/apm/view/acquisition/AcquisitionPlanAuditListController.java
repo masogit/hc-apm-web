@@ -127,7 +127,7 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
             ns.add(new SearchFilter("applicationHospitalUid", SearchFilter.Operator.EQ, item.getApplicationHospitalUid()));
             ns.add(new SearchFilter("applicationYear", SearchFilter.Operator.EQ, item.getApplicationYear()));
             Sort sort = new Sort(Sort.Direction.DESC, "applicationNo");
-            List<AcquisitionPlan> acquisitionPlans = dao.findBySearchFilter(searchFilters, sort);
+            List<AcquisitionPlan> acquisitionPlans = dao.findBySearchFilter(ns, sort);
             item.setList(acquisitionPlans);
         }
         return new PageImpl<>(list, pageRequest, count);
