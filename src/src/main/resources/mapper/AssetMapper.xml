@@ -310,6 +310,9 @@
             <if test="usageStatus != null">
                 AND ai.usage_status =#{usageStatus}
             </if>
+            <if test="warehouseSystemStatus != null">
+                AND ai.warehouse_system_status =#{warehouseSystemStatus}
+            </if>
             <if test="terminationCause != null">
                 AND ai.termination_cause like concat('%',#{terminationCause},'%')
             </if>

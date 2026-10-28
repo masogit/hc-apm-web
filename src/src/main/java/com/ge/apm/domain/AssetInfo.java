@@ -222,6 +222,12 @@ public class AssetInfo implements ChineseName, Serializable {
     @Column(name = "status")
     private Integer status;//当前状态
 
+    //库房系统状态 1:在用, 2:待报废, 3:报废
+    @Getter
+    @Setter
+    @Column(name = "warehouse_system_status", columnDefinition = "integer default 1")
+    private Integer warehouseSystemStatus = 1;
+
     @Column(name = "manufact_date")
     @Temporal(TemporalType.DATE)
     private Date manufactDate;//出厂日期

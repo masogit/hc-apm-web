@@ -1785,6 +1785,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
             assetInfo.setStatus(4);
             assetInfo.setIsValid(false);
+            assetInfo.setWarehouseSystemStatus(3);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());

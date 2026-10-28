@@ -1665,6 +1665,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void discard(AssetInfo asset) {
         if (asset != null && Objects.equals(asset.getUsageStatus(), 3)) {
             asset.setIsValid(false);
+            asset.setWarehouseSystemStatus(3);
             asset.setTerminateDate(new Date());
             this.selected = dao.save(asset);
             WebUtil.addSuccessMessage("报废成功！");
@@ -1847,6 +1848,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
 
             assetInfo.setIsValid(false);
+            assetInfo.setWarehouseSystemStatus(3);
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
 
