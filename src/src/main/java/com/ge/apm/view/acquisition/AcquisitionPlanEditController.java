@@ -42,6 +42,7 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
 
     public final static String CREATE_ACTION = "Create";
     public final static String EDIT_ACTION = "Edit";
+    public final static String VIEW_ACTION = "View";
     private UserAccount userAccount;
 
     private AcquisitionPlanRepository dao;
@@ -104,7 +105,15 @@ public class AcquisitionPlanEditController extends GenericCRUDUUIDController<Acq
                 acquisitionPlanStepList = acquisitionPlanService.queryApplicationStep(selected.getId());
             }
             attachList = blobService.findBlobObjectsByBoUid(selected.getId());
+        }else if(AcquisitionPlanEditController.VIEW_ACTION.equals(action)){
+            prepareEdit();
+            canEdit = false;
+            if(StrUtil.isNotEmpty(selected.getApplicationStatus())){
+                acquisitionPlanStepList = acquisitionPlanService.queryApplicationStep(selected.getId());
+            }
+            attachList = blobService.findBlobObjectsByBoUid(selected.getId());
         }
+
     }
 
     public void checkCanEdit(){

@@ -15,6 +15,7 @@ import com.ge.apm.service.budget.BudgetFileDynamicTemplate;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.budget.BudgetApplicationBapController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -27,6 +28,7 @@ import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.*;
@@ -213,6 +215,18 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
 
     public String editUrl() throws ParseException {
         return UrlEncryptController.encodeUrlParam("Edit?action=Edit&id="+selected.getId());
+    }
+
+    public void onSelectAsset() throws IOException {
+        if (null == selected) {
+            return;
+        }
+
+        String url = "action=View&id=" + selected.getId();
+        url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public void delete(){
