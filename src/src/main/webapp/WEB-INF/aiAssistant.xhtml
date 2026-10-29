@@ -49,26 +49,15 @@
             </button>
 
         </div>
-        <!-- 对话框内容区高度：默认 700；放大后跟着视口长高，iframe 用 100% 填满，
-             子页面再按 iframe 视口自己把输入框钉到底部。 -->
-        <style>
-            #globalHelpDialog .ui-dialog-content {
-                height: 700px;
-                padding: 0;
-            }
-            #globalHelpDialog.ui-dialog-maximized .ui-dialog-content {
-                height: calc(100vh - 50px) !important;
-            }
-        </style>
         <!-- 对话框中的 iframe：使用预加载好的实例 position="right top"-->
         <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
                   position="right top" positionType="fixed" header="APM助手" modal="false"
                   resizable="false" draggable="true" closable="true" fitViewport="true"
                   width="500" style="z-index: 10000;"  maximizable="true"
         >
-            <div style="height: 100%;width: 100%;overflow: hidden">
+            <div style="height: 700px;width: 100%;overflow: hidden">
                 <!-- 初始为空，onShow 时填入预加载的 iframe -->
-                <div id="aiAssistantContainer" style="width: 100%; height: 100%;min-height: 0"></div>
+                <div id="aiAssistantContainer" style="width: 100%; height: 100%;min-height: 600px"></div>
             </div>
 
 
