@@ -52,16 +52,19 @@
         <!-- 对话框内容区高度：默认 700；放大后跟着视口长高，iframe 用 100% 填满，
              子页面再按 iframe 视口自己把输入框钉到底部。 -->
         <style>
-            #globalHelpDialog .ui-dialog-content {
+            /* 用 styleClass 而不是 #id：这个对话框是 include 进来的，PrimeFaces 的
+               客户端 id 可能带命名容器前缀，按 id 选不中。 */
+            .ai-assistant-dialog .ui-dialog-content {
                 height: 700px;
                 padding: 0;
             }
-            #globalHelpDialog.ui-dialog-maximized .ui-dialog-content {
+            .ai-assistant-dialog.ui-dialog-maximized .ui-dialog-content {
                 height: calc(100vh - 50px) !important;
             }
         </style>
         <!-- 对话框中的 iframe：使用预加载好的实例 position="right top"-->
         <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
+                  styleClass="ai-assistant-dialog"
                   position="right top" positionType="fixed" header="APM助手" modal="false"
                   resizable="false" draggable="true" closable="true" fitViewport="true"
                   width="500" style="z-index: 10000;"  maximizable="true"
