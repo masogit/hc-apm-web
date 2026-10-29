@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.apm.dao.mapper.UdidDeviceCategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.ge.apm.domain.UdidDeviceCategory">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+        <result property="cat1Code" column="cat1_code" jdbcType="INTEGER"/>
+        <result property="cat2Code" column="cat2_code" jdbcType="INTEGER"/>
+        <result property="cat3Code" column="cat3_code" jdbcType="INTEGER"/>
+        <result property="categoryCode" column="category_code" jdbcType="VARCHAR"/>
+        <result property="catalogName" column="catalog_name" jdbcType="VARCHAR"/>
+        <result property="primaryCategory" column="primary_category" jdbcType="VARCHAR"/>
+        <result property="secondaryCategory" column="secondary_category" jdbcType="VARCHAR"/>
+        <result property="productDescription" column="product_description" jdbcType="VARCHAR"/>
+        <result property="intendedUse" column="intended_use" jdbcType="VARCHAR"/>
+        <result property="productExamples" column="product_examples" jdbcType="VARCHAR"/>
+        <result property="managementClass" column="management_class" jdbcType="VARCHAR"/>
+        <result property="displayCategoryCode" column="display_category_code" jdbcType="VARCHAR"/>
+        <result property="displayCategoryName" column="display_category_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="fuzzySearch" resultMap="BaseResultMap">
+        <choose>
+            <when test="categoryTriple != null and categoryTriple.size() > 0">
+                SELECT * FROM (
+                <foreach collection="categoryTriple" item="triple" separator=" UNION ALL ">
+                    SELECT t.*,
+                    <choose>
+                        <when test="triple.third != null and triple.third != 0">
+                            LPAD(#{triple.first}::text, 2, '0') || LPAD(#{triple.second}::text, 2, '0') || LPAD(#{triple.third}::text, 2, '0') AS display_category_code,
+                            SUBSTRING(t.secondary_category FROM '[ \u00A0](.+)$') AS display_category_name
+                        </when>
+                        <when test="triple.second != null and triple.second != 0">
+                            LPAD(#{triple.first}::text, 2, '0') || LPAD(#{triple.second}::text, 2, '0') AS display_category_code,
+                            SUBSTRING(t.primary_category FROM '[ \u00A0](.+)$') AS display_category_name
+                        </when>
+                        <when test="triple.first != null and triple.first != 0">
+                            LPAD(#{triple.first}::text, 2, '0') AS display_category_code,
+                            SUBSTRING(t.catalog_name FROM '[ \u00A0](.+)$') AS display_category_name
+                        </when>
+                        <otherwise>
+                            '' AS display_category_code,
+                            '' AS display_category_name
+                        </otherwise>
+                    </choose>
+                    FROM udid_device_category t
+                    WHERE 1=1
+                    <if test="triple.first != null and triple.first != 0">
+                        AND t.cat1_code = #{triple.first}
+                    </if>
+                    <if test="triple.second != null and triple.second != 0">
+                        AND t.cat2_code = #{triple.second}
+                    </if>
+                    <if test="triple.third != null and triple.third != 0">
+                        AND t.cat3_code = #{triple.third}
+                    </if>
+                    <if test="category != null and category != ''">
+                        <choose>
+                            <when test="triple.third != null and triple.third != 0">
+                                AND ((LPAD(#{triple.first}::text, 2, '0') || LPAD(#{triple.second}::text, 2, '0') || LPAD(#{triple.third}::text, 2, '0')) ilike CONCAT('%', #{category}, '%')
+                                OR SUBSTRING(t.secondary_category FROM '[ \u00A0](.+)$') ilike CONCAT('%', #{category}, '%'))
+                            </when>
+                            <when test="triple.second != null and triple.second != 0">
+                                AND ((LPAD(#{triple.first}::text, 2, '0') || LPAD(#{triple.second}::text, 2, '0')) ilike CONCAT('%', #{category}, '%')
+                                OR SUBSTRING(t.primary_category FROM '[ \u00A0](.+)$') ilike CONCAT('%', #{category}, '%'))
+                            </when>
+                            <when test="triple.first != null and triple.first != 0">
+                                AND ((LPAD(#{triple.first}::text, 2, '0')) ilike CONCAT('%', #{category}, '%')
+                                OR SUBSTRING(t.catalog_name FROM '[ \u00A0](.+)$') ilike CONCAT('%', #{category}, '%'))
+                            </when>
+                        </choose>
+                    </if>
+                </foreach>
+                ) sub
+            </when>
+            <otherwise>
+                SELECT *, '' AS display_category_code, '' AS display_category_name
+                FROM udid_device_category
+                WHERE 1=0
+            </otherwise>
+        </choose>
+        ORDER BY category_code
+    </select>
+</mapper>

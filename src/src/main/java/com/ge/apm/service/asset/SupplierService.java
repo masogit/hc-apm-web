@@ -39,6 +39,15 @@ public class SupplierService {
     @Autowired
     private SupplierContactPersonRepository supplierContactPersonRepository;
 
+    public Supplier findSupplierById(String id) {
+        try {
+            Integer supplierId = Integer.valueOf(id);
+            return supplierDao.findById(supplierId);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     public List<String> getSupplier(String name) {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> filter = new ArrayList<>();

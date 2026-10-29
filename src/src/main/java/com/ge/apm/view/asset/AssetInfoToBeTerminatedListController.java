@@ -239,6 +239,38 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         }
         return false;
     }
+
+    public boolean checkWarehouseSystemStatusEnabled() {
+        String value = userContextService.getConfigItemValue("enableWarehouseSystemStatus");
+        return Boolean.TRUE.toString().equals(value);
+    }
+
+    public void batchUpdateWarehouseSystemStatus() {
+        List<String> assetUidList = selectedMap.entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        if (assetUidList.isEmpty()) {
+            WebUtil.addErrorMessage("请先选择记录");
+            return;
+        }
+        List<AssetInfo> assetInfos = dao.findByUidIn(assetUidList);
+        int count = 0;
+        for (AssetInfo asset : assetInfos) {
+            if (!asset.getIsValid()) {
+                continue;
+            }
+            asset.setWarehouseSystemStatus(2);
+            count++;
+        }
+        if (count == 0) {
+            WebUtil.addErrorMessage("所选设备均已报废，无法修改");
+            return;
+        }
+        dao.save(assetInfos);
+        WebUtil.addSuccessMessage(WebUtil.getMessage("BatchUpdateWarehouseStatusSuccess"));
+        this.selectedMap.clear();
+    }
     private String buildOrderBy(Sort lastPageSort) {
         String sql=null;
         if(lastPageSort==null){
@@ -634,6 +666,18 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                 exportFields.add("UUID");
             }
         }
+        // 库房系统状态不在CustomConfigFields中，手动追加到导出列
+        if (checkWarehouseSystemStatusEnabled()) {
+            String warehouseStatusHeader = WebUtil.getMessage("warehouseSystemStatus");
+            if (!exportFields.contains(warehouseStatusHeader)) {
+                int uuidIndex = exportFields.indexOf("UUID");
+                if (uuidIndex >= 0) {
+                    exportFields.add(uuidIndex, warehouseStatusHeader);
+                } else {
+                    exportFields.add(warehouseStatusHeader);
+                }
+            }
+        }
         template.exportAsset(assetList, sites, orgList, exportFields);
 
         logger.info("exported asset list to excel, start to get input stream");
@@ -716,6 +760,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         AssetInfo oldAssetInfo = assetHistoryService.depCopy(assetInfo);
         assetInfo.setStatus(4);
         assetInfo.setIsValid(false);
+        assetInfo.setWarehouseSystemStatus(3);
         assetInfo.setTerminateDate(new Date());
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo,ModifySourceEnum.ASSET_SCRAP.getCode());
         dao.save(assetInfo);
@@ -1117,6 +1162,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
                     break;
                 case "usageStatus":
                     param.put("usageStatus",Integer.parseInt(searchFilter.value.toString()));
+                    break;
+                case "warehouseSystemStatus":
+                    param.put("warehouseSystemStatus",Integer.parseInt(searchFilter.value.toString()));
                     break;
                 case "terminationCause":
                     param.put("terminationCause", searchFilter.value);

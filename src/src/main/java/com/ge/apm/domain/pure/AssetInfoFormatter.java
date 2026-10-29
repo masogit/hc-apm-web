@@ -1223,6 +1223,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("usageCount"), assetInfo.getUsageCount());
         map.put(getMessage("ratingUsageCount"), assetInfo.getRatingUsageCount());
         map.put(getMessage("epc"), assetInfo.getEpc());
+        map.put(getMessage("warehouseSystemStatus"), this.getWarehouseSystemStatusAsString());
         return map;
 
     }
@@ -1230,6 +1231,15 @@ public class AssetInfoFormatter {
     public String getProductSegmentAsString() {
         if (assetInfo.getProductSegment() == null) return null;
         return findMatchValue(assetInfo.getProductSegment(), importService.productSegmentList);
+    }
+
+    public String getWarehouseSystemStatusAsString() {
+        if (assetInfo.getWarehouseSystemStatus() == null) return null;
+        I18nMessage msg = I18nMessageService.getMessageUsingDefaultConfigAsLowestPriority("warehouseSystemStatus", String.valueOf(assetInfo.getWarehouseSystemStatus()), siteId);
+        if (msg != null) {
+            return msg.getValueZh();
+        }
+        return null;
     }
 
     private String getMedicalApparatusClassificationName(String medicalApparatusClassification) {

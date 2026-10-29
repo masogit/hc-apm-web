@@ -39,6 +39,7 @@ public class AssetInfoToBeTerminatedService{
         AssetInfo oldAssetInfo = assetHistoryService.depCopy(assetInfo);
         assetInfo.setStatus(4);
         assetInfo.setIsValid(false);
+        assetInfo.setWarehouseSystemStatus(3);
         assetInfo.setTerminateDate(new Date());
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo,ModifySourceEnum.ASSET_SCRAP.getCode());
         dao.save(assetInfo);

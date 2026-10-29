@@ -152,8 +152,8 @@ public class AssetInfoDetailController {
             selected = assetDao.findByUid(assetUid);
         }
         selected.setAssetUsedLifecycle(AssetInfoService.getAssetUsedLifecycle(selected.getInstallDate(), selected.getLifecycle()));
-        UdidSearchService udidSearchService = WebUtil.getBean(UdidSearchService.class);
-        selected.setRegistrationInfo(udidSearchService.selectByRegistryNum(selected.getRegistrationNo()));
+        UdidInfoService udidInfoService = WebUtil.getBean(UdidInfoService.class);
+        selected.setRegistrationInfo(udidInfoService.selectByRegistryNum(selected.getRegistrationNo()));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         userContextService = WebUtil.getBean(UserContextService.class);

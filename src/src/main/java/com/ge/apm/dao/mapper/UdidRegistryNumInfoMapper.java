@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ge.apm.domain.UdidRegistryNumInfo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author 550021593
  * @description 针对表【udid_registry_num_info】的数据库操作Mapper
@@ -13,4 +15,9 @@ import org.apache.ibatis.annotations.Param;
 public interface UdidRegistryNumInfoMapper extends BaseMapper<UdidRegistryNumInfo> {
 
     UdidRegistryNumInfo selectByRegistryNum(@Param("registryNum") String registryNum);
+
+    List<UdidRegistryNumInfo> fuzzySearch(@Param("registryNum") String registryNum,
+                                          @Param("manufacture") String manufacture,
+                                          @Param("assetName") String assetName,
+                                          @Param("functionType") String functionType);
 }

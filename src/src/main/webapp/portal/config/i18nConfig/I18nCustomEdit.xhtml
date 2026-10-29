@@ -31,6 +31,13 @@
                         <label class="label">#{msg.ConfigItemName}-#{msg.Traditional}</label>
                         <p:inputText id="traditional" autocomplete="off" value="#{i18nTypeManageController.selectedI18n.valueTw}" style="width: 95%;"/>
                     </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">是否启用</label>
+                        <p:selectOneRadio id="enabled" value="#{i18nTypeManageController.selectedI18n.enabled}" layout="lineDirection">
+                            <f:selectItem itemLabel="是" itemValue="true"/>
+                            <f:selectItem itemLabel="否" itemValue="false"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
                 </p:panelGrid>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{i18nTypeManageController.editI18nConfig}" update=":i18nTypeForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'i18nCustomEditDlg');" />

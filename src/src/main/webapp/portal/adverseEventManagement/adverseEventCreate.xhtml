@@ -202,8 +202,8 @@
                                 </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset legend="产品信息">
-                                <p:selectOneRadio value="#{adverseEventManagementController.assetType}" id="assetType" layout="custom" >
-                                    <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:productInfo" />
+                                <p:selectOneRadio value="#{adverseEventManagementController.assetType}" id="assetType" layout="custom" disabled="#{adverseEventManagementController.readOnlyCreateForm}">
+                                    <p:ajax event="change" listener="#{adverseEventManagementController.onAssetTypeChange}" update=":AdverseEventCreateForm:accordionCreate:productInfo" />
                                     <f:selectItem itemValue="1" />
                                     <f:selectItem itemValue="2" />
                                 </p:selectOneRadio>
@@ -217,12 +217,30 @@
                                 </h:panelGroup>
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" id="productInfo">
                                     <h:panelGroup>
-                                        <label class="label">产品名称<span style="color:red">*</span></label>
-                                        <p:inputText id="productName" value="#{adverseEventManagementController.selected.productName}" required="false"  requiredMessage="产品名称不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <label class="label">注册证编号<span style="color:red">*</span></label>
+                                        <p:autoComplete id="registrationNum" widgetVar="registrationNumWidget"
+                                                        value="#{adverseEventManagementController.selected.registrationNum}"
+                                                        completeMethod="#{adverseEventManagementController.completeUdidRegistryNum}"
+                                                        scrollHeight="160" panelStyleClass="max-width-200" queryDelay="200"
+                                                        var="t" itemLabel="#{t}" itemValue="#{t}" dropdown="true"
+                                                        readonly="#{adverseEventManagementController.readOnlyCreateForm}"
+                                                        onblur="(function(){
+                                                            window._rt &amp;&amp; clearTimeout(window._rt);
+                                                            window._rt = setTimeout(function(){
+                                                                var v = PF('registrationNumWidget').input.val();
+                                                                if (window._lastRegNum === v) return;
+                                                                window._lastRegNum = v;
+                                                                lookupRegNum([{name:'regNum', value:v}]);
+                                                            }, 150);
+                                                        })();">
+                                        </p:autoComplete>
+
+                                        <p:remoteCommand name="lookupRegNum" process="@this" update=":AdverseEventCreateForm:accordionCreate:productInfo"
+                                                         actionListener="#{adverseEventManagementController.onLookupRegNum}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">注册证编号<span style="color:red">*</span></label>
-                                        <p:inputText id="registrationNum" value="#{adverseEventManagementController.selected.registrationNum}" required="false"  requiredMessage="注册证编号不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                        <label class="label">产品名称<span style="color:red">*</span></label>
+                                        <p:inputText id="productName" value="#{adverseEventManagementController.selected.productName}" required="false"  requiredMessage="产品名称不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="false">
                                         <label class="label">曾用注册证编号</label>
@@ -273,7 +291,7 @@
                                         <p:inputText  maxlength="100" value="#{adverseEventManagementController.selected.productLotNum}" required="false" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{adverseEventManagementController.assetType == 2}">
-                                        <label class="label">编号</label>
+                                        <label class="label">编号<span style="color:red">*</span></label>
                                         <p:inputText maxlength="100" value="#{adverseEventManagementController.selected.productNum}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -430,7 +448,7 @@
                                             </h:panelGrid>
                                         </p:panel>
                                     </p:dataGrid>
-                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|ZIP|RAR|MP4|MOV)$/" fileUploadListener="#{adverseEventManagementController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
+                                    <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|ZIP|RAR|MP4|MOV)$/" fileUploadListener="#{adverseEventManagementController.tempInjuryPerformanceFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false" sizeLimit="500000000" update="@this injuryPerformance" auto="true" invalidFileMessage="类型应该为xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|zip|rar|mp4|mov" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}" disabled="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">器械故障表现<span style="color:red">*</span></label>
@@ -553,7 +571,7 @@
 
                                 <h:panelGroup id="usePlaceDecHi">
                                     <label class="label">使用场所<span style="color:red">*</span></label>
-                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.usePlace}" id="usePlace" layout="custom" required="false" requiredMessage="使用场所不能为空"  readonly="#{adverseEventManagementController.readOnlyCreateForm}">
+                                    <p:selectOneRadio value="#{adverseEventManagementController.selected.usePlace}" id="usePlace" layout="custom" required="false" requiredMessage="使用场所不能为空"  disabled="#{adverseEventManagementController.readOnlyCreateForm}">
                                         <p:ajax event="change" update=":AdverseEventCreateForm:accordionCreate:usePlaceDecHi" />
                                         <f:selectItem itemValue="1" />
                                         <f:selectItem itemValue="2" />

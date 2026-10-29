@@ -6456,3 +6456,16 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'depreciationLifecycle', '折旧年限', 'Depreciation Lifecycle', NULL, '-1');
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DepreciationLifecycle', '折旧年限', 'Depreciation Lifecycle', NULL, '-1');
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'DepreciationLifecycle', '折旧年限', 'Depreciation Lifecycle', NULL, '-1');
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'manufactureNotExists', '该制造商在系统中不存在，请先新增该制造商', 'This manufacturer doesn''t exist in the system, please add this manufacturer first', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'medicalApparatusClassificationNotExists', '该医疗器械分类在系统中不存在，请联系管理员', 'This medical device classification doesn''t exist in the system, please contact the administrator', NULL, '-1');
+
+
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'warehouseSystemStatus', '库房系统状态', 'Warehouse System Status', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'warehouseSystemStatus', '库房系统状态', 'Warehouse System Status', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('warehouseSystemStatus', '1', '在用', 'In Use', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('warehouseSystemStatus', '2', '待报废', 'Pending Scrap', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('warehouseSystemStatus', '3', '报废', 'Scrapped', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BatchUpdateWarehouseStatus', '批量修改库房系统状态', 'Batch Update Warehouse System Status', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'BatchUpdateWarehouseStatusConfirm', '是否确认将选中记录的库房系统状态批量修改为待报废', 'Are you sure to batch update the warehouse system status of selected records to Pending Scrap', NULL, '-1');
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'BatchUpdateWarehouseStatusSuccess', '库房系统状态批量修改成功', 'Warehouse system status batch update successful', NULL, '-1');
