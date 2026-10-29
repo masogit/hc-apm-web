@@ -121,6 +121,36 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
+                    <p:fieldset legend="设备三证资料" >
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1.2;">
+                            <h:panelGroup>
+                                <label class="label">#{msg.threeInformation}<span style="color:red">*</span></label>
+                                <h:panelGrid>
+                                    <p:selectManyCheckbox id="threeInformation" value="#{assetProbationEditController.informationList}" >
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('threeInformation')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectManyCheckbox>
+                                </h:panelGrid>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <p:dataList id="threeInformationList" value="#{assetProbationEditController.getAttachList('information')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{msg.attachmentUrl}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
+                                    <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
+                                    <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
+                                        <img src="#{not empty fileitem.compressObjectId ? fileDownloadService.getImgBase64(fileitem.compressObjectId) : fileDownloadService.getImgBase64(fileitem.objectStorageId)}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                    </p:commandLink>
+                                    <span/><span/>
+                                    <p:commandButton actionListener="#{assetProbationEditController.removeAttachmentById(fileitem.id)}" update="threeInformationList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetProbationEditController.canEditBase}">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="information" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                              multiple="true"  sizeLimit="500000000"  update="threeInformationList" rendered="#{assetProbationEditController.canEditBase}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
 
                     <p:fieldset legend="#{msg.WorkorderInformation}" rendered="#{assetProbationEditController.selected.status ge 0}">
                         <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -178,20 +208,11 @@
                                             </h:panelGrid>
                                         </h:panelGroup>
                                     </p:panelGrid>
-                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 1.2;">
-                                        <h:panelGroup>
-                                            <label class="label">#{msg.threeInformation}<span style="color:red">*</span></label>
-                                            <h:panelGrid>
-                                                <p:selectManyCheckbox id="threeInformation" value="#{assetProbationEditController.informationList}" disabled="#{!assetProbationEditController.canEditDetection()}">
-                                                    <f:selectItems value="#{fieldMsg.getFieldValueList('threeInformation')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                                </p:selectManyCheckbox>
-                                            </h:panelGrid>
-                                        </h:panelGroup>
-                                    </p:panelGrid>
+
                                 </div>
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup>
-                                        <p:dataList id="informationList" value="#{assetProbationEditController.getAttachList('information')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                        <p:dataList id="informationList" value="#{assetProbationEditController.getAttachList('detectionInformation')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                             <f:facet name="header">#{msg.attachmentUrl}<p:outputLabel value="(0-10)" style="color: red"></p:outputLabel></f:facet>
                                             <p:commandLink value="#{fileitem.objectName}" ajax="false" actionListener="#{fileDownloadService.downloadFile(fileitem.objectStorageId)}" styleClass="p-mr-2"/>
                                             <p:commandLink rendered="#{fileitem.showPreview()}" actionListener="#{assetProbationEditController.preViewed(fileitem.objectStorageId)}" update="previewedDlg" oncomplete="PF('previewedDlg').show()">
@@ -203,7 +224,7 @@
                                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                             </p:commandButton>
                                         </p:dataList>
-                                        <p:fileUpload id="information" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                        <p:fileUpload id="detectionInformation" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetProbationEditController.handleFileUpload}" mode="advanced" dragDropSupport="false"
                                                       multiple="true"  sizeLimit="500000000"  update="informationList" rendered="#{assetProbationEditController.canEditDetection()}" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
                                     </h:panelGroup>
                                 </p:panelGrid>
