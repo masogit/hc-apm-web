@@ -7,8 +7,11 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.acquisition.AcquisitionPlan;
 import com.ge.apm.domain.acquisition.HospitalAreaClassification;
 import com.ge.apm.domain.acquisition.PlanFilingPeriod;
+import com.ge.apm.domain.budget.BudgetApplication;
 import com.ge.apm.domain.budget.PurchaseBudgetConfig;
+import com.ge.apm.service.acquisition.AcquisitionPlanImportService;
 import com.ge.apm.service.acquisition.AcquisitionPlanService;
+import com.ge.apm.service.budget.BudgetFileDynamicTemplate;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -23,12 +26,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
+import org.primefaces.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,8 +38,10 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +59,7 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
     private UserAccount loginUser;
     private UaaService uaaService;
     private AcquisitionPlanService acquisitionPlanService;
+    private AcquisitionPlanImportService acquisitionPlanImportService;
 
     @Getter @Setter
     private String filterApplicationDate = null;
@@ -69,7 +73,10 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
     private OrgInfo org;
     @Getter@Setter
     private StreamedContent excelFile;
-
+    @Getter  @Setter
+    private UploadedFile file;
+    @Getter @Setter
+    private List<Object> errorImportList;
 
     @Override
     protected void init() {
@@ -77,6 +84,7 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
         dao = WebUtil.getBean(AcquisitionPlanRepository.class);
         planFilingPeriodRepository = WebUtil.getBean(PlanFilingPeriodRepository.class);
         acquisitionPlanService = WebUtil.getBean(AcquisitionPlanService.class);
+        acquisitionPlanImportService = WebUtil.getBean(AcquisitionPlanImportService.class);
         uaaService = WebUtil.getBean(UaaService.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
@@ -166,6 +174,33 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
         selectedDept = (OrgInfo) node.getData();
     }
 
+    @Getter  @Setter
+    private StreamedContent templateFile;
+    public void exportBudgetExcelTemplate() throws IOException {
+        InputStream templateStream = FacesContext.getCurrentInstance().getExternalContext()
+                .getResourceAsStream("/portal/acquisition/plan/Exp_AcquisitionPlan_Template.xlsx");
+
+        if (templateStream == null) {
+            logger.error("Template file not found: Exp_AcquisitionPlan_Template.xlsx");
+            WebUtil.addErrorMessage("模板文件不存在，请联系管理员！");
+            return;
+        }
+
+        try {
+            // 创建 DefaultStreamedContent 对象
+            templateFile = new DefaultStreamedContent(
+                    templateStream,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "Exp_AcquisitionPlan_Template.xlsx"
+            );
+
+            logger.info("Export acquisition plan excel template successful.");
+        } catch (Exception e) {
+            logger.error("Failed to export acquisition plan template: " + e.getMessage());
+            WebUtil.addErrorMessage("导出模板失败：" + e.getMessage());
+            throw e;
+        }
+    }
 
     public String createUrl() throws ParseException {
         List<PlanFilingPeriod> planFilingPeriods = planFilingPeriodRepository.queryEffectConfig(loginUser.getTenantUID(), new Date());
@@ -197,6 +232,37 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
         InputStream inputStream = acquisitionPlanService.exportExcel(list);
         excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "Acquisition_Export.xlsx");
 
+    }
+
+    public void handleFileUploadImport(FileUploadEvent event) throws IOException, ParseException, NoSuchFieldException, IllegalAccessException {
+        this.file = event.getFile();
+        FacesMessage message;
+
+        try {
+            List<AcquisitionPlanImportService.AcquisitionPlanImportResult> results =
+                    acquisitionPlanImportService.importPlan(event.getFile());
+
+            long successCount = results.stream().filter(AcquisitionPlanImportService.AcquisitionPlanImportResult::isSuccess).count();
+            long failCount = results.stream().filter(r -> !r.isSuccess()).count();
+
+            // 将校验失败的数据放入 errorImportList
+            errorImportList = results.stream()
+                    .filter(r -> !r.isSuccess())
+                    .collect(Collectors.toList());
+
+            if (failCount > 0) {
+                message = new FacesMessage(FacesMessage.SEVERITY_WARN, "导入完成",
+                        String.format("成功 %d 条，失败 %d 条", successCount, failCount));
+            } else {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "导入完成",
+                        String.format("成功导入 %d 条数据", successCount));
+            }
+        } catch (Exception e) {
+            errorImportList = new ArrayList<>();
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "导入失败", e.getMessage());
+        }
+
+        FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
 

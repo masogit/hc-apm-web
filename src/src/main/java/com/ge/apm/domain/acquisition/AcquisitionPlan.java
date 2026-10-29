@@ -239,8 +239,22 @@ public class AcquisitionPlan {
     @Size(max = 2000)
     private String fileComments;
 
+    /**
+     * 临床重点专科建设标准配备或政策文件要求配备  必填  是/否
+     */
+    @Column(name = "required_asset_flag")
+    private String requiredAssetFlag;
+
     @Transient
     private List<AcquisitionPlan> list= new ArrayList<>();
+
+    public String getRequiredAssetFlag() {
+        return requiredAssetFlag;
+    }
+
+    public void setRequiredAssetFlag(String requiredAssetFlag) {
+        this.requiredAssetFlag = requiredAssetFlag;
+    }
 
     public String getFileComments() {
         return fileComments;

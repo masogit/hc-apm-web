@@ -36,11 +36,18 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query("select t from OrgInfo t where t.name=?1 and t.orgType=2 and t.institutionUID=?2")
     public OrgInfo getHospitalByName(String name, String institutionUID);
 
+    @Query("select t from OrgInfo t where t.name=?1 and t.orgType=2 and t.tenantUID=?2")
+    public OrgInfo getHospitalByNameAndTenantUID(String name, String tenantUID);
+
+
     @Query("select t from OrgInfo t where t.name=?1 and t.orgType=3 and t.hospitalUID=?2")
     public OrgInfo getSiteByName(String name, String hospitalUID);
 
     @Query("select t from OrgInfo t where t.name=?1 and t.orgType=4 and t.siteUID=?2")
     public OrgInfo getDepartmentByName(String name, String siteUID);
+
+    @Query("select t from OrgInfo t where t.name=?1 and t.orgType=4 and t.hospitalUID=?2")
+    public OrgInfo getDepartmentByNameAndHospital(String name, String hospitalUID);
 
     @Query("select t from OrgInfo t where t.name=?1 and t.orgType=4 and t.parentUID=?2")
     public OrgInfo getDepartmentByNameParent(String name, String parentUID);

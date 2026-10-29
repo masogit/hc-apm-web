@@ -144,6 +144,8 @@
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{acquisitionPlanListController.exportExcel}" icon="ui-icon-arrowstop-1-s">
                                 <p:fileDownload value="#{acquisitionPlanListController.excelFile}"/>
                             </p:commandButton>
+                            <p:commandButton id="importButton" ajax="false" title="购置管理导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n"  class="btn btn-sm btn-gray">
+                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                     <p:overlayPanel appendTo="formList" id="idPanelFilterApplicationDate" widgetVar="panelFilterApplicationDate" for=":formList:datalist:filterApplicationDate" dismissable="false" >

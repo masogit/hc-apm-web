@@ -196,7 +196,7 @@ public class AcquisitionPlanService {
         }
     }
 
-    private void genApplicationNum(AcquisitionPlan acquisitionPlan, String orderType) {
+    public void genApplicationNum(AcquisitionPlan acquisitionPlan, String orderType) {
         Object o = acquisitionPlanRepository.getMaxIndex();
         int index = o == null ? 0 : Integer.parseInt(o.toString());
         index++;

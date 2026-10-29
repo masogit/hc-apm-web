@@ -49,6 +49,27 @@ public class AcquisitionSpecification {
     @Column(name = "tenant_uid", length = 50)
     private String tenantUid;
 
+    @Column(name = "device_grade")
+    private int deviceGrade;
+    @Column(name = "modality")
+    private String modality;
+
+    public int getDeviceGrade() {
+        return deviceGrade;
+    }
+
+    public void setDeviceGrade(int deviceGrade) {
+        this.deviceGrade = deviceGrade;
+    }
+
+    public String getModality() {
+        return modality;
+    }
+
+    public void setModality(String modality) {
+        this.modality = modality;
+    }
+
     public String getTenantUid() {
         return tenantUid;
     }
@@ -104,6 +125,20 @@ public class AcquisitionSpecification {
     public void setTypicalExamples(String typicalExamples) {
         this.typicalExamples = typicalExamples;
     }
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof AcquisitionSpecification)) {
+            return false;
+        }
+        AcquisitionSpecification other = (AcquisitionSpecification) object;
+        return (this.id != null || other.id == null) && (this.id == null || this.id.equals(other.id));
+    }
 
 }

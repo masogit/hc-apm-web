@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="content">
+            <div class="ui-g">
+                <div class="ui-g-12 card cardTitle">
+                        <p:outputLabel class="pageTitle" value="申购信息导入"/>
+                </div>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form enctype="multipart/form-data" id="budgetImportForm">
+                    <p:fieldset  legend="批量导入购置数据" >
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <p:fileUpload fileUploadListener="#{acquisitionPlanListController.handleFileUploadImport}"
+                                          mode="advanced"
+                                          dragDropSupport="false" multiple="false" auto="true"
+                                          invalidFileMessage="只支持xls或xlsx格式的文件"
+                                          invalidSizeMessage="文件大小不得超过5M"
+                                          sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                          update=":errorDataListForm"
+                                          label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p>说明</p>
+                            <p>
+                                1.
+                                <p:commandButton value="#{msg.downloadTemplateFile}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm" actionListener="#{acquisitionPlanListController.exportBudgetExcelTemplate}" update=":growl"
+                                                 onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"  style="background-color: #5180ce;">
+                                    <p:fileDownload value="#{budgetController.templateFile}" />
+                                </p:commandButton>
+                            </p>
+                            <p>2. 文件中填入所有字段的值</p>
+                            <p>3. 上传文件进行导入</p>
+                        </h:panelGroup>
+                    </p:fieldset>
+                    <h:panelGroup>
+                        <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="List.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+
+
+            <div class="ui-g-12 card">
+                <h:form id="errorDataListForm">
+                    <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+                    <p:fieldset  legend="导入失败的数据">
+                        <p:dataTable id="datalist" rendered="#{not empty acquisitionPlanListController.errorImportList}" value="#{acquisitionPlanListController.errorImportList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="数据为空"
+                                     rowsPerPageTemplate="20,50,100,500">
+                            <p:column headerText="EXCEL行数">
+                                <h:outputText value="#{item.excelIdex}" />
+                            </p:column>
+                            <p:column headerText="错误信息"  >
+                                <h:outputText value="#{item.errorInfo}"/>
+                            </p:column>
+                           <f:facet name="{Toolbar}">
+                                <p:commandButton title="导出错误数据" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="datalist" fileName="ProbeFailed_export"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:fieldset>
+                </h:form>
+            </div>
+    </ui:define>
+</ui:composition>
+
+

@@ -190,6 +190,15 @@
                                     <p:ajax update="annualOperationEfficiencyWeight" listener="#{acquisitionPlanEditController.calcEfficiencyWeight()}"/>
                                 </p:inputNumber>
                             </h:panelGroup>
+
+                            <h:panelGroup>
+                                <p:outputLabel class="label">临床重点专科建设标准配备或政策文件要求配备<span style="color: red">*</span></p:outputLabel>
+                                <p:selectOneMenu value="#{acquisitionPlanEditController.selected.requiredAssetFlag}" required="false"  requiredMessage="临床重点专科建设标准配备或政策文件要求配备 #{msg.ValidationRequire}" disabled="#{!acquisitionPlanEditController.canEdit}">
+                                    <p:ajax />
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('budgetApplicationT_F')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:tab>
                     <p:tab title="年度运用效益分析" closable="false">

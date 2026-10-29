@@ -172,7 +172,7 @@
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column style="width: 100px" exportable="false" rendered="#{acquisitionPlanAuditListController.queryIndex == 0}">
+                            <p:column headerText="操作" style="width: 100px" exportable="false" rendered="#{acquisitionPlanAuditListController.queryIndex == 0}">
                                 <p:commandButton value="审批"  action="#{acquisitionPlanAuditListController.auditUrl(detailItem.id)}"/>
                             </p:column>
                             <f:facet name="{Toolbar}">
