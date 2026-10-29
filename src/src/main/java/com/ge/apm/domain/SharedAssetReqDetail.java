@@ -240,6 +240,9 @@ public class SharedAssetReqDetail implements Serializable{
     @Transient
     private Date signatureTime;
 
+    @Transient
+    private String borrowDealName;
+
     public String getId() {
         return id;
     }
@@ -392,6 +395,14 @@ public class SharedAssetReqDetail implements Serializable{
 
     public void setBorrowDealUid(String borrowDealUid) {
         this.borrowDealUid = borrowDealUid;
+    }
+
+    public String getBorrowDealName() {
+        return borrowDealName;
+    }
+
+    public void setBorrowDealName(String borrowDealName) {
+        this.borrowDealName = borrowDealName;
     }
 
     public String getReturnDealUid() {

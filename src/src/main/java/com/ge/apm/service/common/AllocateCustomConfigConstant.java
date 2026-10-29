@@ -35,6 +35,7 @@ public enum  AllocateCustomConfigConstant  {
                 allAllocateFields.put("status", "状态");
                 allAllocateFields.put("swapIndex", "调剂编码");
                 allAllocateFields.put("precautions", "注意事项");
+                allAllocateFields.put("borrowDealName", "借用受理人");
             }
             return allAllocateFields;
         }
@@ -43,7 +44,7 @@ public enum  AllocateCustomConfigConstant  {
             return Arrays.asList("reclinicalDept","arrivalListAssetName","departNum","swapName","functionType",
                     "brand","chargingBeginTime","chargingEndTime","unitPrice","chargingType","rentalTime","totalAmount",
                     "compensationAmount","gratisDuration","gratisFee","discountPeriod","discount","discountTime","discountFee","cost",
-                    "status","swapIndex","precautions","signatory","signatureTime","signatureId");
+                    "status","swapIndex","precautions","borrowDealName","signatory","signatureTime","signatureId");
         }
     };
     public  LinkedHashMap<String,String> getAllAllocateFields(){return new LinkedHashMap<>();}
