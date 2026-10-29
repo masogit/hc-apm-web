@@ -29,7 +29,7 @@
                                 1.
                                 <p:commandButton value="#{msg.downloadTemplateFile}" title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm" actionListener="#{acquisitionPlanListController.exportBudgetExcelTemplate}" update=":growl"
                                                  onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"  style="background-color: #5180ce;">
-                                    <p:fileDownload value="#{budgetController.templateFile}" />
+                                    <p:fileDownload value="#{acquisitionPlanListController.templateFile}" />
                                 </p:commandButton>
                             </p>
                             <p>2. 文件中填入所有字段的值</p>

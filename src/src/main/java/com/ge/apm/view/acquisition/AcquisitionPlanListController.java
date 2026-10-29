@@ -180,10 +180,10 @@ public class AcquisitionPlanListController extends GenericCRUDUUIDController<Acq
     private StreamedContent templateFile;
     public void exportBudgetExcelTemplate() throws IOException {
         InputStream templateStream = FacesContext.getCurrentInstance().getExternalContext()
-                .getResourceAsStream("/portal/acquisition/plan/Exp_AcquisitionPlan_Template.xlsx");
+                .getResourceAsStream("/portal/acquisition/plan/Acquisition_Import_Template.xlsx");
 
         if (templateStream == null) {
-            logger.error("Template file not found: Exp_AcquisitionPlan_Template.xlsx");
+            logger.error("Template file not found: Acquisition_Import_Template.xlsx");
             WebUtil.addErrorMessage("模板文件不存在，请联系管理员！");
             return;
         }
