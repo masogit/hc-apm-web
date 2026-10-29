@@ -178,7 +178,7 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
     private void addSearchFilter() {
         if(searchForm != null){
             if(StrUtil.isNotEmpty(searchForm.getApplicationHospitalName())){
-                updateSearchFilter(new SearchFilter("applicationHospitalName", SearchFilter.Operator.LIKE, searchForm.getApplicationHospitalName(), "1*"));
+                updateSearchFilter(new SearchFilter("applicationHospitalName", SearchFilter.Operator.LIKE, searchForm.getApplicationHospitalName().toLowerCase(), "1*"));
             }
             if(StrUtil.isNotEmpty(searchForm.getAssetName())){
                 updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, searchForm.getAssetName(), "1*"));

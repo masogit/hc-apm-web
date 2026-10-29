@@ -81,7 +81,8 @@ public class AcquisitionPlanProvider {
                     sb.append(" and application_hospital_uid = '").append(value).append("'");
                     break;
                 case "assetName":
-                    sb.append(" and aset_name like '%").append(value).append("%'");
+                    // 匹配完整名称 或 首字母缩写（如 CT → C*T）
+                    sb.append(" and lower(aset_name) like lower('%").append(value).append("%')");
                     break;
                 case "applicationType": {
                     sb.append(" and application_type = '").append(value).append("'");
@@ -138,7 +139,7 @@ public class AcquisitionPlanProvider {
                     }
                     break;
                 case "applicationHospitalName":
-                    sb.append(" and application_hospital_name like '%").append(value).append("%'");
+                    sb.append(" and lower(application_hospital_name) like lower('%").append(value).append("%')");
                     break;
                 case "userIds":
                     sb.append(" and (drug_center_uid = '").append(value).append("' or work_group_uid = '").append(value).append("' or bureau_party_uid = '").append(value).append("') ");

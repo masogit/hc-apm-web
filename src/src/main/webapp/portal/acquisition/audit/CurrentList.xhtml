@@ -38,7 +38,8 @@
                     <h:panelGroup style="display: flex;">
                         <p:commandButton value="#{msg.Search}"
                                          action="#{acquisitionPlanAuditListController.search}"
-                                         update="tab:currentListForm searchForm"/>
+                                         update="tab:currentListForm searchForm"
+                                         oncomplete="expandAllRows()"/>
                         <p:commandButton value="#{msg.Reset}"
                                          actionListener="#{acquisitionPlanAuditListController.resetSearch}"
                                          update="searchForm tab:currentListForm"/>
@@ -209,11 +210,10 @@
                 newWin.location.href = args.url;
             }
 
-            <!-- 放在 </p:dataTable> 之后或页面底部 -->
-            $(function() {
-                // 等待 PrimeFaces 表格渲染完成
+            <!-- 自动展开所有行的函数 -->
+            function expandAllRows() {
+                // 延迟执行，确保 PrimeFaces 表格已渲染
                 setTimeout(function() {
-                    // 自动点击所有未展开的行 toggler
                     var table = PF('varDataList');
                     if (table) {
                         var rows = table.tbody.children('tr');
@@ -225,7 +225,7 @@
                         });
                     }
                 }, 500);
-            });
+            }
 
         </h:outputScript>
         <h:outputStylesheet>
