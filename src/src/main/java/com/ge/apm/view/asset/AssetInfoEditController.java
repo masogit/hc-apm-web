@@ -2953,159 +2953,196 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 supplierService.findSupplierById(selected.getManufactureId()), getApmMedicalClass(selected.getMedicalApparatusClassification()));
 
         udidInfo.setMedicalClassTree(buildMedicalClassTree(selected.getRegistrationNo(), medicalInstrumentsClassificationCompCtrl.getSysAuthGroupTreeForUdid()));
-        udidInfo.setChecked(false);
-    }
-
-    /**
-     * 将对话框中的表单值应用到资产对象，逐字段校验必填项
-     */
-    public void applyUidInfo() {
-        if (needEdit("registrationNo")) {
-            if (StringUtils.isBlank(udidInfo.getRegistryNum())) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("registrationNo") + WebUtil.getMessage("ValidationRequire"));
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("validationFailed", true);
-                return;
-            }
-            selected.setRegistrationNo(udidInfo.getRegistryNum());
-        }
-        if (needEdit("name")) {
-            if (Objects.isNull(udidInfo.getAssetName()) || StringUtils.isBlank(udidInfo.getAssetName().getValue())) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("name") + WebUtil.getMessage("ValidationRequire"));
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("validationFailed", true);
-                return;
-            }
-            selected.setName(udidInfo.getAssetName().getValue());
-        }
-        if (needEdit("functionType")) {
-            if (customConfig.getAssetFields().get("functionType").isRequired() && StringUtils.isBlank(udidInfo.getFunctionType())) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("functionType") + WebUtil.getMessage("ValidationRequire"));
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("validationFailed", true);
-                return;
-            }
-            selected.setFunctionType(udidInfo.getFunctionType());
-        }
-        if (needEdit("manufacture")) {
-            if (customConfig.getAssetFields().get("manufacture").isRequired() && Objects.isNull(udidInfo.getManufacture())) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("manufacture") + WebUtil.getMessage("ValidationRequire"));
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("validationFailed", true);
-                return;
-            }
-            if (Objects.nonNull(udidInfo.getManufacture())) {
-                if (Objects.equals(-1, udidInfo.getManufacture().getId())) {
-                    WebUtil.addErrorMessage(WebUtil.getMessage("manufactureNotExists"));
-                    RequestContext requestContext = RequestContext.getCurrentInstance();
-                    requestContext.addCallbackParam("validationFailed", true);
-                    return;
-                }
-                selected.setManufacture(udidInfo.getManufacture().getName());
-                selected.setManufactureId(udidInfo.getManufacture().getId().toString());
-                selected.setManufactureTel(udidInfo.getManufacture().getTel());
-                selectedObjectMap.put("manufacturer", udidInfo.getManufacture());
-            }
-        }
-        if (needEdit("medicalApparatusClassification")) {
-            if (customConfig.getAssetFields().get("medicalApparatusClassification").isRequired()
-                    && (Objects.isNull(udidInfo.getMedicalClass()) || StringUtils.isBlank(udidInfo.getMedicalClass().getClassificationCode()))) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("medicalApparatusClassification") + WebUtil.getMessage("ValidationRequire"));
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("validationFailed", true);
-                return;
-            }
-            if (Objects.nonNull(udidInfo.getMedicalClass()) && StringUtils.isNotBlank(udidInfo.getMedicalClass().getClassificationCode())) {
-                SysAuthGroup sysAuthGroup = authGroupDao.findByClassificationCode(udidInfo.getMedicalClass().getClassificationCode());
-                if (Objects.isNull(sysAuthGroup)) {
-                    WebUtil.addErrorMessage(WebUtil.getMessage("medicalApparatusClassificationNotExists"));
-                    RequestContext requestContext = RequestContext.getCurrentInstance();
-                    requestContext.addCallbackParam("validationFailed", true);
-                    return;
-                }
-                selected.setMedicalApparatusClassification(udidInfo.getMedicalClass().getClassificationCode());
-                medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, selected.getMedicalApparatusClassification());
-            }
-        }
     }
 
     /**
      * 知识库校验：将表单各字段与注册证知识库比对，标记一致/不一致状态
      */
-    public void checkUdid() {
-        int count = 0;
-        StringBuilder warnColumn = new StringBuilder();
-
-        if (StringUtils.isBlank(udidInfo.getRegistryNum())) {
-            udidInfo.clearFlag();
-            udidInfo.setRegistryNumFromUdid(false);
-            udidInfo.setChecked(false);
-            udidInfo.setMessage("注册证号为空");
+    public void verifyUdidInfo() {
+        // 校验必填项
+        String validationError = validateRequiredFields();
+        if (validationError != null) {
+            validateFailed(validationError);
             return;
         }
 
-        UdidRegistryNumInfo udidRegistryNumInfo = udidInfoService.selectByRegistryNum(udidInfo.getRegistryNum());
+        // 制造商特殊校验：id == -1 表示新创建但未保存
+        if (needEdit("manufacture") && udidInfo.getManufacture() != null
+                && Objects.equals(-1, udidInfo.getManufacture().getId())) {
+            validateFailed(WebUtil.getMessage("manufactureNotExists"));
+            return;
+        }
 
-        if (Objects.isNull(udidRegistryNumInfo)) {
+        // 医疗器械分类特殊校验：分类编码必须在系统中存在
+        if (needEdit("medicalApparatusClassification") && udidInfo.getMedicalClass() != null
+                && StringUtils.isNotBlank(udidInfo.getMedicalClass().getClassificationCode())
+                && authGroupDao.findByClassificationCode(udidInfo.getMedicalClass().getClassificationCode()) == null) {
+            validateFailed(WebUtil.getMessage("medicalApparatusClassificationNotExists"));
+            return;
+        }
+
+        UdidRegistryNumInfo info = udidInfoService.selectByRegistryNum(udidInfo.getRegistryNum());
+        if (info == null) {
             udidInfo.clearFlag();
             udidInfo.setRegistryNumFromUdid(false);
-            udidInfo.setChecked(false);
+            RequestContext.getCurrentInstance().addCallbackParam("udidVerified", false);
             udidInfo.setMessage("该注册证号在知识库中不存在");
-        } else {
-            udidInfo.setRegistryNumFromUdid(true);
-            if (needEdit("name") && (Objects.isNull(udidInfo.getAssetName()) || !Objects.equals(udidRegistryNumInfo.getProductName(), udidInfo.getAssetName().getValue()))) {
-                count++;
-                warnColumn.append("名称");
-                udidInfo.setAssetNameFromUdid(false);
-            } else {
-                udidInfo.setAssetNameFromUdid(true);
-            }
-            if (needEdit("functionType") && !UdidInfoService.parseJsonArrayToStringList(udidRegistryNumInfo.getGgxh()).contains(udidInfo.getFunctionType())) {
-                if (count > 0) {
-                    warnColumn.append("、");
-                }
-                count++;
-                warnColumn.append("设备型号");
-                udidInfo.setFunctionTypeFromUdid(false);
-            } else {
-                udidInfo.setFunctionTypeFromUdid(true);
-            }
-            if (needEdit("manufacture") && (Objects.isNull(udidInfo.getManufacture()) || !Objects.equals(udidRegistryNumInfo.getRegistrantName(), udidInfo.getManufacture().getName()))) {
-                if (count > 0) {
-                    warnColumn.append("、");
-                }
-                count++;
-                warnColumn.append("制造商");
-                udidInfo.setManufactureFromUdid(false);
-            } else {
-                udidInfo.setManufactureFromUdid(true);
-            }
-            List<String> medicalClassList = UdidInfoService.parseJsonArrayAndStripHyphens(udidRegistryNumInfo.getFlbm());
-            if (needEdit("medicalApparatusClassification") && CollectionUtils.isNotEmpty(medicalClassList)
-                    && (Objects.isNull(udidInfo.getMedicalClass()) || !medicalClassList.contains(udidInfo.getMedicalClass().getClassificationCode()))) {
-                if (count > 0) {
-                    warnColumn.append("、");
-                }
-                count++;
-                warnColumn.append("医疗器械分类");
-                udidInfo.setMedicalClassFromUdid(false);
-            } else {
-                udidInfo.setMedicalClassFromUdid(true);
-            }
-            if (count > 0) {
-                udidInfo.setChecked(false);
-                udidInfo.setMessage("检测到" + count + "个字段与知识库不一致（" + warnColumn + "）");
-            } else {
-                udidInfo.setChecked(true);
-                udidInfo.setMessage("");
-            }
+            return;
         }
+
+        udidInfo.setRegistryNumFromUdid(true);
+
+        // 收集不一致的字段名
+        List<String> warnings = new ArrayList<>();
+        List<String> ggxhList = UdidInfoService.parseJsonArrayToStringList(info.getGgxh());
+        List<String> flbmList = UdidInfoService.parseJsonArrayAndStripHyphens(info.getFlbm());
+
+        markMatchFlag(warnings, "名称", needEdit("name"),
+                udidInfo.getAssetName() != null && Objects.equals(info.getProductName(), udidInfo.getAssetName().getValue()),
+                udidInfo::setAssetNameFromUdid);
+        markMatchFlag(warnings, "设备型号", needEdit("functionType"),
+                ggxhList.contains(udidInfo.getFunctionType()),
+                udidInfo::setFunctionTypeFromUdid);
+        markMatchFlag(warnings, "制造商", needEdit("manufacture"),
+                udidInfo.getManufacture() != null && Objects.equals(info.getRegistrantName(), udidInfo.getManufacture().getName()),
+                udidInfo::setManufactureFromUdid);
+        markMatchFlag(warnings, "医疗器械分类", needEdit("medicalApparatusClassification"),
+                CollectionUtils.isEmpty(flbmList)
+                        || (udidInfo.getMedicalClass() != null
+                        && flbmList.contains(udidInfo.getMedicalClass().getClassificationCode())),
+                udidInfo::setMedicalClassFromUdid);
+
+        if (warnings.isEmpty()) {
+            RequestContext.getCurrentInstance().addCallbackParam("udidVerified", true);
+            udidInfo.setMessage("");
+        } else {
+            RequestContext.getCurrentInstance().addCallbackParam("udidVerified", false);
+            udidInfo.setMessage("检测到" + warnings.size() + "个字段与知识库不一致（" + String.join("、", warnings) + "）");
+        }
+    }
+
+    /**
+     * 校验必填项，返回第一个错误信息（无错误返回 null）
+     */
+    private String validateRequiredFields() {
+        String err;
+        if ((err = validateRequired("registrationNo",
+                StringUtils.isBlank(udidInfo.getRegistryNum()))) != null) return err;
+        if ((err = validateRequired("name",
+                udidInfo.getAssetName() == null || StringUtils.isBlank(udidInfo.getAssetName().getValue()))) != null) return err;
+        if ((err = validateRequiredWithConfig("functionType",
+                StringUtils.isBlank(udidInfo.getFunctionType()))) != null) return err;
+        if ((err = validateRequiredWithConfig("manufacture",
+                udidInfo.getManufacture() == null)) != null) return err;
+        if ((err = validateRequiredWithConfig("medicalApparatusClassification",
+                udidInfo.getMedicalClass() == null
+                        || StringUtils.isBlank(udidInfo.getMedicalClass().getClassificationCode()))) != null) return err;
+        return null;
+    }
+
+    /**
+     * 统一必填校验：字段启用且未填则返回错误信息
+     */
+    private String validateRequired(String fieldName, boolean empty) {
+        if (needEdit(fieldName) && empty) {
+            return WebUtil.getMessage(fieldName) + WebUtil.getMessage("ValidationRequire");
+        }
+        return null;
+    }
+
+    /**
+     * 统一必填校验（带配置 required 判断）
+     */
+    private String validateRequiredWithConfig(String fieldName, boolean empty) {
+        if (needEdit(fieldName)
+                && customConfig.getAssetFields().get(fieldName).isRequired()
+                && empty) {
+            return WebUtil.getMessage(fieldName) + WebUtil.getMessage("ValidationRequire");
+        }
+        return null;
+    }
+
+    /**
+     * 统一"报错 + 标记校验失败"动作
+     */
+    private void validateFailed(String message) {
+        WebUtil.addErrorMessage(message);
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+    }
+
+    /**
+     * 统一的字段一致性检查
+     *
+     * @param warnings   不一致字段收集器
+     * @param fieldName  字段中文名
+     * @param enabled    是否启用此字段校验
+     * @param matched    是否与知识库匹配
+     * @param flagSetter 设置 FromUdid 标记的 setter
+     */
+    private void markMatchFlag(List<String> warnings, String fieldName, boolean enabled,
+                               boolean matched, java.util.function.Consumer<Boolean> flagSetter) {
+        boolean ok = !enabled || matched;
+        flagSetter.accept(ok);
+        if (!ok) {
+            warnings.add(fieldName);
+        }
+    }
+
+    /**
+     * 应用 UDI 知识库信息到资产表单（调用前应保证必填项已通过校验）
+     */
+    public void applyUdidInfo() {
+        if (needEdit("registrationNo")) {
+            selected.setRegistrationNo(udidInfo.getRegistryNum());
+        }
+        if (needEdit("name") && udidInfo.getAssetName() != null) {
+            selected.setName(udidInfo.getAssetName().getValue());
+        }
+        if (needEdit("functionType")) {
+            selected.setFunctionType(udidInfo.getFunctionType());
+        }
+        if (needEdit("manufacture")) {
+            applyManufacture();
+        }
+        if (needEdit("medicalApparatusClassification")) {
+            applyMedicalClass();
+        }
+    }
+
+    /**
+     * 应用制造商到资产表单
+     */
+    private void applyManufacture() {
+        if (udidInfo.getManufacture() != null) {
+            selected.setManufacture(udidInfo.getManufacture().getName());
+            selected.setManufactureId(udidInfo.getManufacture().getId().toString());
+            selected.setManufactureTel(udidInfo.getManufacture().getTel());
+            selectedObjectMap.put("manufacturer", udidInfo.getManufacture());
+        } else {
+            selected.setManufacture(null);
+            selected.setManufactureId(null);
+            selected.setManufactureTel(null);
+            selectedObjectMap.put("manufacturer", null);
+        }
+    }
+
+    /**
+     * 应用医疗器械分类到资产表单，并触发分类变更事件
+     */
+    private void applyMedicalClass() {
+        String code = udidInfo.getMedicalClass() != null
+                ? udidInfo.getMedicalClass().getClassificationCode()
+                : null;
+        selected.setMedicalApparatusClassification(code);
+        medicalInstrumentsClassificationCompCtrl.onServerEvent(
+                MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE,
+                code);
     }
 
     /**
      * 重置表单为原始资产数据（编辑模式从数据库重新读取，创建模式清空）
      */
-    public void resetUdid() {
+    public void resetUdidInfo() {
         AssetInfo currentAsset = null;
         if (isEditAction()) {
             currentAsset = assetInfoService.getAssetInfo(selected.getId());
@@ -3211,7 +3248,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         udidInfo.setRegistryNum(udidRegistryNum);
 
         if (!Objects.equals(selected.getRegistrationNo(), udidInfo.getRegistryNum())) {
-            udidInfo.setChecked(false);
             udidInfo.setMedicalClassTree(buildMedicalClassTree(udidInfo.getRegistryNum(), medicalInstrumentsClassificationCompCtrl.getSysAuthGroupTreeForUdid()));
         }
     }
@@ -3222,10 +3258,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void onUdidAssetNameChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             udidInfo.setAssetName((AutoCompleteVo) ((SelectEvent) event).getObject());
-        }
-
-        if (Objects.isNull(udidInfo.getAssetName()) || !Objects.equals(selected.getName(), udidInfo.getAssetName().getValue())) {
-            udidInfo.setChecked(false);
         }
     }
 
@@ -3238,7 +3270,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         if (!Objects.equals(selected.getFunctionType(), udidInfo.getFunctionType())) {
-            udidInfo.setChecked(false);
         }
     }
 
@@ -3248,10 +3279,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void onUdidManufactureChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
             udidInfo.setManufacture((Supplier) ((SelectEvent) event).getObject());
-        }
-
-        if (!Objects.equals(selected.getManufactureId(), udidInfo.getManufacture().getId().toString())) {
-            udidInfo.setChecked(false);
         }
     }
 
