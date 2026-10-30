@@ -7,9 +7,10 @@
       xmlns:h="http://java.sun.com/jsf/html">
 
 <ui:composition>
-    <c:if test="#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}">
-        <p:growl id="growl" showDetail="true" />
-        <div id="aiButton" style="position: fixed; bottom: 90px; right: 5px; z-index: 9999;">
+    <!-- 服务端只输出 feature flag；是否显示由下面脚本统一判断（localStorage 配置 或 feature flag 任一满足） -->
+    <span id="ai-feature-enabled" style="display:none;">#{userContextService.accessContainsApmFeature('AI_ASSISTANT')}</span>
+
+    <div id="aiButton" style="position: fixed; bottom: 90px; right: 5px; z-index: 9999; display: none;">
             <button
                     style="background-color: white; color: white; border: none; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);border-radius: 100%;  width: 45px; height: 45px; padding:6px;"
                     title="点击获取帮助"
@@ -50,14 +51,22 @@
 
         </div>
         <!-- 对话框中的 iframe：使用预加载好的实例 position="right top"-->
+        <style>
+            /* 对话框在 h:form id="menuform" 里，clientId 是 menuform:globalHelpDialog，只能用 id 后缀匹配。
+               默认高度由面板上的内联 700px 保证；放大时 PrimeFaces 会按视口算出内容区高度，
+               这里只让面板填满它，iframe 跟着 100% 撑开，子页面再把输入框钉到底部。 */
+            [id$="globalHelpDialog"].ui-dialog-maximized #aiAssistantPanel {
+                height: 100% !important;
+            }
+        </style>
         <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
                   position="right top" positionType="fixed" header="APM助手" modal="false"
                   resizable="false" draggable="true" closable="true" fitViewport="true"
                   width="500" style="z-index: 10000;"  maximizable="true"
         >
-            <div style="height: 700px;width: 100%;overflow: hidden">
+            <div id="aiAssistantPanel" style="height: 700px;width: 100%;overflow: hidden">
                 <!-- 初始为空，onShow 时填入预加载的 iframe -->
-                <div id="aiAssistantContainer" style="width: 100%; height: 100%;min-height: 600px"></div>
+                <div id="aiAssistantContainer" style="width: 100%; height: 100%;min-height: 0"></div>
             </div>
 
 
@@ -209,9 +218,31 @@
                 }
             }
             (function() {
+                    // 显示条件：localStorage 配了 aiAssistantBaseUrl，或服务端 feature flag 为 true，任一满足即可
+                    var featureEnabled = false;
+                    var flagEl = document.getElementById('ai-feature-enabled');
+                    if (flagEl) {
+                        featureEnabled = flagEl.textContent.trim() === 'true';
+                    }
+                    var baseUrl = '';
+                    try {
+                        // 去掉结尾的 /，避免拼出 //wx
+                        baseUrl = (localStorage.getItem('aiAssistantBaseUrl') || '').replace(/\/+$/, '');
+                    } catch (e) {
+                        baseUrl = '';
+                    }
+                    if (!featureEnabled &amp;&amp; !baseUrl) {
+                        return;
+                    }
+
+                    var aiButton = document.getElementById('aiButton');
+                    if (aiButton) {
+                        aiButton.style.display = 'flex';
+                    }
+
                     var preloadFrame = document.createElement('iframe');
                     preloadFrame.id = 'aiAssistantPreload';
-                    preloadFrame.src = '/wx/acctChatbot?cache=true&amp;view=webpage';
+                    preloadFrame.src = baseUrl + '/wx/acctChatbot?cache=true&amp;view=webpage';
                     preloadFrame.style.cssText = 'position:absolute; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0;';
                     preloadFrame.onload = function() {
                         console.log('AI 助手预加载完成');
@@ -262,6 +293,5 @@
             });
         </h:outputScript>
 
-    </c:if>
 </ui:composition>
 </html>
