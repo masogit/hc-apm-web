@@ -48,6 +48,7 @@
         ai.financing_num,
         ai.qr_code,
         ai.function_type,
+        mcd.asset_manufacturer manufacture,
         ai.asset_group,
         ai.clinical_dept_name,
         ai.asset_dept_uid,

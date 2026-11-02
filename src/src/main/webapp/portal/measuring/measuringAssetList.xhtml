@@ -69,6 +69,9 @@
                     <p:column rendered="#{measureAssetListController.matchType!=3}"   headerText="设备型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.functionType}"/>
                     </p:column>
+                    <p:column rendered="#{measureAssetListController.matchType!=3}"   headerText="制造厂" styleClass="ui-helper-hidden">
+                        <h:outputText value="#{item.manufacture}"/>
+                    </p:column>
                     <p:column rendered="#{measureAssetListController.matchType!=3}"   headerText="#{msg.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                         <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                         <f:facet name="filter">
