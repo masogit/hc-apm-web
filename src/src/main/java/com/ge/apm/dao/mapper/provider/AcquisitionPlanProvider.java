@@ -126,6 +126,8 @@ public class AcquisitionPlanProvider {
                         sb.append(")");
                     }else if (op.equals(SearchFilter.Operator.EQ)){
                         sb.append(" and application_status = '").append(value).append("'");
+                    }else if (op.equals(SearchFilter.Operator.NE)){
+                        sb.append(" and application_status != '").append(value).append("'");
                     }
                     break;
                 case "applicationUserName" :

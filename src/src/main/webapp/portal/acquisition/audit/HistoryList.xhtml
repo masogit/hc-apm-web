@@ -6,7 +6,41 @@
 <ui:composition>
     <div class="ui-g-12 card">
         <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
-
+        <h:form id="searchForm2">
+            <p:fieldset legend="筛选条件" >
+            <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank form-group" id="searchForm">
+                <h:panelGroup>
+                    <p:outputLabel class="label">申报单位</p:outputLabel>
+                    <p:inputText value="#{acquisitionPlanAuditListController.searchForm.applicationHospitalName}" ><p:ajax /></p:inputText>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:outputLabel class="label">设备名称</p:outputLabel>
+                    <p:inputText value="#{acquisitionPlanAuditListController.searchForm.assetName}" ><p:ajax /></p:inputText>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:outputLabel class="label">预算总费用(万元)</p:outputLabel>
+                    <p:inputText value="#{acquisitionPlanAuditListController.searchForm.budgetTotalAmountBegin}" ><p:ajax /></p:inputText>~
+                    <p:inputText value="#{acquisitionPlanAuditListController.searchForm.budgetTotalAmountEnd}" ><p:ajax /></p:inputText>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:outputLabel class="label">工单状态</p:outputLabel>
+                    <p:selectOneMenu value="#{acquisitionPlanAuditListController.searchForm.applicationType}" >
+                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItems value="#{acquisitionPlanAuditListController.getI18nMessages()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup style="display: flex;">
+                    <p:commandButton value="#{msg.Search}"
+                                     action="#{acquisitionPlanAuditListController.search}"
+                                     update="tab:historyListForm searchForm2"
+                                     oncomplete="expandAllRows()"/>
+                    <p:commandButton value="#{msg.Reset}"
+                                     actionListener="#{acquisitionPlanAuditListController.resetSearch}"
+                                     update="searchForm2 tab:searchForm2"/>
+                </h:panelGroup>
+            </p:panelGrid>
+        </p:fieldset>
+        </h:form>
         <h:form id="historyListForm">
             <p:dataTable id="datalist" value="#{acquisitionPlanAuditListController.lazyModel}" var="item"
                          widgetVar="varDataList"

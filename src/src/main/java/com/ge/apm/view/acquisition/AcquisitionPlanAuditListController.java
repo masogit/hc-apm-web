@@ -138,36 +138,37 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
         if(tabIndex == 0){
             String currentYear = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
             this.updateSearchFilter(new SearchFilter("applicationYear", SearchFilter.Operator.EQ, currentYear, "1*"));
+            if(queryIndex == 0){
+                /*this.updateSearchFilter(new SearchFilter("pendAuditUid", SearchFilter.Operator.LIKE, loginUser.getUid(), "1*"));*/
+                Set<String> userFunctions = UserContextService.getCurrentUserFunction();
+                List<String> statusList = new ArrayList<>();
+                if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER.name())) {
+                    statusList.add(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name());
+                }
+                if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP.name())) {
+                    statusList.add(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name());
+                }
+                if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_BUREAU_PARTY.name())) {
+                    statusList.add(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name());
+                }
+                if (!statusList.isEmpty()) {
+                    searchFilters.removeAll(searchFilters.stream().filter(item -> "applicationStatus".equals(item.fieldName)).collect(Collectors.toList()));
+                    searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, statusList, "1*"));
+                }
+            }else if(queryIndex == 1){
+                this.updateSearchFilter(new SearchFilter("drugCenterUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
+                this.updateSearchFilter(new SearchFilter("workGroupUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
+                this.updateSearchFilter(new SearchFilter("bureauPartyUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
+            }else {
+                searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.NE, AcquisitionPlan.ApplicationStatusEnum.TempSave.name(), "1*"));
+            }
         } else if (tabIndex == 1) {
             String currentYear = String.valueOf(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
             this.updateSearchFilter(new SearchFilter("applicationYear", SearchFilter.Operator.NE, currentYear, "1*"));
+            searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.NE, AcquisitionPlan.ApplicationStatusEnum.TempSave.name(), "1*"));
         } else {
             this.removeFilterOnField("applicationYear");
         }
-
-        if(queryIndex == 0){
-            /*this.updateSearchFilter(new SearchFilter("pendAuditUid", SearchFilter.Operator.LIKE, loginUser.getUid(), "1*"));*/
-            Set<String> userFunctions = UserContextService.getCurrentUserFunction();
-            List<String> statusList = new ArrayList<>();
-            if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_DRUG_CENTER.name())) {
-                statusList.add(AcquisitionPlan.ApplicationStatusEnum.DrugCenterPending.name());
-            }
-            if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_WORK_GROUP.name())) {
-                statusList.add(AcquisitionPlan.ApplicationStatusEnum.WorkGroupPending.name());
-            }
-            if (userFunctions.contains(ApmFunction.ACQUISITION_PLAN_MANAGEMENT_AUDIT_BUREAU_PARTY.name())) {
-                statusList.add(AcquisitionPlan.ApplicationStatusEnum.BureauPartyPending.name());
-            }
-            if (!statusList.isEmpty()) {
-                searchFilters.removeAll(searchFilters.stream().filter(item -> "applicationStatus".equals(item.fieldName)).collect(Collectors.toList()));
-                searchFilters.add(new SearchFilter("applicationStatus", SearchFilter.Operator.IN, statusList, "1*"));
-            }
-        }else if(queryIndex == 1){
-            this.updateSearchFilter(new SearchFilter("drugCenterUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
-            this.updateSearchFilter(new SearchFilter("workGroupUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
-            this.updateSearchFilter(new SearchFilter("bureauPartyUid", SearchFilter.Operator.EQ, loginUser.getUid(), "1*2+"));
-        }
-
 
         searchFilters.removeAll(searchFilters.stream().filter(item -> "applicationDeptUid".equals(item.fieldName)).collect(Collectors.toList()));
         if(selectedDept != null){
@@ -229,6 +230,8 @@ public class AcquisitionPlanAuditListController extends GenericCRUDUUIDControlle
                 break;
         }
         selected = null;
+        searchForm = new AcquisitionPlanSearchForm();
+        this.searchFilters = new ArrayList<>();
     }
 
     public String auditUrl(String id){
