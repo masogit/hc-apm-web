@@ -97,3 +97,12 @@ INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, cli
 INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time, last_access_date)  select replace(uuid_generate_v4()::text,'-',''), '90cefbe134bf4bac8e9a60aa65974906', '90cefbe134bf4bac8e9a60aa65974906', '张家港人民医院', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, null where not exists(select 1 from system_client_info where bind_site_uid='90cefbe134bf4bac8e9a60aa65974906');
 
 insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '是否启用库房系统状态', 'enableWarehouseSystemStatus', '是否启用库房系统状态', 'f','t',3 where not exists(select * from config_item where key = 'enableWarehouseSystemStatus');
+
+
+
+
+
+
+
+--YHAAO-30021
+update  config_item set validation='[{"key":"设备型号","value":"functionType"},{"key":"设备序列号","value":"serialNum"},{"key":"出厂日期","value":"manufactDate"},{"key":"注册证号","value":"registrationNo"},{"key":"安装位置","value":"locationName"},{"key":"二维码","value":"qrCode"},{"key":"制造商","value":"manufacture"},{"key":"使用年限","value":"lifecycle"},{"key":"下次计量日期","value":"nextMeteringDate"},{"key":"备注","value":"comments"},{"key":"图片","value":"attachment"}]' where key='scanInventoryField';
