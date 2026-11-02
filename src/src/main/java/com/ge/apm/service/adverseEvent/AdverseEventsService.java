@@ -1,6 +1,7 @@
 package com.ge.apm.service.adverseEvent;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.ge.apm.domain.AdverseEvents;
 import com.ge.apm.domain.dto.AdverseEventsExportDto;
 import org.springframework.beans.BeanUtils;
@@ -10,13 +11,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class AdverseEventsService {
 
 
-    public InputStream exportExcel(List<AdverseEvents> adverseEventsList){
+    public InputStream exportExcel(List<AdverseEvents> adverseEventsList, boolean showHarmDegreeDesc){
         List<AdverseEventsExportDto> adverseEventsExportDtos = new ArrayList<>();
         adverseEventsList.forEach( adverseEvent ->{
             AdverseEventsExportDto adverseEventsExportDto = new AdverseEventsExportDto();
@@ -24,8 +26,11 @@ public class AdverseEventsService {
             adverseEventsExportDtos.add(adverseEventsExportDto);
         });
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        EasyExcel.write(outputStream, AdverseEventsExportDto.class)
-                .sheet("Sheet1")
+        ExcelWriterBuilder writerBuilder = EasyExcel.write(outputStream, AdverseEventsExportDto.class);
+        if(!showHarmDegreeDesc){
+            writerBuilder.excludeColumnFieldNames(Collections.singletonList("harmDegreeDesc"));
+        }
+        writerBuilder.sheet("Sheet1")
                 .registerWriteHandler(new AdverseEventCellWriteWidthConfig())
                 .doWrite(adverseEventsExportDtos);
 
