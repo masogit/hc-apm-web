@@ -590,7 +590,7 @@ public class AdverseEventManagementController extends AdverseEventBaseController
                 adverseEvents.setApprovalOpinion(recentApprove.getApprovalOpinion());
             }
         }
-        InputStream inputStream = adverseEventsService.exportExcel(adverseEventsList);
+        InputStream inputStream = adverseEventsService.exportExcel(adverseEventsList, userContextService.enableDisplayByKey("showAdverseEventHarmDegreeDesc"));
         excelFile = new DefaultStreamedContent(inputStream, "application/vnd.ms-excel", "AdverseEvents_Export.xlsx");
 
     }

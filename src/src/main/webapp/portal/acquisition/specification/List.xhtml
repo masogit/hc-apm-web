@@ -28,7 +28,7 @@
                                  sortBy="#{item.majorCategory}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                 rows="10" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
+                                 rows="20" pageLinks="5" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
                         <p:ajax event="rowSelect"  update="editButton"/>

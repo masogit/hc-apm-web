@@ -41,6 +41,22 @@
         }
         // https://stackoverflow.com/questions/40570164/how-to-customize-the-message-changes-you-made-may-not-be-saved-for-window-onb
         window.onbeforeunload = null;
+
+        // 修复360浏览器中 PrimeFaces Calendar 月份导航箭头点击无效的问题
+        $(document).on('click', '.ui-datepicker-prev, .ui-datepicker-next', function(e) {
+            var $target = $(this);
+            var $datepicker = $target.closest('.ui-datepicker');
+            var input = $datepicker.siblings('input.hasDatepicker')[0] || $datepicker.prev('input.hasDatepicker')[0];
+            if (!input) return;
+            var inst = $.datepicker._getInst(input);
+            if (!inst) return;
+            if ($target.hasClass('ui-datepicker-prev')) {
+                $.datepicker._adjustInstDate(inst, -1, 'M');
+            } else {
+                $.datepicker._adjustInstDate(inst, +1, 'M');
+            }
+            $.datepicker._updateDatepicker(inst);
+        });
     </script>
     <h:outputStylesheet name="css/main3.css"/>
     <h:outputScript name="js/main.js"/>

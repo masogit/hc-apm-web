@@ -84,9 +84,11 @@ public class PreViewerBean implements ServerEventInterface {
                 if (StringUtils.isBlank(blobObject.getObjectType())) {
                     Collection<String> collection = new ArrayList<>();
                     collection.add(blobObject.getObjectStorageId());
-                    List<FileInfoResult> fileInfoResults = fileDownloadService.getFileInfoForEhome(collection);
-                    blobObject.setObjectType(fileInfoResults.get(0).getObjectType());
-                    blobObject.setObjectName(fileInfoResults.get(0).getObjectName());
+                    List<FileInfoResult> fileInfoResults = fileDownloadService.getNotByteFileInfoForEhome(collection);
+                    if(!CollectionUtils.isEmpty(fileInfoResults)){
+                        blobObject.setObjectType(fileInfoResults.get(0).getObjectType());
+                        blobObject.setObjectName(fileInfoResults.get(0).getObjectName());
+                    }
                 }
             }
              if(!CollectionUtils.isEmpty(allByObjectStorageId)){
@@ -94,9 +96,18 @@ public class PreViewerBean implements ServerEventInterface {
                 streamedContent = fileDownloadService.getFile(objectId);
                 //type = objectType.contains("image") ? 0 : (objectType.contains("pdf") ? 1 : -1);
                  try {
+                     if(blobObject == null){
+                         throw new Exception("文件对象不存在");
+                     }
+                     if(StrUtil.isEmpty(blobObject.getObjectName()) || "无".equals(blobObject.getObjectName())){
+                         throw new Exception("文件名称有误。" + blobObject.getObjectName());
+                     }
                      getTypeByObject();
                  }catch (Exception e){
                      logger.error("onServerEvent error:",e);
+                     type = -1;
+                     RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                     return;
                  }
             }
         }else if(eventObject instanceof StreamedContent){

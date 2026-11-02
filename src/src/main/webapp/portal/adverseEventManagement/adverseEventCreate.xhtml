@@ -427,7 +427,7 @@
                                     <p:radioButton for="harmDegree" itemIndex="2"/>
                                     <h:outputLabel value="其他" styleClass="radiolabelPF"/>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{adverseEventManagementController.selected.harmDegree == 3}">
+                                <h:panelGroup rendered="#{adverseEventManagementController.selected.harmDegree == 3 and userContextService.enableDisplayByKey('showAdverseEventHarmDegreeDesc')}">
                                     <label class="label">伤害描述</label>
                                     <p:inputText id="harmDegreeDesc" maxlength="100" value="#{adverseEventManagementController.selected.harmDegreeDesc}"  readonly="#{adverseEventManagementController.readOnlyCreateForm}"/>
                                 </h:panelGroup>

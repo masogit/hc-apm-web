@@ -45,6 +45,8 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
     private String auditComment;
     @Getter @Setter
     List<I18nMessage> acquisitionResultList = new ArrayList<>();
+    @Getter @Setter
+    private boolean auditCanEdit = false;
 
     @Getter
     private String benefitAssessIframeUrl;
@@ -63,6 +65,7 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
         acquisitionPlanStepList = acquisitionPlanService.queryApplicationStep(selected.getId());
         attachList = blobService.findBlobObjectsByBoUid(selected.getId());
         initAcquisitionResult();
+        initAuditFlag();
     }
 
     public void initAcquisitionResult(){
@@ -89,6 +92,12 @@ public class AcquisitionPlanAuditEditController  extends GenericCRUDUUIDControll
             }
         }else {
             acquisitionResultList.addAll(list);
+        }
+    }
+
+    public void initAuditFlag(){
+        if(!"Approved".equals(selected.getApplicationStatus()) && !"Rejected".equals(selected.getApplicationStatus())){
+            auditCanEdit = true;
         }
     }
 
