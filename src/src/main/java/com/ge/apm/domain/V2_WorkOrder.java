@@ -229,6 +229,15 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name = "external_expense")
     private Double externalExpense;
 
+    @Column(name = "man_hour_price")
+    private Double manHourPrice;
+
+    @Column(name = "total_man_price")
+    private Double totalManPrice;
+
+    @Column(name = "total_parts_price")
+    private Double totalPartsPrice;
+
     /**
      * 1: auto dispatch 2: grab and manual 3: grab 4: manual
      */
@@ -683,6 +692,30 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public Double getManHourPrice() {
+        return manHourPrice;
+    }
+
+    public void setManHourPrice(Double manHourPrice) {
+        this.manHourPrice = manHourPrice;
+    }
+
+    public Double getTotalManPrice() {
+        return totalManPrice;
+    }
+
+    public void setTotalManPrice(Double totalManPrice) {
+        this.totalManPrice = totalManPrice;
+    }
+
+    public Double getTotalPartsPrice() {
+        return totalPartsPrice;
+    }
+
+    public void setTotalPartsPrice(Double totalPartsPrice) {
+        this.totalPartsPrice = totalPartsPrice;
     }
 
     public Integer getStatus() {

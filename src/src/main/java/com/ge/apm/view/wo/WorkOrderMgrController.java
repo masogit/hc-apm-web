@@ -1758,7 +1758,40 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             isSave = Boolean.TRUE;
             takeEquip();
         }
+        updateTotalFee(selectedWorkOrder);
         dao.save(selectedWorkOrder);
+    }
+
+    /**
+     * YHAAO-29997 已关单工单修改工时/其它费用/外部费用后，同步刷新总计工时与总计费用
+     * 计算口径与资产服务 WorkOrderService.saveTotalTimeAndPrice 保持一致：
+     * 总计费用 = 备件费用 + 总计工时 * 工单人工费用 + 其它费用 + 外部费用
+     */
+    private void updateTotalFee(V2_WorkOrder wo) {
+        double manHours = wo.getManHours() == null || wo.getManHours().isNaN() ? 0d : wo.getManHours();
+        double otherExpense = wo.getOtherExpense() == null || wo.getOtherExpense().isNaN() ? 0d : wo.getOtherExpense();
+        double externalExpense = wo.getExternalExpense() == null || wo.getExternalExpense().isNaN() ? 0d : wo.getExternalExpense();
+        //工单人工费用单价取关单时已记录的值，避免后续流程配置变更影响历史工单
+        double manHourPrice = wo.getManHourPrice() == null || wo.getManHourPrice().isNaN() ? 0d : wo.getManHourPrice();
+
+        double totalPartsPrice = 0d;
+        for (V2_WorkOrder_Detail detail : woService.getWorkOrderDetails(wo.getId())) {
+            if (detail.getApproved() == null || Boolean.TRUE.equals(detail.getApproved())) {
+                totalPartsPrice += detail.getClosedPrice() == null || detail.getClosedPrice().isNaN() ? 0d : detail.getClosedPrice();
+            }
+        }
+
+        double totalManHour = manHours;
+        for (V2_WorkOrderCoworker coworker : woService.getWorkOrderCoworker(wo.getId())) {
+            totalManHour += coworker.getManHours() == null || coworker.getManHours().isNaN() ? 0d : coworker.getManHours();
+        }
+
+        wo.setOtherExpense(otherExpense);
+        wo.setExternalExpense(externalExpense);
+        wo.setTotalManHour(totalManHour);
+        wo.setTotalManPrice(totalManHour * manHourPrice);
+        wo.setTotalPartsPrice(totalPartsPrice);
+        wo.setTotalPrice(totalPartsPrice + totalManHour * manHourPrice + otherExpense + externalExpense);
     }
 
     private Boolean hourRequired = false;

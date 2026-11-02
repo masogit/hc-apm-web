@@ -106,3 +106,6 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 --YHAAO-30021
 update  config_item set validation='[{"key":"设备型号","value":"functionType"},{"key":"设备序列号","value":"serialNum"},{"key":"出厂日期","value":"manufactDate"},{"key":"注册证号","value":"registrationNo"},{"key":"安装位置","value":"locationName"},{"key":"二维码","value":"qrCode"},{"key":"制造商","value":"manufacture"},{"key":"使用年限","value":"lifecycle"},{"key":"下次计量日期","value":"nextMeteringDate"},{"key":"备注","value":"comments"},{"key":"图片","value":"attachment"}]' where key='scanInventoryField';
+
+-- YHAAO-30020 不良事件是否显示伤害描述
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 14, 'true', '不良事件是否显示伤害描述，配置为否时不展示', 'showAdverseEventHarmDegreeDesc', '不良事件是否显示伤害描述', 'f','t',3 where not exists(select * from config_item where key = 'showAdverseEventHarmDegreeDesc');
