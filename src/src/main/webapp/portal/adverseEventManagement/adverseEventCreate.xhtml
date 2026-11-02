@@ -7,6 +7,26 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
+        <script>
+            function onRegNumBlur(e) {
+                var w = PF('registrationNumWidget');
+                if (!w) return;
+                var rt = e.relatedTarget;
+                if (rt &amp;&amp; w.jq &amp;&amp; w.jq[0] &amp;&amp; w.jq[0].contains(rt)) {
+                    return;
+                }
+                if (rt &amp;&amp; w.panel &amp;&amp; w.panel[0] &amp;&amp; w.panel[0].contains(rt)) {
+                    return;
+                }
+                window._rt &amp;&amp; clearTimeout(window._rt);
+                window._rt = setTimeout(function () {
+                    var v = w.input.val();
+                    if (window._lastRegNum === v) return;
+                    window._lastRegNum = v;
+                    lookupRegNum([{name: 'regNum', value: v}]);
+                }, 150);
+            }
+        </script>
         <style type="text/css">
             .grid-radio td {
                 padding: .5rem;
@@ -224,15 +244,7 @@
                                                         scrollHeight="160" panelStyleClass="max-width-200" queryDelay="200"
                                                         var="t" itemLabel="#{t}" itemValue="#{t}" dropdown="true"
                                                         readonly="#{adverseEventManagementController.readOnlyCreateForm}"
-                                                        onblur="(function(){
-                                                            window._rt &amp;&amp; clearTimeout(window._rt);
-                                                            window._rt = setTimeout(function(){
-                                                                var v = PF('registrationNumWidget').input.val();
-                                                                if (window._lastRegNum === v) return;
-                                                                window._lastRegNum = v;
-                                                                lookupRegNum([{name:'regNum', value:v}]);
-                                                            }, 150);
-                                                        })();">
+                                                        onblur="onRegNumBlur(event)">
                                         </p:autoComplete>
 
                                         <p:remoteCommand name="lookupRegNum" process="@this" update=":AdverseEventCreateForm:accordionCreate:productInfo"

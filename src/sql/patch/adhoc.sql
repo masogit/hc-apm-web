@@ -91,3 +91,9 @@ SELECT REPLACE(uuid_generate_v4()::TEXT, '-', ''),
        '01-22-13-03',
        '细胞过滤分选仪器'
 WHERE NOT EXISTS (SELECT 1 FROM sys_auth_group WHERE classification_code = '221303');
+
+
+INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time, last_access_date)  select replace(uuid_generate_v4()::text,'-',''), 'c5c0cfce67d447f88927c694c79eaffe', 'c5c0cfce67d447f88927c694c79eaffe', '黔东南人民医院', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, null where not exists(select 1 from system_client_info where bind_site_uid='c5c0cfce67d447f88927c694c79eaffe');
+INSERT INTO system_client_info (uid, bind_site_uid, client_key, client_name, client_secret, client_type, create_time, last_access_date)  select replace(uuid_generate_v4()::text,'-',''), '90cefbe134bf4bac8e9a60aa65974906', '90cefbe134bf4bac8e9a60aa65974906', '张家港人民医院', '$2a$10$F3CSKY43V7DRTGfmtYRDCuTcD1..spTjc/qJ82Foo1AQWixfEaOqK', 'SYNC_DATA', NULL, null where not exists(select 1 from system_client_info where bind_site_uid='90cefbe134bf4bac8e9a60aa65974906');
+
+insert into public.config_item (uid, category, default_value, description, key, name, super_admin_edit,user_parent_config, value_type) select replace(uuid_generate_v4()::text,'-',''), 1, 'false', '是否启用库房系统状态', 'enableWarehouseSystemStatus', '是否启用库房系统状态', 'f','t',3 where not exists(select * from config_item where key = 'enableWarehouseSystemStatus');

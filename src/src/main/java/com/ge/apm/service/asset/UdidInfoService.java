@@ -50,6 +50,10 @@ public class UdidInfoService {
      */
     public List<String> fuzzySearchManufacture(String registryNum, String manufacture) {
 
+        if (StringUtils.isBlank(registryNum)) {
+            return Lists.newArrayList();
+        }
+
         List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, manufacture, "", "");
 
         return result.stream()
@@ -68,6 +72,10 @@ public class UdidInfoService {
      */
     public List<String> fuzzySearchAssetName(String registryNum, String assetName) {
 
+        if (StringUtils.isBlank(registryNum)) {
+            return Lists.newArrayList();
+        }
+
         List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", assetName, "");
 
         return result.stream()
@@ -85,6 +93,10 @@ public class UdidInfoService {
      * @param functionType 设备型号
      */
     public List<String> fuzzySearchFunctionType(String registryNum, String functionType) {
+
+        if (StringUtils.isBlank(registryNum)) {
+            return Lists.newArrayList();
+        }
 
         List<UdidRegistryNumInfo> result = fuzzySearch(registryNum, "", "", functionType);
 

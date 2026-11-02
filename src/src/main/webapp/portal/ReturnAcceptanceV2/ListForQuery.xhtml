@@ -263,6 +263,11 @@
                                         <h:outputText value="#{item.signatory}"/>
                                     </p:column>
                                 </c:if>
+                                <c:if test="#{columnItem eq 'borrowDealName'}">
+                                    <p:column headerText="借用受理人"  >
+                                        <h:outputText value="#{item.borrowDealName}"/>
+                                    </p:column>
+                                </c:if>
 
                                 <c:if test="#{columnItem eq 'signatureTime'}">
                                     <p:column headerText="签名日期"  >

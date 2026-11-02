@@ -39,9 +39,6 @@ public class UdidInfoForm {
     // 医疗器械分类来自udid
     private Boolean medicalClassFromUdid;
 
-    // 知识库是否检验通过
-    private Boolean checked;
-
     // 知识库校验信息
     private String message;
 

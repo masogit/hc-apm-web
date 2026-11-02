@@ -7,16 +7,74 @@
 
 <ui:composition>
     <h:outputStylesheet>
-        #UdidInfoForm\:udidManufacture_panel > table > tbody > tr > td {
+        /* 去除下拉框的边框 */
+        [id$=udidManufacture_panel] > table,
+        [id$=udidManufacture_panel] > table > tbody,
+        [id$=udidManufacture_panel] > table > tbody tr,
+        [id$=udidManufacture_panel] > table > tbody tr * {
             border: none !important;
         }
 
-        #UdidInfoForm\:udidMedicalClass_panel > table > tbody > tr > td {
+        /* 下拉框正常显示 */
+        .allow-overflow.ui-dialog,
+        .allow-overflow .ui-dialog-content {
+            overflow: visible !important;
+            max-height: none !important;
+        }
+
+        /* 下拉框内容靠左 */
+        [id$=UdidInfoDialog] .ui-autocomplete-group.ui-widget-header > td {
+            text-align: left !important;
+        }
+
+        [id$=udidMedicalClassPanel] .ui-tree-container > li.ui-treenode > .ui-treenode-content > .ui-treenode-label {
+            font-weight: bold !important;
+        }
+
+        /* 间距 */
+        [id$=UdidInfoForm] .margin-bottom-15px .ui-panelgrid-cell {
+            margin-bottom: 15px !important;
+        }
+
+        /* 确认框 */
+        .udid-apply-confirm.ui-confirm-dialog > .ui-dialog-content {
+            margin: 20px !important;
+        }
+
+        /* 确认框 */
+        .udid-apply-confirm.ui-confirm-dialog > .ui-dialog-content > .ui-icon {
+            display: none;
+        }
+
+        /* 确认框 */
+        .udid-apply-confirm.ui-confirm-dialog > .ui-dialog-buttonpane.ui-dialog-footer.ui-widget-content.ui-helper-clearfix {
             border: none !important;
         }
     </h:outputStylesheet>
+    <h:outputScript>
+        // autoComplete 失焦时，仅在焦点真正离开 widget 时才触发 lookupRegNum，
+        // 避免点击 dropdown 按钮 / 候选项时误触发 AJAX update 导致面板被替换。
+        function onRegistryNumBlur(e) {
+            var w = PF('registryNumWidget');
+            if (!w) return;
+            var rt = e.relatedTarget;
+            if (rt &amp;&amp; w.jq &amp;&amp; w.jq[0] &amp;&amp; w.jq[0].contains(rt)) {
+                return;
+            }
+            if (rt &amp;&amp; w.panel &amp;&amp; w.panel[0] &amp;&amp; w.panel[0].contains(rt)) {
+                return;
+            }
+            window._rt &amp;&amp; clearTimeout(window._rt);
+            window._rt = setTimeout(function(){
+            var v = w.input.val();
+            if (window._lastUdidRegistryNum === v) return;
+                window._lastUdidRegistryNum = v;
+                lookupRegNum([{name:'udidRegistryNum', value:v}]);
+            }, 150);
+        }
+    </h:outputScript>
 
-    <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" width="960">
+    <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" width="960" styleClass="allow-overflow">
         <h:form id="UdidInfoForm">
             <h:panelGroup id="display">
                 <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%" rendered="#{assetInfoEditController.udidInfo != null}">
@@ -24,15 +82,15 @@
                         <p:column style="width: 75%; text-align: left">
                             <p:outputLabel value="#{assetInfoEditController.udidInfo.message}" rendered="#{not empty assetInfoEditController.udidInfo.message}" style="color: #ffc107"/>
                         </p:column>
-                        <p:column style="width: 25%; text-align: right">
-                            <p:commandButton id="udidCheck" value="知识库校验" actionListener="#{assetInfoEditController.checkUdid()}" update="UdidInfoForm"/>
-                            <p:commandButton id="udidReset" value="重置" actionListener="#{assetInfoEditController.resetUdid()}" update="UdidInfoForm"
+                        <p:column style="width: 25%">
+                            <p:commandButton id="udidCheck" value="知识库校验" actionListener="#{assetInfoEditController.verifyUdidInfo()}" update="UdidInfoForm"/>
+                            <p:commandButton id="udidReset" value="重置" actionListener="#{assetInfoEditController.resetUdidInfo()}" update="UdidInfoForm"
                                              rendered="#{assetInfoEditController.isEditAction()}"/>
                         </p:column>
                     </p:row>
                 </p:panelGrid>
 
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetInfoEditController.udidInfo != null}">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group margin-bottom-15px" rendered="#{assetInfoEditController.udidInfo != null}">
                     <h:panelGroup rendered="#{assetInfoEditController.needEdit('registrationNo')}">
                         <h:panelGroup rendered="#{assetInfoEditController.udidInfo.registryNumFromUdid eq true}">
                             <label class="label">
@@ -54,19 +112,13 @@
                                 <span style="color:red">*</span>
                             </label>
                         </h:panelGroup>
+                        <!-- 手动输入的值无法绑定，焦点真的离开 widget 时才触发，点击 dropdown 按钮不算离开 -->
                         <p:autoComplete id="udidRegistryNum" widgetVar="registryNumWidget" value="#{assetInfoEditController.udidInfo.registryNum}"
+                                        style="width: 80%" panelStyle="width: 100%" inputStyle="width: 100%"
                                         completeMethod="#{assetInfoEditController.completeUdidRegistryNum}" queryDelay="200"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
+                                        scrollHeight="240" dropdown="true"
                                         var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.udidGroup(t)}"
-                                        onblur="(function(){
-                                            window._rt &amp;&amp; clearTimeout(window._rt);
-                                            window._rt = setTimeout(function(){
-                                                var v = PF('registryNumWidget').input.val();
-                                                if (window._lastUdidRegistryNum === v) return;
-                                                window._lastUdidRegistryNum = v;
-                                                lookupRegNum([{name:'udidRegistryNum', value:v}]);
-                                            }, 150);
-                                        })();">
+                                        onblur="onRegistryNumBlur(event)">
                         </p:autoComplete>
 
                         <p:remoteCommand name="lookupRegNum" process="@this" update="UdidInfoForm"
@@ -96,7 +148,8 @@
                         </h:panelGroup>
                         <p:autoComplete id="udidAsstName" value="#{assetInfoEditController.udidInfo.assetName}"
                                         completeMethod="#{assetInfoEditController.completeUdidAssetName}"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true" converter="autoCompleteVoConverter"
+                                        style="width: 80%" panelStyle="width: 100%" inputStyle="width: 100%"
+                                        scrollHeight="240" dropdown="true" converter="autoCompleteVoConverter"
                                         var="t" itemLabel="#{t.label}" itemValue="#{t}" groupBy="#{t.group}">
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidAssetNameChange}" update="UdidInfoForm"/>
                             <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidAssetNameChange}" update="UdidInfoForm"/>
@@ -132,7 +185,8 @@
                         </h:panelGroup>
                         <p:autoComplete id="udidFunctionType" value="#{assetInfoEditController.udidInfo.functionType}"
                                         completeMethod="#{assetInfoEditController.completeUdidFunctionType}" queryDelay="200"
-                                        scrollHeight="240" panelStyleClass="max-width-200" dropdown="true"
+                                        style="width: 80%" panelStyle="width: 100%" inputStyle="width: 100%"
+                                        scrollHeight="240" dropdown="true"
                                         var="t" itemLabel="#{t}" itemValue="#{t}" groupBy="#{assetInfoEditController.udidGroup(t)}">
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidFunctionTypeChange}" update="UdidInfoForm"/>
                             <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidFunctionTypeChange}" update="UdidInfoForm"/>
@@ -168,10 +222,11 @@
                         </h:panelGroup>
                         <p:autoComplete id="udidManufacture" value="#{assetInfoEditController.udidInfo.manufacture}"
                                         completeMethod="#{assetInfoEditController.completeUdidManufacture}" queryDelay="200"
-                                        scrollHeight="210" panelStyleClass="max-width-200" dropdown="true" converter="udidSupplierConverter"
+                                        style="width: 80%" panelStyle="width: 100%" inputStyle="width: 100%" forceSelection="true"
+                                        scrollHeight="210" dropdown="true" converter="udidSupplierConverter"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupBySource(t)}">
-                            <p:column style="border: none">
-                                <div style="position: relative; text-align: center;">
+                            <p:column style="border: none;">
+                                <div style="position: relative; text-align: left;">
                                     <h:outputText value="#{t.name}"/>
                                     <p:commandButton rendered="#{t.fromUdid and t.id lt 0}" style="zoom: 0.6; position: absolute; right: 0; top: 50%; transform: translateY(-50%);"
                                                      icon="ui-icon-plus" title="#{msg.Create}" process="@this" type="button"
@@ -210,10 +265,11 @@
                                 </span>
                             </label>
                         </h:panelGroup>
-                        <p:inputText value="#{assetInfoEditController.udidInfo.medicalClassLabel}" readonly="true" class="udidMedicalClassInput"/>
+                        <p:inputText class="udidMedicalClassInput" value="#{assetInfoEditController.udidInfo.medicalClassLabel}"
+                                     readonly="true" style="width: 70%"/>
                         <p:commandButton id="udidMedicalClass" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
-                        <p:overlayPanel widgetVar="udidMedicalClassOverPanel" for="udidMedicalClass" hideEffect="fade" dynamic="false"
-                                        style="width:300px" modal="false">
+                        <p:overlayPanel id="udidMedicalClassPanel" widgetVar="udidMedicalClassOverPanel" for="udidMedicalClass"
+                                        hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                             <p:scrollPanel style="height:300px; border: 0" mode="native">
                                 <p:tree class="tree" style="width:98%; border:0;"
                                         value="#{assetInfoEditController.udidInfo.medicalClassTree}" var="node" selectionMode="single">
@@ -232,15 +288,20 @@
                     </h:panelGroup>
 
                     <!-- 空 -->
-                    <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
-                    <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
-                    <h:panelGroup/> <h:panelGroup/> <h:panelGroup/>
+                    <h:panelGroup/> <h:panelGroup/>
                 </p:panelGrid>
                 <br/>
-                <p:commandButton validateClient="true" value="应用" actionListener="#{assetInfoEditController.applyUidInfo()}"
-                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'UdidInfoDlg');" update="tab:AssetInfoEditForm">
-                    <p:confirm header="确认" disabled="#{assetInfoEditController.udidInfo.checked eq true}" message="当前数据未通过知识库校验，确认应用到资产信息中吗？&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
-                </p:commandButton>
+                <p:commandButton id="btnApply" validateClient="true" value="应用" icon="ui-icon-check"
+                                 actionListener="#{assetInfoEditController.verifyUdidInfo}"
+                                 disabled="#{empty assetInfoEditController.udidInfo.registryNum}"
+                                 oncomplete="if (args &amp;&amp; args.validationFailed) { /* growl 已显示错误，不弹确认框、不 apply */ } else if (args &amp;&amp; !args.udidVerified) { PF('udidApplyConfirmDlg').show(); } else { doApplyUdidInfo(); }"
+                                 update="tab:AssetInfoEditForm udidApplyConfirmDlg"/>
+
+                <p:remoteCommand name="doApplyUdidInfo"
+                                 actionListener="#{assetInfoEditController.applyUdidInfo}"
+                                 update="tab:AssetInfoEditForm"
+                                 oncomplete="handleSubmit(args, 'UdidInfoDlg');"/>
+
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('UdidInfoDlg').hide()"/>
             </h:panelGroup>
 
@@ -316,5 +377,20 @@
             </h:panelGroup>
         </h:form>
     </p:dialog>
+
+    <!-- 知识库校验未通过时的确认对话框 -->
+    <p:confirmDialog id="udidApplyConfirmDlg" widgetVar="udidApplyConfirmDlg"
+                     header="确认" modal="true" responsive="true" width="420"
+                     styleClass="udid-apply-confirm"
+                     message="#{assetInfoEditController.udidInfo.message}，确认应用到资产信息中吗？">
+        <p:commandButton value="确认" icon="ui-icon-check"
+                         actionListener="#{assetInfoEditController.applyUdidInfo}"
+                         oncomplete="PF('udidApplyConfirmDlg').hide(); handleSubmit(args, 'UdidInfoDlg');"
+                         update="tab:AssetInfoEditForm"
+                         styleClass="uiButton"/>
+        <p:commandButton value="取消" type="button" icon="ui-icon-close"
+                         onclick="PF('udidApplyConfirmDlg').hide();"
+                         styleClass="uiButton"/>
+    </p:confirmDialog>
 </ui:composition>
 </html>

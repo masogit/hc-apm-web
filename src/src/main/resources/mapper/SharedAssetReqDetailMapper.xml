@@ -46,6 +46,7 @@
         <result column="signature_id" property="signatureId"/>
         <result column="signatory" property="signatory"/>
         <result column="signature_time" property="signatureTime"/>
+        <result column="borrow_deal_name" property="borrowDealName"/>
     </resultMap>
     <sql id="selectSql">
         select
@@ -93,13 +94,15 @@
                 sat.swap_name,
                 bsarr.signature_id,
                 bsarr.signatory,
-                bsarr.signature_time
+                bsarr.signature_time,
+                ua_borrow_deal.name as borrow_deal_name
                 from  shared_asset_req_detail sard
                 left join shared_asset_request bsar on bsar.id=sard.borrow_id
                 left join shared_asset_swap_index sasi on sard.asset_info_id = sasi.asset_uid
                 left join asset_info ai on ai.uid=sard.asset_info_id
                 left join shared_asset_type  sat on ai.shared_asset_type=sat.id
                 left join shared_asset_request bsarr on bsarr.id=sard.return_id
+                left join user_account ua_borrow_deal on ua_borrow_deal.uid=sard.borrow_deal_uid
     </sql>
     <select id="getTotalRowCount" resultType="int">
             select count(distinct id) from (
