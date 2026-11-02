@@ -287,10 +287,21 @@ public class CustomRoleController extends JpaCRUDController<CustomRole> {
 	@Transactional
 	public void save() {
 		authorities=parseAuthMap();
+		selected.setName(StringUtils.strip(selected.getName()));
 		if (keyRoles.contains(selected.getName())) {
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("containsKeyRole"));
 			return;
+		}
+		//YHAAO-30076 同一租户内自定义角色名称不允许重复
+		if (StringUtils.isNotEmpty(selected.getName())) {
+			List<CustomRole> sameNameRoles = dao.findSameNameInTenant(user.getTenantUID(), selected.getName());
+			boolean duplicated = sameNameRoles.stream().anyMatch(role -> !Objects.equals(role.getId(), selected.getId()));
+			if (duplicated) {
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage("角色名称已存在");
+				return;
+			}
 		}
 //		if (cards.length == 0 && menus.length == 0) {
 //			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);

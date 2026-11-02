@@ -13,6 +13,9 @@ public interface CustomRoleRepository extends GenericRepository<CustomRole> {
 
     CustomRole findByTenantUIDAndName(String tenantUID, String newRoleName);
 
+    @Query(value = "select * from custom_role where tenant_uid = ?1 and lower(btrim(name)) = lower(btrim(?2))", nativeQuery = true)
+    List<CustomRole> findSameNameInTenant(String tenantUID, String name);
+
     @Query(value = "select * from custom_role where id in (select role_id from user_role where role_type = 1 and user_id = ?1)",nativeQuery = true)
     List<CustomRole> findCustomRolesByUserId(Integer userId);
 
