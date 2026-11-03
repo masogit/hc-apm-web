@@ -216,7 +216,7 @@ public class UaaService {
                 }
             }
             //判断是否是智康宝用户，如果不是就移除掉智康宝的角色
-            if(srVO.getName().equals("zkbDealerSales") || srVO.getName().equals("zkbDealerFE")){
+            if("zkbDealerSales".equals(srVO.getName()) || "zkbDealerFE".equals(srVO.getName())){
                 if(null != ti.getType() && !Objects.equals(ti.getType(), 3)){
                     continue;
                 }
