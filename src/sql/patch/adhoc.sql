@@ -112,6 +112,4 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 
 --YHAAO-29873 外来设备功能调整
-UPDATE asset_probation
-SET nameplate = CASE WHEN information IS NOT NULL AND information LIKE '%nameplate%' THEN true ELSE false END
-WHERE id IS NOT NULL
+UPDATE asset_probation SET has_nameplate = (CASE WHEN information IS NOT NULL AND information LIKE '%nameplate%' THEN true ELSE false END) WHERE id IS NOT NULL;
