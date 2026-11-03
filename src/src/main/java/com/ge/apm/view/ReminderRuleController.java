@@ -242,14 +242,12 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
         try {
             String token = UserContextService.getAccessToken();
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(org.springframework.http.MediaType.parseMediaType("application/json; charset=UTF-8"));
             headers.add("Authorization", token);
 
-            // 1. 调用 SEND_REMINDER_CREATE 创建提醒事件
-            HashMap<String, Object> createParam = new HashMap<>();
-            createParam.put("ruleId", ruleId);
-            HttpEntity<HashMap> createRequest = new HttpEntity<>(createParam, headers);
-            String createURL = adminConsoleService.getGatewayURL(GatewayURL.SEND_REMINDER_CREATE);
+            // 1. 调用 SEND_REMINDER_CREATE 创建提醒事件（参数通过 URL query parameter 传递）
+            String createURL = adminConsoleService.getGatewayURL(GatewayURL.SEND_REMINDER_CREATE)
+                    + "?reminderId=" + ruleId;
+            HttpEntity<Void> createRequest = new HttpEntity<>(headers);
             ResponseEntity<LinkedHashMap> createResponse = restTemplate.postForEntity(createURL, createRequest, LinkedHashMap.class);
             logger.info("SEND_REMINDER_CREATE response: status={}, body={}", createResponse.getStatusCode(), createResponse.getBody());
             if (!HttpStatus.OK.equals(createResponse.getStatusCode())) {
@@ -257,9 +255,10 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
                 return;
             }
 
-            // 2. 调用 SEND_REMINDER_EXECUTE 执行提醒事件
-            HttpEntity<HashMap> executeRequest = new HttpEntity<>(createParam, headers);
-            String executeURL = adminConsoleService.getGatewayURL(GatewayURL.SEND_REMINDER_EXECUTE);
+            // 2. 调用 SEND_REMINDER_EXECUTE 执行提醒事件（参数通过 URL query parameter 传递）
+            String executeURL = adminConsoleService.getGatewayURL(GatewayURL.SEND_REMINDER_EXECUTE)
+                    + "?reminderId=" + ruleId;
+            HttpEntity<Void> executeRequest = new HttpEntity<>(headers);
             ResponseEntity<LinkedHashMap> executeResponse = restTemplate.postForEntity(executeURL, executeRequest, LinkedHashMap.class);
             logger.info("SEND_REMINDER_EXECUTE response: status={}, body={}", executeResponse.getStatusCode(), executeResponse.getBody());
             if (HttpStatus.OK.equals(executeResponse.getStatusCode())) {
