@@ -247,7 +247,7 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
 
             // 1. 调用 SEND_REMINDER_CREATE 创建提醒事件
             HashMap<String, Object> createParam = new HashMap<>();
-            createParam.put("ruleId", ruleId);
+            createParam.put("reminderId", ruleId);
             HttpEntity<HashMap> createRequest = new HttpEntity<>(createParam, headers);
             String createURL = adminConsoleService.getGatewayURL(GatewayURL.SEND_REMINDER_CREATE);
             ResponseEntity<LinkedHashMap> createResponse = restTemplate.postForEntity(createURL, createRequest, LinkedHashMap.class);
