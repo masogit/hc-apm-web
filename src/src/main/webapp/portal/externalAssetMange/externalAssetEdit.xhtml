@@ -192,7 +192,7 @@
                         <p:fieldset legend="#{msg.tempEngineerDetection}" rendered="#{assetProbationEditController.viewDetection()}">
                             <p:fieldset legend="#{msg.equipmentMaterialInformation}">
                                 <div style="display: flex; gap: 1rem;">
-                                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 0.8;">
+                                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" style="flex: 0.8;">
                                         <h:panelGroup>
                                             <label class="label">#{msg.Device.concat(msg.certificate)}<span style="color:red">*</span></label>
                                             <h:panelGrid>
@@ -205,6 +205,12 @@
                                                 <p:selectManyCheckbox id="specification" value="#{assetProbationEditController.specificationList}" disabled="#{!assetProbationEditController.canEditDetection()}">
                                                     <f:selectItems value="#{fieldMsg.getFieldValueList('specification')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                                 </p:selectManyCheckbox>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.nameplate}<span style="color:red">*</span></label>
+                                            <h:panelGrid>
+                                                <p:selectBooleanCheckbox value="#{assetProbationEditController.selected.nameplate}" disabled="#{!assetProbationEditController.canEditDetection()}"/>
                                             </h:panelGrid>
                                         </h:panelGroup>
                                     </p:panelGrid>

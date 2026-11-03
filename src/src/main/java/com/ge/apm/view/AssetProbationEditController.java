@@ -223,11 +223,11 @@ public class AssetProbationEditController extends GenericCRUDUUIDController<Asse
                     RequestContext.getCurrentInstance().addCallbackParam("specification", true);
                     valid = false;
                 }
-                if (ObjectUtil.isEmpty(this.specificationList)) {
-                    WebUtil.addErrorMessage("说明书不能为空！");
-                    RequestContext.getCurrentInstance().addCallbackParam("specification", true);
+                /*if (ObjectUtil.isEmpty(this.selected.getNameplate())) {
+                    WebUtil.addErrorMessage("铭牌照片不能为空！");
+                    RequestContext.getCurrentInstance().addCallbackParam("nameplate", true);
                     valid = false;
-                }
+                }*/
               /*  if (ObjectUtil.isEmpty(this.informationList)) {
                     WebUtil.addErrorMessage("三证资料不能为空！");
                     RequestContext.getCurrentInstance().addCallbackParam("threeInformation", true);
