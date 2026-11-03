@@ -1700,6 +1700,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selected.setStatus(1);
         this.selected.setIsValid(true);
         this.selected.setTerminateDate(null);
+        this.selected.setWarehouseSystemStatus(1);
         update();
         assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, selected, ModifySourceEnum.LEDGER_EDIT.getCode());
 //        assetLifecyleService.saveLifecycle(originStatus,selected,loginUser);
