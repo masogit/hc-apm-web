@@ -6290,8 +6290,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('threeInformation','permit','经营许可证或备案','Distributing license or filing',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('threeInformation','registered','产品注册证','Product registration certificate',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('threeInformation','colorPage','彩页','Color Page',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('threeInformation','nameplate','铭牌照片','Nameplate photos',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','approvalCompletedDate','审批完成日期','Approval Completed Date',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','nameplate','铭牌照片','Nameplate photos',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('nameplate','nameplate','铭牌照片','Nameplate photos',NULL,-1);
 
 --台账重要字段完整分析
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AssetImportantIntegrityAnalysis','台账重要字段完整性分析','AssetImportant Integrity Analysis',NULL,-1);
