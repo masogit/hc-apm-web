@@ -76,6 +76,19 @@ public class FieldValueMessageController implements Serializable {
         return getFieldValueList(fieldName).stream().filter(I18nMessage::getEnabled).collect(Collectors.toList());
     }
 
+    /**
+     * 获取字段值列表，排除指定的 msgKey
+     *
+     * @param fieldName   字段名（msgType）
+     * @param excludeKeys 需要排除的 msgKey 列表
+     */
+    public static List<I18nMessage> getFieldValueListExcludeKeys(String fieldName, List<String> excludeKeys) {
+        Set<String> excludeSet = new HashSet<>(excludeKeys);
+        return getFieldValueList(fieldName).stream()
+                .filter(msg -> !excludeSet.contains(msg.getMsgKey()))
+                .collect(Collectors.toList());
+    }
+
     public static List<I18nMessage> getFieldValueList(String fieldName) {
         Integer instId = -1;
         try {

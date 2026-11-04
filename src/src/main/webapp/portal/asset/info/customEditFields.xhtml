@@ -674,7 +674,7 @@
             </p:inputText>
 
             <p:commandButton id="udidButton" actionListener="#{assetInfoEditController.showUdidInfo()}" title="可根据注册证匹配知识库，带出设备名称、型号、制造商、医疗器械分类的参考值"
-                             process="@this" update=":UdidInfoForm:display" oncomplete="PF('UdidInfoDlg').show()" icon="ui-icon-repeat"/>
+                             process="@this" update=":UdidInfoForm:display" oncomplete="PF('UdidInfoDlg').show()" icon="ui-icon-link"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'modalityId')}" >

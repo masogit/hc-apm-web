@@ -118,3 +118,8 @@ SELECT replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修验收备注
 
 --YHAAO-29873 外来设备功能调整
 UPDATE asset_probation SET has_nameplate = (CASE WHEN information IS NOT NULL AND information LIKE '%nameplate%' THEN true ELSE false END) WHERE id IS NOT NULL;
+
+-- 增加配置项：是否支持合并保养，默认否，归属保养流程tag(category=5)
+INSERT INTO PUBLIC.config_item (uid, category, default_value, description, KEY, name, super_admin_edit, user_parent_config, value_type)
+SELECT REPLACE(uuid_generate_v4 ()::TEXT, '-', ''), 5, 'true', '是否支持合并保养', 'enableCombinedMaintenance', '是否支持合并保养', 'f', 't', 3
+WHERE NOT EXISTS (SELECT 1 FROM PUBLIC.config_item WHERE KEY = 'enableCombinedMaintenance');
