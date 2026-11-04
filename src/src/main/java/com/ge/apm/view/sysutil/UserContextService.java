@@ -1699,5 +1699,26 @@ public class UserContextService implements Serializable {
         bean.pageSizeCache.remove(key);
     }
 
+    // 是否支持合并保养
+    public boolean isEnableCombinedMaintenance(String configItemKey) {
+        ConfigItemService configItemService = WebUtil.getBean(ConfigItemService.class);
+        return BooleanUtils.isTrue(configItemService.getConfigItemByKey(configItemKey, getLoginUser()));
+    }
+
+    // [保养类型]排除的键
+    public List<String> pmTypeExcludeKeys(String configItemKey) {
+        if (isEnableCombinedMaintenance(configItemKey)) {
+            return Collections.singletonList("4");
+        }
+        return Arrays.asList("4", "5");
+    }
+
+    // [保养类型]排除的键
+    public List<String> pmTypeExcludeKeysWhenFilter(String configItemKey) {
+        if (isEnableCombinedMaintenance(configItemKey)) {
+            return Collections.emptyList();
+        }
+        return Collections.singletonList("5");
+    }
 
 }
