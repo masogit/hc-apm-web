@@ -80,8 +80,8 @@ public class AssetProbation implements Serializable {
     @Size(max = 64)
     @Column(name = "information")
     private String information;//三证资料
-    @Column(name = "nameplate")
-    private Boolean nameplate;//铭牌照片
+    @Column(name = "has_nameplate")
+    private Boolean hasNameplate;//铭牌照片
     @Size(max = 64)
     @Column(name = "order_num")
     private String orderNum;//工单号
@@ -192,12 +192,12 @@ public class AssetProbation implements Serializable {
     @Size(max = 2000)
     private String remark;
 
-    public Boolean getNameplate() {
-        return nameplate;
+    public Boolean getHasNameplate() {
+        return hasNameplate;
     }
 
-    public void setNameplate(Boolean nameplate) {
-        this.nameplate = nameplate;
+    public void setHasNameplate(Boolean hasNameplate) {
+        this.hasNameplate = hasNameplate;
     }
 
     public String getRemark() {

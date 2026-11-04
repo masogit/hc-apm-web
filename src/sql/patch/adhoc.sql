@@ -117,6 +117,4 @@ SELECT replace(uuid_generate_v4()::text,'-',''), 4, 'false', '维修验收备注
     WHERE NOT EXISTS (SELECT 1 FROM public.config_item WHERE key = 'repairAcceptanceRemarkRequired');
 
 --YHAAO-29873 外来设备功能调整
-UPDATE asset_probation
-SET nameplate = CASE WHEN information IS NOT NULL AND information LIKE '%nameplate%' THEN true ELSE false END
-WHERE id IS NOT NULL
+UPDATE asset_probation SET has_nameplate = (CASE WHEN information IS NOT NULL AND information LIKE '%nameplate%' THEN true ELSE false END) WHERE id IS NOT NULL;

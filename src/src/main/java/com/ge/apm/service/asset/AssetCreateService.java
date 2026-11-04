@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -301,6 +302,11 @@ public class AssetCreateService {
             return !CollectionUtils.isEmpty(userAccounts);
         }
         return false;
+    }
+
+    public Boolean needShowAssetApprovalByUser(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.accessContainsFunctionMenu(ApmFunction.ASSET_AUDIT_APPROVE.name());
     }
     private List<WorkflowConfig> getWWorkflowConfig(List<String> orgList,UserAccount user){
         List<WorkflowConfig> bySiteUIDList = wcDao.getBySiteUIDList(orgList);

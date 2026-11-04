@@ -1802,7 +1802,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public Boolean getNeedShowAssetApproval() {
         if (null == needShowAssetApproval) {
-            needShowAssetApproval = acService.needShowAssetApprovalByUser(UserContextService.getCurrentUserAccount().getUid());
+            //needShowAssetApproval = acService.needShowAssetApprovalByUser(UserContextService.getCurrentUserAccount().getUid());
+            needShowAssetApproval = acService.needShowAssetApprovalByUser();
         }
         return needShowAssetApproval;
     }
