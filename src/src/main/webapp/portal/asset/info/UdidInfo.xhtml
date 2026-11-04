@@ -226,9 +226,9 @@
                                         scrollHeight="210" dropdown="true" converter="udidSupplierConverter"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupBySource(t)}">
                             <p:column style="border: none;">
-                                <div style="position: relative; text-align: left;">
-                                    <h:outputText value="#{t.name}"/>
-                                    <p:commandButton rendered="#{t.fromUdid and t.id lt 0}" style="zoom: 0.6; position: absolute; right: 0; top: 50%; transform: translateY(-50%);"
+                                <div style="display: flex; align-items: center; margin-right: -5px">
+                                    <h:outputText value="#{t.name}" style="flex: 1; min-width: 0; text-align: left; word-break: break-all;"/>
+                                    <p:commandButton rendered="#{t.fromUdid and t.id lt 0}" style="zoom: 0.7; flex-shrink: 0; margin-left: 4px;"
                                                      icon="ui-icon-plus" title="#{msg.Create}" process="@this" type="button"
                                                      onclick="invokeCreateUdidSupplier([{name:'supplierName', value:'#{t.name}'}])"/>
                                 </div>
@@ -236,6 +236,9 @@
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidManufactureChange}" update="UdidInfoForm"/>
                             <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidManufactureChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
+
+                        <p:remoteCommand name="invokeCreateUdidSupplier" actionListener="#{assetInfoEditController.prepareCreateUdidSupplier}"
+                                         update="UdidSupplierDialog" oncomplete="PF('UdidSupplierDlg').show()"/>
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{assetInfoEditController.needEdit('medicalApparatusClassification')}">
@@ -304,9 +307,6 @@
 
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('UdidInfoDlg').hide()"/>
             </h:panelGroup>
-
-            <p:remoteCommand name="invokeCreateUdidSupplier" actionListener="#{assetInfoEditController.prepareCreateUdidSupplier}"
-                             update="UdidSupplierDialog" oncomplete="PF('UdidSupplierDlg').show()"/>
         </h:form>
     </p:dialog>
 
