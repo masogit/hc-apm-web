@@ -77,15 +77,14 @@
     <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" width="960" styleClass="allow-overflow">
         <h:form id="UdidInfoForm">
             <h:panelGroup id="display">
-                <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%" rendered="#{assetInfoEditController.udidInfo != null}">
+                <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%" rendered="#{assetInfoEditController.isEditAction()}">
                     <p:row>
                         <p:column style="width: 75%; text-align: left">
-                            <p:outputLabel value="#{assetInfoEditController.udidInfo.message}" rendered="#{not empty assetInfoEditController.udidInfo.message}" style="color: #ffc107"/>
+                            <p:outputLabel value="#{assetInfoEditController.udidInfo.message}" style="color: #ffc107"/>
                         </p:column>
                         <p:column style="width: 25%">
                             <p:commandButton id="udidCheck" value="知识库校验" actionListener="#{assetInfoEditController.verifyUdidInfo()}" update="UdidInfoForm"/>
-                            <p:commandButton id="udidReset" value="重置" actionListener="#{assetInfoEditController.resetUdidInfo()}" update="UdidInfoForm"
-                                             rendered="#{assetInfoEditController.isEditAction()}"/>
+                            <p:commandButton id="udidReset" value="重置" actionListener="#{assetInfoEditController.resetUdidInfo()}" update="UdidInfoForm"/>
                         </p:column>
                     </p:row>
                 </p:panelGrid>
