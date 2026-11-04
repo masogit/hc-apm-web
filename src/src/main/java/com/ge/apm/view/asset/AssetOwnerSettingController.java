@@ -286,9 +286,11 @@ public class AssetOwnerSettingController {
             return Collections.emptyList();
         }
 
-        List<UserAccount> res = userAccountList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))
-                && (selectedOrg != null && Objects.equals(selectedOrg.getSiteId(),item.getSiteId())) ).collect(Collectors.toList());
+        List<UserAccount> res = userAccountList.stream().filter(item ->
+                (selectedOrg == null || Objects.equals(selectedOrg.getSiteUID(), item.getSiteUID()))
+                && (Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                    || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase())))
+        ).collect(Collectors.toList());
         //res.sort(new PinYinComparatorByName());
         return res;
     }
