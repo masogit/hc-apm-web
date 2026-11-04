@@ -3279,7 +3279,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
      */
     public void onUdidManufactureChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
-            udidInfo.setManufacture((Supplier) ((SelectEvent) event).getObject());
+            Supplier supplier = (Supplier) ((SelectEvent) event).getObject();
+            if (Objects.equals(-1, supplier.getId())) {
+                udidInfo.setManufacture(null);
+                validateFailed(WebUtil.getMessage("manufactureNotExists"));
+                return;
+            }
+            udidInfo.setManufacture(supplier);
         }
     }
 
