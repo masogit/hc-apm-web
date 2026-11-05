@@ -219,7 +219,7 @@
                                 </span>
                             </label>
                         </h:panelGroup>
-                        <p:autoComplete id="udidManufacture" value="#{assetInfoEditController.udidInfo.manufacture}"
+                        <p:autoComplete id="udidManufacture" widgetVar="udidManufactureWidget" value="#{assetInfoEditController.udidInfo.manufacture}"
                                         completeMethod="#{assetInfoEditController.completeUdidManufacture}" queryDelay="200"
                                         style="width: 80%" panelStyle="width: 100%" inputStyle="width: 100%" forceSelection="true"
                                         scrollHeight="210" dropdown="true" converter="udidSupplierConverter"
@@ -229,7 +229,7 @@
                                     <h:outputText value="#{t.name}" style="flex: 1; min-width: 0; text-align: left; word-break: break-all;"/>
                                     <p:commandButton rendered="#{t.fromUdid and t.id lt 0}" style="zoom: 0.7; flex-shrink: 0; margin-left: 4px;"
                                                      icon="ui-icon-plus" title="#{msg.Create}" process="@this" type="button"
-                                                     onclick="invokeCreateUdidSupplier([{name:'supplierName', value:'#{t.name}'}])"/>
+                                                     onclick="event.stopPropagation(); PF('udidManufactureWidget').hide(); invokeCreateUdidSupplier([{name:'supplierName', value:'#{t.name}'}])"/>
                                 </div>
                             </p:column>
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidManufactureChange}" update="UdidInfoForm"/>
@@ -237,6 +237,9 @@
                         </p:autoComplete>
 
                         <p:remoteCommand name="invokeCreateUdidSupplier" actionListener="#{assetInfoEditController.prepareCreateUdidSupplier}"
+                                         update="UdidSupplierDialog" oncomplete="PF('UdidSupplierDlg').show()"/>
+                        <p:commandButton icon="ui-icon-plus" title="#{msg.Create}" process="@this"
+                                         actionListener="#{assetInfoEditController.prepareCreateUdidSupplier}"
                                          update="UdidSupplierDialog" oncomplete="PF('UdidSupplierDlg').show()"/>
                     </h:panelGroup>
 
