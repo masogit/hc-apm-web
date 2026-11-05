@@ -262,13 +262,13 @@ public class ReminderRuleController extends GenericCRUDUUIDController<ReminderRu
             ResponseEntity<LinkedHashMap> executeResponse = restTemplate.postForEntity(executeURL, executeRequest, LinkedHashMap.class);
             logger.info("SEND_REMINDER_EXECUTE response: status={}, body={}", executeResponse.getStatusCode(), executeResponse.getBody());
             if (HttpStatus.OK.equals(executeResponse.getStatusCode())) {
-                WebUtil.addSuccessMessage("消息已触发发送，ruleId: " + ruleId);
+                WebUtil.addSuccessMessage("消息已触发发送");
             } else {
                 WebUtil.addErrorMessage("执行提醒事件失败");
             }
         } catch (Exception e) {
-            logger.error("立即发送提醒消息异常, ruleId: {}", ruleId, e);
-            WebUtil.addErrorMessage("发送异常: " + e.getMessage());
+            logger.error("立即发送提醒消息异常");
+            WebUtil.addErrorMessage("发送异常，请联系管理员");
         }
     }
 
