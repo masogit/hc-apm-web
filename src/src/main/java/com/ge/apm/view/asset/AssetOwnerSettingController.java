@@ -285,9 +285,8 @@ public class AssetOwnerSettingController {
         if (userAccountList == null) {
             return Collections.emptyList();
         }
-
         List<UserAccount> res = userAccountList.stream().filter(item ->
-                (selectedOrg == null || Objects.equals(selectedOrg.getSiteUID(), item.getSiteUID()))
+                (selectedOrg != null && Objects.equals(selectedOrg.getSiteUID(), item.getSiteUID()))
                 && (Strings.isNullOrEmpty(query) || item.getName().contains(query)
                     || (item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase())))
         ).collect(Collectors.toList());
