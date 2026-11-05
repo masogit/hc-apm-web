@@ -626,6 +626,16 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         selectedObjectMap.put("applyDept", null);
     }
 
+    public void prepareImportPurchase() {
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        if (selected == null || Strings.isNullOrEmpty(selected.getId())) {
+            WebUtil.addErrorMessage("请先保存合同后再导入订购设备");
+            requestContext.addCallbackParam("canImport", false);
+            return;
+        }
+        requestContext.addCallbackParam("canImport", true);
+    }
+
     public void prepareEditPurchaseAsset(ContractInfoItem item) {
         selectedContractItem = item;
         selectedObjectMap.put("manufacture", selectedContractItem.getManufacturer() == null ? null : supplierDao.findByUid(selectedContractItem.getManufacturer()));
