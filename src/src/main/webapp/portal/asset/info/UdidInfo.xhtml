@@ -77,15 +77,14 @@
     <p:dialog id="UdidInfoDialog" widgetVar="UdidInfoDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="注册证-知识库参考" width="960" styleClass="allow-overflow">
         <h:form id="UdidInfoForm">
             <h:panelGroup id="display">
-                <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%" rendered="#{assetInfoEditController.udidInfo != null}">
+                <p:panelGrid layout="tabular" styleClass="ui-panelgrid-blank form-group" style="width: 100%" rendered="#{assetInfoEditController.isEditAction()}">
                     <p:row>
                         <p:column style="width: 75%; text-align: left">
-                            <p:outputLabel value="#{assetInfoEditController.udidInfo.message}" rendered="#{not empty assetInfoEditController.udidInfo.message}" style="color: #ffc107"/>
+                            <p:outputLabel value="#{assetInfoEditController.udidInfo.message}" style="color: #ffc107"/>
                         </p:column>
                         <p:column style="width: 25%">
                             <p:commandButton id="udidCheck" value="知识库校验" actionListener="#{assetInfoEditController.verifyUdidInfo()}" update="UdidInfoForm"/>
-                            <p:commandButton id="udidReset" value="重置" actionListener="#{assetInfoEditController.resetUdidInfo()}" update="UdidInfoForm"
-                                             rendered="#{assetInfoEditController.isEditAction()}"/>
+                            <p:commandButton id="udidReset" value="重置" actionListener="#{assetInfoEditController.resetUdidInfo()}" update="UdidInfoForm"/>
                         </p:column>
                     </p:row>
                 </p:panelGrid>
@@ -220,22 +219,28 @@
                                 </span>
                             </label>
                         </h:panelGroup>
-                        <p:autoComplete id="udidManufacture" value="#{assetInfoEditController.udidInfo.manufacture}"
+                        <p:autoComplete id="udidManufacture" widgetVar="udidManufactureWidget" value="#{assetInfoEditController.udidInfo.manufacture}"
                                         completeMethod="#{assetInfoEditController.completeUdidManufacture}" queryDelay="200"
                                         style="width: 80%" panelStyle="width: 100%" inputStyle="width: 100%" forceSelection="true"
                                         scrollHeight="210" dropdown="true" converter="udidSupplierConverter"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" groupBy="#{assetInfoEditController.groupBySource(t)}">
                             <p:column style="border: none;">
-                                <div style="position: relative; text-align: left;">
-                                    <h:outputText value="#{t.name}"/>
-                                    <p:commandButton rendered="#{t.fromUdid and t.id lt 0}" style="zoom: 0.6; position: absolute; right: 0; top: 50%; transform: translateY(-50%);"
+                                <div style="display: flex; align-items: center; margin-right: -5px">
+                                    <h:outputText value="#{t.name}" style="flex: 1; min-width: 0; text-align: left; word-break: break-all;"/>
+                                    <p:commandButton rendered="#{t.fromUdid and t.id lt 0}" style="zoom: 0.7; flex-shrink: 0; margin-left: 4px;"
                                                      icon="ui-icon-plus" title="#{msg.Create}" process="@this" type="button"
-                                                     onclick="invokeCreateUdidSupplier([{name:'supplierName', value:'#{t.name}'}])"/>
+                                                     onclick="event.stopPropagation(); PF('udidManufactureWidget').hide(); invokeCreateUdidSupplier([{name:'supplierName', value:'#{t.name}'}])"/>
                                 </div>
                             </p:column>
                             <p:ajax process="@this" listener="#{assetInfoEditController.onUdidManufactureChange}" update="UdidInfoForm"/>
                             <p:ajax event="itemSelect" process="@this" listener="#{assetInfoEditController.onUdidManufactureChange}" update="UdidInfoForm"/>
                         </p:autoComplete>
+
+                        <p:remoteCommand name="invokeCreateUdidSupplier" actionListener="#{assetInfoEditController.prepareCreateUdidSupplier}"
+                                         update="UdidSupplierDialog" oncomplete="PF('UdidSupplierDlg').show()"/>
+                        <p:commandButton icon="ui-icon-plus" title="#{msg.Create}" process="@this"
+                                         actionListener="#{assetInfoEditController.prepareCreateUdidSupplier}"
+                                         update="UdidSupplierDialog" oncomplete="PF('UdidSupplierDlg').show()"/>
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{assetInfoEditController.needEdit('medicalApparatusClassification')}">
@@ -304,9 +309,6 @@
 
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('UdidInfoDlg').hide()"/>
             </h:panelGroup>
-
-            <p:remoteCommand name="invokeCreateUdidSupplier" actionListener="#{assetInfoEditController.prepareCreateUdidSupplier}"
-                             update="UdidSupplierDialog" oncomplete="PF('UdidSupplierDlg').show()"/>
         </h:form>
     </p:dialog>
 

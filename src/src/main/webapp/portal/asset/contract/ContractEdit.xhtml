@@ -456,7 +456,9 @@
                                 <p:commandLink value="#{msg.AddOrderedEquipment}" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPurchaseAsset()}" process="@this"
                                                update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
                                 <p:commandLink value="导入" style="color:#3e87e8;padding: 10px" process="@this"
-                                               oncomplete="PF('importPurchaseDlg').show()" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
+                                               actionListener="#{contractInfoEditController.prepareImportPurchase()}"
+                                               update=":importPurchaseForm:importContractInfo"
+                                               oncomplete="if (args &amp;&amp; args.canImport) {PF('importPurchaseDlg').show();}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
                             </f:facet>
 
                         </p:dataTable>
@@ -700,9 +702,9 @@
         <p:dialog id="importPurchaseDlg" widgetVar="importPurchaseDlg" modal="true" width="650" resizable="true" draggable="true" appendTo="@(body)" header="导入订购设备">
             <h:form id="importPurchaseForm" enctype="multipart/form-data">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    <h:panelGroup>
+                    <h:panelGroup id="importContractInfo">
                         <p><strong>合同信息</strong></p>
-                        <p>合同编号：#{contractInfoEditController.selected.contractNum}  合同名称：#{contractInfoEditController.selected.name}</p>
+                        <p>合同编号：#{contractInfoEditController.selected.contractNum} <br/>合同名称：#{contractInfoEditController.selected.name}</p>
                     </h:panelGroup>
                     <h:panelGroup>
                         <p>说明：</p>

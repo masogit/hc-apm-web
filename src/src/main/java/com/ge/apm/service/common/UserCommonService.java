@@ -68,6 +68,7 @@ public class UserCommonService {
                     UserAccount u = new UserAccount();
                     u.setId(Integer.parseInt(item.get("id").toString()));
                     u.setUid(item.get("uid").toString());
+                    u.setSiteUID(item.get("siteUID").toString());
                     u.setName(item.get("name").toString());
                     u.setTelephone(Optional.ofNullable(item.get("telephone")).orElse("").toString());
                     return u;

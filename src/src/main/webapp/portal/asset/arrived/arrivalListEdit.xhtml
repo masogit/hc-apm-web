@@ -950,7 +950,6 @@
                         <h:panelGroup>
                             <label class="label">订购项*</label>
                             <p:selectOneMenu id="contractItem" value="#{assetArrivedListEditController.selectedContractItemId}" required="true" requiredMessage="订购项 #{msg.ValidationRequire}">
-                                <p:ajax listener="#{assetArrivedListEditController.onContractItemChange()}" update="contractItem" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{assetArrivedListEditController.contractItemList}" var="item" itemLabel="#{item.contractAssetName}/#{item.contractAssetQuantity}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>

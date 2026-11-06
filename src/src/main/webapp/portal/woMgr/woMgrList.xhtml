@@ -580,8 +580,8 @@
                         <p:rating value="#{workOrderMgrController.rating}" required="true" requiredMessage="#{msg.feedbackRating}#{msg.ValidationRequire}"  cancel="false"/>
                     </h:panelGroup>
                     <h:panelGroup >
-                        <label class="label">#{msg.feedbackComment}</label>
-                        <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
+                        <label class="label">#{msg.feedbackComment}<h:panelGroup rendered="#{userContextService.enableDisplayByKey('repairAcceptanceRemarkRequired')}"><span style="color:red">*</span></h:panelGroup></label>
+                        <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" required="#{userContextService.enableDisplayByKey('repairAcceptanceRemarkRequired')}" requiredMessage="#{msg.feedbackComment}#{msg.ValidationRequire}" />
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>

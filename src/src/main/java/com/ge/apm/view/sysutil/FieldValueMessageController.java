@@ -76,6 +76,35 @@ public class FieldValueMessageController implements Serializable {
         return getFieldValueList(fieldName).stream().filter(I18nMessage::getEnabled).collect(Collectors.toList());
     }
 
+    // 获取当前已启用的I18n列表，并且排除指定的 msgKey
+    public static List<I18nMessage> getEnabledFieldValueListExcludeKeys(String fieldName, String excludeKeys) {
+        return getEnabledFieldValueList(fieldName).stream()
+                .filter(msg -> !Arrays.asList(excludeKeys.split(",")).contains(msg.getMsgKey()))
+                .collect(Collectors.toList());
+    }
+
+    // 获取当前已启用的I18n列表，并且包含指定的 msgKey, 按顺序排序
+    public static List<I18nMessage> getFieldValueListIncludeKeys(String fieldName, String includeKeys) {
+        List<I18nMessage> enabledFieldValueList = getEnabledFieldValueList(fieldName);
+        List<I18nMessage> includeFieldValueList = getFieldValueList(fieldName).stream()
+                .filter(msg -> Arrays.asList(includeKeys.split(",")).contains(msg.getMsgKey()))
+                .collect(Collectors.toList());
+        enabledFieldValueList.addAll(includeFieldValueList);
+        return enabledFieldValueList.stream().sorted(Comparator.comparing(I18nMessage::getOrderBy, Comparator.nullsLast(Integer::compareTo))).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取字段值列表，排除指定的 msgKey
+     *
+     * @param fieldName   字段名（msgType）
+     * @param excludeKeys 需要排除的 msgKey 列表
+     */
+    public static List<I18nMessage> getFieldValueListExcludeKeys(String fieldName, String excludeKeys) {
+        return getFieldValueList(fieldName).stream()
+                .filter(msg -> !Arrays.asList(excludeKeys.split(",")).contains(msg.getMsgKey()))
+                .collect(Collectors.toList());
+    }
+
     public static List<I18nMessage> getFieldValueList(String fieldName) {
         Integer instId = -1;
         try {
