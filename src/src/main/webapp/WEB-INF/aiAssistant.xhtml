@@ -58,8 +58,18 @@
             [id$="globalHelpDialog"].ui-dialog-maximized #aiAssistantPanel {
                 height: 100% !important;
             }
+            /* 用 styleClass 而不是 #id：这个对话框是 include 进来的，PrimeFaces 的
+               客户端 id 可能带命名容器前缀，按 id 选不中。 */
+            .ai-assistant-dialog .ui-dialog-content {
+                height: 700px;
+                padding: 0;
+            }
+            .ai-assistant-dialog.ui-dialog-maximized .ui-dialog-content {
+                height: calc(100vh - 50px) !important;
+            }
         </style>
         <p:dialog id="globalHelpDialog" widgetVar="globalHelpDialog"
+                  styleClass="ai-assistant-dialog"
                   position="right top" positionType="fixed" header="APM助手" modal="false"
                   resizable="false" draggable="true" closable="true" fitViewport="true"
                   width="500" style="z-index: 10000;"  maximizable="true"
