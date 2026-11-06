@@ -113,3 +113,21 @@ insert into public.config_item (uid, category, default_value, description, key, 
 
 --YHAAO-29873 外来设备功能调整
 UPDATE asset_probation SET has_nameplate = (CASE WHEN information IS NOT NULL AND information LIKE '%nameplate%' THEN true ELSE false END) WHERE id IS NOT NULL;
+
+
+
+-- YHAAO-30128
+SELECT DISTINCT wo.id, wo.current_step_name
+FROM v2_work_order wo
+WHERE wo.approval_status = '6'
+  AND NOT EXISTS (
+    SELECT 1
+    FROM v2_work_order_detail wod
+    WHERE wod.wo_id = wo.id
+      AND (wod.approved IS NULL OR wod.approved = false)
+)
+  AND EXISTS (
+    SELECT 1
+    FROM v2_work_order_detail wod
+    WHERE wod.wo_id = wo.id
+);
